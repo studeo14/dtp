@@ -1,0 +1,162 @@
+SET DATABASE UNIQUE NAME HSQLDB6C63FE6247
+SET DATABASE GC 0
+SET DATABASE DEFAULT RESULT MEMORY ROWS 0
+SET DATABASE EVENT LOG LEVEL 0
+SET DATABASE TRANSACTION CONTROL LOCKS
+SET DATABASE DEFAULT ISOLATION LEVEL READ COMMITTED
+SET DATABASE TRANSACTION ROLLBACK ON CONFLICT TRUE
+SET DATABASE TEXT TABLE DEFAULTS ''
+SET DATABASE SQL NAMES FALSE
+SET DATABASE SQL REFERENCES FALSE
+SET DATABASE SQL SIZE TRUE
+SET DATABASE SQL TYPES FALSE
+SET DATABASE SQL TDC DELETE TRUE
+SET DATABASE SQL TDC UPDATE TRUE
+SET DATABASE SQL CONCAT NULLS TRUE
+SET DATABASE SQL UNIQUE NULLS TRUE
+SET DATABASE SQL CONVERT TRUNCATE TRUE
+SET DATABASE SQL AVG SCALE 0
+SET DATABASE SQL DOUBLE NAN TRUE
+SET FILES WRITE DELAY 500 MILLIS
+SET FILES BACKUP INCREMENT TRUE
+SET FILES CACHE SIZE 10000
+SET FILES CACHE ROWS 50000
+SET FILES SCALE 32
+SET FILES LOB SCALE 32
+SET FILES DEFRAG 0
+SET FILES NIO TRUE
+SET FILES NIO SIZE 256
+SET FILES LOG TRUE
+SET FILES LOG SIZE 50
+CREATE USER SA PASSWORD DIGEST 'd41d8cd98f00b204e9800998ecf8427e'
+ALTER USER SA SET LOCAL TRUE
+CREATE SCHEMA PUBLIC AUTHORIZATION DBA
+SET SCHEMA PUBLIC
+CREATE MEMORY TABLE PUBLIC.SENTENCES(ID INTEGER,SENTENCE VARCHAR(1024))
+ALTER SEQUENCE SYSTEM_LOBS.LOB_ID RESTART WITH 1
+SET DATABASE DEFAULT INITIAL SCHEMA PUBLIC
+GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.SQL_IDENTIFIER TO PUBLIC
+GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.YES_OR_NO TO PUBLIC
+GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.TIME_STAMP TO PUBLIC
+GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.CARDINAL_NUMBER TO PUBLIC
+GRANT USAGE ON DOMAIN INFORMATION_SCHEMA.CHARACTER_DATA TO PUBLIC
+GRANT DBA TO SA
+SET SCHEMA SYSTEM_LOBS
+INSERT INTO BLOCKS VALUES(0,2147483647,0)
+SET SCHEMA PUBLIC
+INSERT INTO SENTENCES VALUES(0,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(26,'The UART (Universal Asynchronous Receiver/Transmitter) core provides serial communication capabilities, which allow communication with modem or other external devices, like another computer using a serial cable and RS232 protocol.')
+INSERT INTO SENTENCES VALUES(257,'This core is designed to be maximally compatible with the industry standard National Semiconductors\u2019 16550A device.')
+INSERT INTO SENTENCES VALUES(373,'Features:')
+INSERT INTO SENTENCES VALUES(383,'\u2022 WISHBONE interface in 32-bit or 8-bit data bus modes (selectable) \u2022 FIFO only operation \u2022 Register level and functionality compatibility with NS16550A (but not 16450).')
+INSERT INTO SENTENCES VALUES(553,'\u2022 Debug Interface in 32-bit data bus mode.')
+INSERT INTO SENTENCES VALUES(596,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(622,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(648,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(674,'Clocks table:')
+INSERT INTO SENTENCES VALUES(688,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(714,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(740,'In addition, there are 2 Clock Divisor registers that together form one 16-bit.')
+INSERT INTO SENTENCES VALUES(820,'The registers can be accessed when the 7th (DLAB) bit of the Line Control Register is set to \u20181\u2019.')
+INSERT INTO SENTENCES VALUES(918,'At this time the above registers at addresses 0-1 can\u2019t be accessed.')
+INSERT INTO SENTENCES VALUES(987,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(1013,'When using 32-bit data bus interface, additional read-only registers are available for debug purposes:')
+INSERT INTO SENTENCES VALUES(1116,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(1142,'This register allows enabling and disabling interrupt generation by the UART.')
+INSERT INTO SENTENCES VALUES(1220,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(1246,'Reset Value: 00h')
+INSERT INTO SENTENCES VALUES(1263,'The IIR enables the programmer to retrieve what is the current highest priority pending interrupt.')
+INSERT INTO SENTENCES VALUES(1362,'Bit 0 indicates that an interrupt is pending when it\u2019s logic \u20180\u2019.')
+INSERT INTO SENTENCES VALUES(1428,'When it\u2019s \u20181\u2019 \u2013 no interrupt is pending.')
+INSERT INTO SENTENCES VALUES(1469,'The following table displays the list of possible interrupts along with the bits they enable, priority, and their source and reset control.')
+INSERT INTO SENTENCES VALUES(1609,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(1635,'Bits 4 and 5: Logic \u20180\u2019.')
+INSERT INTO SENTENCES VALUES(1660,'Bits 6 and 7: Logic \u20181\u2019 for compatibility reason.')
+INSERT INTO SENTENCES VALUES(1710,'Reset Value: C1h')
+INSERT INTO SENTENCES VALUES(1727,'The FCR allows selection of the FIFO trigger level (the number of bytes in FIFO required to enable the Received Data Available interrupt).')
+INSERT INTO SENTENCES VALUES(1866,'In addition, the FIFOs can be cleared using this register.')
+INSERT INTO SENTENCES VALUES(1925,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(1951,'Reset Value : 11000000b')
+INSERT INTO SENTENCES VALUES(1975,'The line control register allows the specification of the format of the asynchronous data communication used.')
+INSERT INTO SENTENCES VALUES(2085,'A bit in the register also allows access to the Divisor Latches, which define the baud rate.')
+INSERT INTO SENTENCES VALUES(2178,'Reading from the register is allowed to check the current settings of the communication.')
+INSERT INTO SENTENCES VALUES(2267,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(2293,'Reset Value: 00000011b')
+INSERT INTO SENTENCES VALUES(2316,'The modem control register allows transferring control signals to a modem connected to the UART.')
+INSERT INTO SENTENCES VALUES(2413,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(2439,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(2465,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(2491,'The register displays the current state of the modem control lines.')
+INSERT INTO SENTENCES VALUES(2559,'Also, four bits also provide an indication in the state of one of the modem status lines.')
+INSERT INTO SENTENCES VALUES(2649,'These bits are set to \u20181\u2019 when a change in corresponding line has been detected and they are reset when the register is being read.')
+INSERT INTO SENTENCES VALUES(2781,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(2807,'The divisor latches can be accessed by setting the 7th bit of LCR to \u20181\u2019.')
+INSERT INTO SENTENCES VALUES(2881,'You should restore this bit to \u20180\u2019 after setting the divisor latches in order to restore access to the other registers that occupy the same addresses.')
+INSERT INTO SENTENCES VALUES(3032,'The 2 bytes form one 16-bit register, which is internally accessed as a single number.')
+INSERT INTO SENTENCES VALUES(3119,'You should therefore set all 2 bytes of the register to ensure normal operation.')
+INSERT INTO SENTENCES VALUES(3200,'The register is set to the default value of 0 on reset, which disables all serial I/O operations in order to ensure explicit setup of the register in the software.')
+INSERT INTO SENTENCES VALUES(3364,'The value set should be equal to (system clock speed) / (16 x desired baud rate).')
+INSERT INTO SENTENCES VALUES(3446,'The internal counter starts to work when the LSB of DL is written, so when setting the divisor, write the MSB first and the LSB last.')
+INSERT INTO SENTENCES VALUES(3580,'This register is only available when the core has 32-bit data bus and 5-bit address bus.')
+INSERT INTO SENTENCES VALUES(3669,'It is read only and is provided for debugging purposes of chip testing as it is not part of the original UART16550 device specifications.')
+INSERT INTO SENTENCES VALUES(3807,'Reading from the does not influence core\u2019s bahaviour.')
+INSERT INTO SENTENCES VALUES(3861,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(3887,'This register is only available when the core has 32-bit data bus and 5-bit address bus.')
+INSERT INTO SENTENCES VALUES(3976,'It is read only and is provided for debugging purposes of chip testing as it is not part of the original UART16550 device specifications.')
+INSERT INTO SENTENCES VALUES(4114,'Reading from the does not influence core\u2019s bahaviour.')
+INSERT INTO SENTENCES VALUES(4168,'This is a table sentence.')
+INSERT INTO SENTENCES VALUES(4194,'This UART core is very similar in operation to the standard 16550 UART chip with the main exception being that only the FIFO mode is supported.')
+INSERT INTO SENTENCES VALUES(4338,'The scratch register is removed, as it serves no purpose.')
+INSERT INTO SENTENCES VALUES(4396,'This core can operate in 8-bit data bus mode or in 32-bit bus mode, which is now the default mode.')
+INSERT INTO SENTENCES VALUES(4495,'The 32-bit mode is fully WISHBONE compatible and it uses the WISHBONE [SEL_I] signal to properly receive and return 8-bit data on 32-bit data bus.')
+INSERT INTO SENTENCES VALUES(4642,'The 8-bit version might have problems in various WISHBONE implementations because a 32-bit master reading from 8-bit bus can expect data on different bytes of the 4-byte word, depending on the register address.')
+INSERT INTO SENTENCES VALUES(4853,'Also, in 32-bit data bus mode, the [ADR_I] is 5 and not 3 bits wide.')
+INSERT INTO SENTENCES VALUES(4922,'In addition, in the 32-bit data bus mode a debug interface is present in the system.')
+INSERT INTO SENTENCES VALUES(5007,'This interface has 2 32-bit registers that can be read to provide non-intrusive look into the core\u2019s registers and other internal values of importance.')
+INSERT INTO SENTENCES VALUES(5159,'The selection between 32- and 8-bits data bus modes is performed by defining DATA_BUS_WIDTH_8 in uart_defines.')
+INSERT INTO SENTENCES VALUES(5270,'v, uart_top.')
+INSERT INTO SENTENCES VALUES(5283,'v or on the compiler/synthesizer tool command line.')
+INSERT INTO SENTENCES VALUES(5335,'Upon reset the core performs the following tasks:')
+INSERT INTO SENTENCES VALUES(5385,'\u2022 The receiver and transmitter FIFOs are cleared.')
+INSERT INTO SENTENCES VALUES(5435,'\u2022 The receiver and transmitter shift registers are cleared \u2022 The Divisor Latch register is set to 0.')
+INSERT INTO SENTENCES VALUES(5536,'\u2022 The Line Control Register is set to communication of 8 bits of data, no parity, 1')
+INSERT INTO SENTENCES VALUES(5620,'stop bit.')
+INSERT INTO SENTENCES VALUES(5630,'\u2022 All interrupts are disabled in the Interrupt Enable Register.')
+INSERT INTO SENTENCES VALUES(5694,'For proper operation, perform the following:')
+INSERT INTO SENTENCES VALUES(5739,'\u2022 Set the Line Control Register to the desired line control parameters.')
+INSERT INTO SENTENCES VALUES(5811,'Set bit 7 to \u20181\u2019 to allow access to the Divisor Latches.')
+INSERT INTO SENTENCES VALUES(5868,'\u2022 Set the Divisor Latches, MSB first, LSB next.')
+INSERT INTO SENTENCES VALUES(5916,'\u2022 Set bit 7 of LCR to \u20180\u2019 to disable access to Divisor Latches.')
+INSERT INTO SENTENCES VALUES(5980,'At this time the')
+INSERT INTO SENTENCES VALUES(5997,'transmission engine starts working and data can be sent and received.')
+INSERT INTO SENTENCES VALUES(6067,'\u2022 Set the FIFO trigger level.')
+INSERT INTO SENTENCES VALUES(6097,'Generally, higher trigger level values produce less')
+INSERT INTO SENTENCES VALUES(6149,'interrupt to the system, so setting it to 14 bytes is recommended if the system responds fast enough.')
+INSERT INTO SENTENCES VALUES(6251,'\u2022 Enable desired interrupts by setting appropriate bits in the Interrupt Enable register.')
+INSERT INTO SENTENCES VALUES(6341,'Remember that (Input Clock Speed)/(Divisor Latch value) = 16 x the communication baud rate.')
+INSERT INTO SENTENCES VALUES(6433,'Since the protocol is asynchronous and the sampling of the bits is performed in the perceived middle of the bit time, it is highly immune to small differences in the clocks of the sending and receiving sides, yet no such assumption should be made when calculating the Divisor Latch values.')
+INSERT INTO SENTENCES VALUES(6723,'The core implements the WISNBONE SoC bus interface for communication with the system.')
+INSERT INTO SENTENCES VALUES(6809,'It has an 8-bit data bus for compatibility reason.')
+INSERT INTO SENTENCES VALUES(6860,'The core requires one interrupt.')
+INSERT INTO SENTENCES VALUES(6893,'It requires 2 pads in the chip (serial in and serial out) and, optionally, another six modem control signals, which can otherwise be implemented using general purpose I/Os on the chip.')
+INSERT INTO SENTENCES VALUES(7078,'The block diagram of the core is on the following page.')
+INSERT INTO SENTENCES VALUES(7134,'WISHBONE')
+INSERT INTO SENTENCES VALUES(7143,'bus')
+INSERT INTO SENTENCES VALUES(7147,'Interface')
+INSERT INTO SENTENCES VALUES(7157,'WISHBONE Signals')
+INSERT INTO SENTENCES VALUES(7174,'Modem Signals Logic')
+INSERT INTO SENTENCES VALUES(7194,'Modem control register')
+INSERT INTO SENTENCES VALUES(7217,'Modem Sattus Register')
+INSERT INTO SENTENCES VALUES(7239,'Interrupt Logic')
+INSERT INTO SENTENCES VALUES(7255,'Interrupt Enable Register')
+INSERT INTO SENTENCES VALUES(7281,'Interrupt ID')
+INSERT INTO SENTENCES VALUES(7294,'Register')
+INSERT INTO SENTENCES VALUES(7303,'Trasmitter FIFO')
+INSERT INTO SENTENCES VALUES(7319,'Trasmitter Shift')
+INSERT INTO SENTENCES VALUES(7336,'Register')
+INSERT INTO SENTENCES VALUES(7345,'FIFO Contrrol Register')
+INSERT INTO SENTENCES VALUES(7368,'Receiver FIFO')
+INSERT INTO SENTENCES VALUES(7382,'Receiver Shift')
+INSERT INTO SENTENCES VALUES(7397,'Register')
+INSERT INTO SENTENCES VALUES(7406,'Line Contrrol Register')
+INSERT INTO SENTENCES VALUES(7429,'Li')
