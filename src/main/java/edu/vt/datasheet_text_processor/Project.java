@@ -2,13 +2,14 @@ package edu.vt.datasheet_text_processor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dizitart.no2.Nitrite;
 
 import java.sql.Connection;
 
 public class Project {
     private Logger logger;
     private String name;
-    private Connection connection;
+    private Nitrite db;
 
     public Project(String name) {
         this.name = name;
@@ -19,11 +20,11 @@ public class Project {
         return name;
     }
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
+    public void setDB(Nitrite db) {
+        this.db = db;
     }
 
-    public Connection getConnection() {
-        return connection;
+    public Nitrite getDB() {
+        return db;
     }
 }

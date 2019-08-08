@@ -3,6 +3,7 @@ package edu.vt.datasheet_text_processor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dizitart.no2.Nitrite;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,50 +14,47 @@ import java.sql.SQLException;
 public class ProjectUtils {
     private static final Logger logger = LogManager.getLogger(ProjectUtils.class);
 
-    public static Project createNewProject(File inputFile) throws IOException, SQLException {
+    public static Project createNewProject(File inputFile, boolean textOnly) throws IOException, SQLException {
         var projectName = FilenameUtils.removeExtension(inputFile.getName());
         var project = new Project(projectName);
-        // create project dir
-        var dir = new File(projectName);
-        if (dir.exists()) {
-            return openProject(dir);
-        } else if (!dir.mkdir()) {
-            logger.error("Unable to create project directory: {}", projectName);
+        var db = Nitrite.builder()
+                .compressed()
+                .filePath(projectName + ".project")
+                .openOrCreate();
+        project.setDB(db);
+        if (db.hasRepository(Sentence.class)) {
+            logger.info("Found existing project when trying to create a new one at {}.project", projectName);
+            return project;
         } else {
-            // read in file to hypersql database
-            var connection = DriverManager
-                .getConnection(
-                        String.format("jdbc:hsqldb:file:./%s/%s", projectName, projectName),
-                        "SA", ""
-                );
-            // create table
-            connection.createStatement().executeUpdate("CREATE TABLE sentences (id INTEGER, sentence VARCHAR(1024));");
+            var repo = db.getRepository(Sentence.class);
+            long index = 1;
             for (String line : Files.readAllLines(inputFile.toPath())) {
-                var splits = line.split("::");
-                var id = Integer.parseInt(splits[0]);
-                var statement = connection.prepareStatement("INSERT INTO sentences(id, sentence) VALUES (?,?);");
-                statement.clearParameters();
-                statement.setInt(1, id);
-                statement.setString(2, splits[1]);
-                statement.execute();
-                statement.close();
+                if (textOnly) {
+                    var result = repo.insert(new Sentence(index, line));
+                } else {
+                    var splits = line.split("::");
+                    var id = Integer.parseInt(splits[0]);
+                    var result = repo.insert(new Sentence(id, splits[1]));
+                }
             }
-            connection.commit();
-            project.setConnection(connection);
-            logger.info("New Project {} created in ./{}", projectName, projectName);
+            logger.info("Created new project at {}.project", projectName);
         }
         return project;
     }
 
     public static Project openProject(File inputFile) throws SQLException {
-        var project = new Project(inputFile.getName());
-        var connection = DriverManager
-            .getConnection(
-                    String.format("jdbc:hsqldb:file:./%s/%s;ifexists=true", project.getName(), project.getName()),
-                    "SA", ""
-            );
-        project.setConnection(connection);
-        logger.info("Opened project {}.", project.getName());
+        var projectName = FilenameUtils.removeExtension(inputFile.getName());
+        var project = new Project(projectName);
+        var db = Nitrite.builder()
+                .compressed()
+                .filePath(project.getName() + ".project")
+                .openOrCreate();
+        if (!db.hasRepository(Sentence.class)) {
+            logger.error("Unable to open project. Not initialized or available in {}.project", project.getName());
+        } else {
+            logger.info("Opened project {}.", project.getName());
+            project.setDB(db);
+        }
         return project;
     }
 }

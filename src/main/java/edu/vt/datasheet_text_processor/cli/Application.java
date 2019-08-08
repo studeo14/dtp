@@ -4,12 +4,15 @@ import picocli.CommandLine.Option;
 
 import java.io.File;
 
-public class CLIOptions {
+public class Application {
     @Option(names={"-f", "--file"}, required=true, paramLabel="INPUTFILE", description="the input cas file")
     public File inputFile;
 
+    // new project flags
     @Option(names={"-n", "--new-project"}, description="create a new project")
     public boolean newProject;
+    @Option(names={"-t", "--text"}, description="input file only has raw text, use implied sentence ids")
+    public boolean text;
 
     // processing steps
     // print
