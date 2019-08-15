@@ -17,8 +17,11 @@ class Main {
         try {
             cli.parseArgs(args);
             handleCli(cli, options);
-        } catch (CommandLine.MissingParameterException | IOException | SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e.getMessage());
+        } catch(CommandLine.ParameterException e) {
+            logger.error(e.getMessage());
+            cli.usage(System.out);
         } catch (RuntimeException e) {
             logger.fatal("Unknown runtime exception!: {}", e.getMessage());
             logger.fatal(e.getCause());

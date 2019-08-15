@@ -34,7 +34,7 @@ public class OptionHandler {
         if (options.doToken) {
 
         }
-        if (options.doPrint) {
+        if (options.debugOptions.doPrint) {
             // print all from database
             var db = project.getDB();
             var repo = db.getRepository(Sentence.class);
@@ -43,6 +43,16 @@ public class OptionHandler {
                 var o = String.format("%d :: %s :: %s", s.getSentenceId(), s.getType(), s.getText());
                 System.out.println(o);
             }
+        } else if (options.debugOptions.doPercentage) {
+            var results = DatasheetBOW.count_questionable(project);
+            double percentage = results.getRight().doubleValue()/(results.getLeft().doubleValue());
+            System.out.printf("%%Q: %.2f%%\n", percentage * 100);
+        } else if (options.debugOptions.doShowComments) {
+            DatasheetBOW.debug_file_comments(project);
+        } else if (options.debugOptions.doShowNonComments) {
+            DatasheetBOW.debug_file_questionable(project);
+        } else if (options.debugOptions.doShowMatches) {
+            DatasheetBOW.debug_file_matches(project);
         }
     }
 }

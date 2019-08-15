@@ -3,6 +3,9 @@ package edu.vt.datasheet_text_processor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dizitart.no2.FindOptions;
+import org.dizitart.no2.SortOrder;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -83,23 +86,23 @@ public class DatasheetBOW {
     private static void most_used(String filename) throws IOException {
         // init
         Map<Pattern, Integer> matchCount = new HashMap<>();
-        for (Pattern p: patterns) {
+        for (Pattern p : patterns) {
             matchCount.put(p, 0);
         }
         // read and process file
         Files
                 // preprocessing
-            .lines(Paths.get(filename))
-            .filter(line -> !line.isEmpty())
-            .map(String::toLowerCase)
+                .lines(Paths.get(filename))
+                .filter(line -> !line.isEmpty())
+                .map(String::toLowerCase)
                 // non-comments only
-            .map(line -> Pair.of(line, is_questionable_debug(line)))
-            .filter(line -> line.getRight().getLeft())
+                .map(line -> Pair.of(line, is_questionable_debug(line)))
+                .filter(line -> line.getRight().getLeft())
                 // count each
-            .forEach(line -> {
-                var pat = line.getRight().getRight();
-                matchCount.put(pat, matchCount.get(pat) + 1);
-            });
+                .forEach(line -> {
+                    var pat = line.getRight().getRight();
+                    matchCount.put(pat, matchCount.get(pat) + 1);
+                });
 
         // sort and print
         matchCount.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getValue))
@@ -108,6 +111,7 @@ public class DatasheetBOW {
 
     /**
      * Finds is a sentence matches any of the patterns
+     *
      * @param sentence
      * @return true or false
      */
@@ -123,10 +127,11 @@ public class DatasheetBOW {
 
     /**
      * Finds if a sentence matches any of the patterns and gives the first pattern matched.
+     *
      * @param sentence
      * @return Pair of (match?, pattern)
      */
-    private static Pair<Boolean, Pattern> is_questionable_debug(String sentence) {
+    public static Pair<Boolean, Pattern> is_questionable_debug(String sentence) {
         // return first pattern matched as a pair
         for (Pattern p : patterns) {
             Matcher tempMatcher = p.matcher(sentence);
@@ -139,6 +144,7 @@ public class DatasheetBOW {
 
     /**
      * Finds all matches for a sentence.
+     *
      * @param sentence
      * @return Pair of (match?, patterns)
      */
@@ -157,40 +163,43 @@ public class DatasheetBOW {
     }
 
     // TODO: update for current flow
-    private static Pair<Integer, Integer> count_questionable(String filename) throws IOException {
-        var wrapper = new Object(){int total = 0; int quest = 0;};
-        Files
-            .lines(Paths.get(filename))
-            .filter(line -> !line.isEmpty())
-            .map(String::toLowerCase)
-            .map(DatasheetBOW::is_questionable)
-            .forEach(b -> {
-                wrapper.total++;
-                if (b)
-                    wrapper.quest++;
-            });
-
+    public static Pair<Integer, Integer> count_questionable(final Project project) {
+        var wrapper = new Object() {
+            int total = 0;
+            int quest = 0;
+        };
+        project.getSentences()
+                .forEach(s -> {
+                    wrapper.total++;
+                    if (s.getType() == Sentence.Type.NONCOMMENT)
+                        wrapper.quest++;
+                });
         return Pair.of(wrapper.total, wrapper.quest);
     }
 
     // TODO: update for current flow
-    private static void debug_file_questionable(String filename) throws IOException {
-        Files
-            .lines(Paths.get(filename))
-            .filter(line -> !line.isEmpty())
-            .map(String::toLowerCase)
-            .map(line -> Pair.of(line, is_questionable_debug(line)))
-            .filter(line -> line.getRight().getLeft())
-            .forEach(line -> System.out.println(String.format("%s :: %s", line.getRight().getRight().pattern(), line.getLeft())));
+    public static void debug_file_questionable(final Project project) {
+        project.getSentences()
+                .toList().stream()
+                .filter(s -> s.getType() == Sentence.Type.NONCOMMENT)
+                .map(s -> Pair.of(s.getText(), is_questionable_debug(s.getText()).getRight()))
+                .forEach(p -> System.out.printf("%s :: %s\n", p.getLeft(), p.getRight().pattern()));
     }
 
     // TODO: update for current flow
-    private static void debug_file_comments(String filename) throws IOException {
-        Files
-            .lines(Paths.get(filename))
-            .filter(line -> !line.isEmpty())
-            .map(String::toLowerCase)
-            .filter(line -> !is_questionable(line))
-            .forEach(System.out::println);
+    public static void debug_file_comments(final Project project) {
+        project.getSentences()
+                .toList().stream()
+                .filter(s -> s.getType() == Sentence.Type.COMMENT)
+                .forEach(s -> System.out.println(s.getText()));
     }
+
+    public static void debug_file_matches(final Project project) {
+        project.getSentences()
+                .toList().stream()
+                .filter(s -> s.getType() == Sentence.Type.NONCOMMENT)
+                .map(s -> Pair.of(s.getText(), is_questionable_matches(s.getText()).getRight()))
+                .forEach(p -> logger.info("{} :: {}", p.getLeft(), p.getRight()));
+    }
+
 }
