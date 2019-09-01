@@ -23,7 +23,7 @@ public class Sentence implements Serializable {
     @Id
     private NitriteId empId;
 
-    private long sentenceId;
+    private Integer sentenceId;
     private String text;
     private Type type;
     private List<Integer> wordIds;
@@ -33,7 +33,7 @@ public class Sentence implements Serializable {
 
     }
 
-    public Sentence(long sentenceId, String text) {
+    public Sentence(Integer sentenceId, String text) {
         this.sentenceId = sentenceId;
         this.text = text;
         this.type = Type.NA;
@@ -48,11 +48,11 @@ public class Sentence implements Serializable {
         this.empId = empId;
     }
 
-    public long getSentenceId() {
+    public Integer getSentenceId() {
         return sentenceId;
     }
 
-    public void setSentenceId(long sentenceId) {
+    public void setSentenceId(Integer sentenceId) {
         this.sentenceId = sentenceId;
     }
 

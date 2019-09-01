@@ -14,7 +14,7 @@ import java.sql.SQLException;
 public class ProjectUtils {
     private static final Logger logger = LogManager.getLogger(ProjectUtils.class);
 
-    public static Project createNewProject(File inputFile, boolean textOnly) throws IOException, SQLException {
+    public static Project createNewProject(File inputFile, boolean textOnly) throws IOException{
         var projectName = FilenameUtils.removeExtension(inputFile.getName());
         var project = new Project(projectName);
         var db = Nitrite.builder()
@@ -27,7 +27,7 @@ public class ProjectUtils {
             return project;
         } else {
             var repo = db.getRepository(Sentence.class);
-            long index = 1;
+            Integer index = 1;
             for (String line : Files.readAllLines(inputFile.toPath())) {
                 if (textOnly) {
                     var result = repo.insert(new Sentence(index, line));
@@ -42,7 +42,7 @@ public class ProjectUtils {
         return project;
     }
 
-    public static Project openProject(File inputFile) throws SQLException {
+    public static Project openProject(File inputFile) {
         var projectName = FilenameUtils.removeExtension(inputFile.getName());
         var project = new Project(projectName);
         var db = Nitrite.builder()
