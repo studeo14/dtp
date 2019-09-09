@@ -1,5 +1,6 @@
 package edu.vt.datasheet_text_processor;
 
+import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,31 +29,34 @@ public class OptionHandler {
                 repo.update(s);
             }
         }
-        if (options.doWordId) {
-
+        if (options.wordIDOptions != null) {
+            if (options.wordIDOptions.doWordId) {
+            }
         }
         if (options.doToken) {
 
         }
-        if (options.debugOptions.doPrint) {
-            // print all from database
-            var db = project.getDB();
-            var repo = db.getRepository(Sentence.class);
-            var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
-            for (Sentence s : documents) {
-                var o = String.format("%d :: %s :: %s", s.getSentenceId(), s.getType(), s.getText());
-                System.out.println(o);
+        if (options.debugOptions != null) {
+            if (options.debugOptions.doPrint) {
+                // print all from database
+                var db = project.getDB();
+                var repo = db.getRepository(Sentence.class);
+                var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
+                for (Sentence s : documents) {
+                    var o = String.format("%d :: %s :: %s", s.getSentenceId(), s.getType(), s.getText());
+                    System.out.println(o);
+                }
+            } else if (options.debugOptions.doPercentage) {
+                var results = DatasheetBOW.count_questionable(project);
+                double percentage = results.getRight().doubleValue() / (results.getLeft().doubleValue());
+                System.out.printf("%%Q: %.2f%%\n", percentage * 100);
+            } else if (options.debugOptions.doShowComments) {
+                DatasheetBOW.debug_file_comments(project);
+            } else if (options.debugOptions.doShowNonComments) {
+                DatasheetBOW.debug_file_questionable(project);
+            } else if (options.debugOptions.doShowMatches) {
+                DatasheetBOW.debug_file_matches(project);
             }
-        } else if (options.debugOptions.doPercentage) {
-            var results = DatasheetBOW.count_questionable(project);
-            double percentage = results.getRight().doubleValue()/(results.getLeft().doubleValue());
-            System.out.printf("%%Q: %.2f%%\n", percentage * 100);
-        } else if (options.debugOptions.doShowComments) {
-            DatasheetBOW.debug_file_comments(project);
-        } else if (options.debugOptions.doShowNonComments) {
-            DatasheetBOW.debug_file_questionable(project);
-        } else if (options.debugOptions.doShowMatches) {
-            DatasheetBOW.debug_file_matches(project);
         }
     }
 }

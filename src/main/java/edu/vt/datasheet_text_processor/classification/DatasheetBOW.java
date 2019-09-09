@@ -1,10 +1,10 @@
-package edu.vt.datasheet_text_processor;
+package edu.vt.datasheet_text_processor.classification;
 
+import edu.vt.datasheet_text_processor.Project;
+import edu.vt.datasheet_text_processor.Sentence;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dizitart.no2.FindOptions;
-import org.dizitart.no2.SortOrder;
 
 import java.io.IOException;
 import java.nio.file.Files;

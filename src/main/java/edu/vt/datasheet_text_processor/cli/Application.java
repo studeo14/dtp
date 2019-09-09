@@ -24,8 +24,16 @@ public class Application {
     // tokenization
     @Option(names={"-c", "--classify"}, description="classify the sentences")
     public boolean doClassify;
-    @Option(names={"-w", "--word-id"}, description="translate to word ids")
-    public boolean doWordId;
+
+    // word id options
+    @ArgGroup(exclusive = false, heading = "Word id serialization options%n")
+    public WordIDOptions wordIDOptions;
+    public static class WordIDOptions {
+        @Option(names={"-w", "--word-id"}, description="translate to word ids", required = true)
+        public boolean doWordId;
+        @Option(names={"-m", "--word-id-mappings"}, description = "mapping file (JSON)", required = true)
+        public File mappingFile;
+    }
     @Option(names={"-t", "--tokenize"}, description="tokenize sentences")
     public boolean doToken;
 
