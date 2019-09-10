@@ -51,6 +51,8 @@ public class Application {
         public boolean doShowComments;
         @Option(names={"--show-non-comments"}, description = "print out only the non-comments")
         public boolean doShowNonComments;
+        @Option(names={"--show-wordids"}, description = "print out only the non-comments")
+        public boolean doShowWordIds;
     }
 
     @Option(names={"-h", "--help"}, usageHelp=true, description="display this help message")

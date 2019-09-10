@@ -2,17 +2,19 @@ package edu.vt.datasheet_text_processor;
 
 import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
+import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.FindOptions;
 import org.dizitart.no2.SortOrder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class OptionHandler {
     private static final Logger logger = LogManager.getLogger(OptionHandler.class);
 
-    public static void handle(Project project, Application options) throws SQLException {
+    public static void handle(Project project, Application options) throws IOException {
         if (options.doClassify) {
             // create classify table
             var db = project.getDB();
@@ -31,6 +33,21 @@ public class OptionHandler {
         }
         if (options.wordIDOptions != null) {
             if (options.wordIDOptions.doWordId) {
+                logger.info("Doing wid");
+                var serializer = new Serializer(options.wordIDOptions.mappingFile);
+                var db = project.getDB();
+                var repo = db.getRepository(Sentence.class);
+                var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
+                for (Sentence s : documents) {
+                    // do serializee
+                    if (s.getType() == Sentence.Type.NONCOMMENT) {
+                        var wordIds = serializer.serialize(s.getText());
+                        s.setWordIds(wordIds);
+                        repo.update(s);
+                        logger.info("{}\n->\n{}", s.getText(), wordIds);
+                    }
+                }
+
             }
         }
         if (options.doToken) {
@@ -56,6 +73,17 @@ public class OptionHandler {
                 DatasheetBOW.debug_file_questionable(project);
             } else if (options.debugOptions.doShowMatches) {
                 DatasheetBOW.debug_file_matches(project);
+            } else if (options.debugOptions.doShowWordIds) {
+                var db = project.getDB();
+                var repo = db.getRepository(Sentence.class);
+                var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
+                for (Sentence s : documents) {
+                    // do serializee
+                    if (s.getType() == Sentence.Type.NONCOMMENT) {
+                        logger.info("{}\n->\n{}", s.getText(), s.getWordIds());
+                    }
+                }
+
             }
         }
     }

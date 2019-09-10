@@ -104,6 +104,10 @@ public class Serializer {
             } else if (input.endsWith("s")) {
                 base += 3;
             }
+        } else if (baseClass == WordIDClass.OBJECT) {
+            if (input.endsWith("s")) {
+                base += 3;
+            }
         }
         return base;
     }
