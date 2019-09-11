@@ -44,7 +44,6 @@ public class OptionHandler {
                         var wordIds = serializer.serialize(s.getText());
                         s.setWordIds(wordIds);
                         repo.update(s);
-                        logger.info("{}\n->\n{}", s.getText(), wordIds);
                     }
                 }
 

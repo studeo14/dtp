@@ -34,7 +34,7 @@ public class ProjectUtils {
                 } else {
                     var splits = line.split("::");
                     var id = Integer.parseInt(splits[0]);
-                    var result = repo.insert(new Sentence(id, splits[1]));
+                    var result = repo.insert(new Sentence(id, splits[1].toLowerCase()));
                 }
             }
             logger.info("Created new project at {}.project", projectName);
