@@ -19,7 +19,7 @@ class Main {
             handleCli(cli, options);
         } catch (IOException | SQLException e) {
             logger.error(e.getMessage());
-        } catch(CommandLine.ParameterException e) {
+        } catch (CommandLine.ParameterException e) {
             logger.error(e.getMessage());
             cli.usage(System.out);
         } catch (RuntimeException e) {

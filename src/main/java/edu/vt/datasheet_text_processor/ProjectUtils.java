@@ -8,13 +8,11 @@ import org.dizitart.no2.Nitrite;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class ProjectUtils {
     private static final Logger logger = LogManager.getLogger(ProjectUtils.class);
 
-    public static Project createNewProject(File inputFile, boolean textOnly) throws IOException{
+    public static Project createNewProject(File inputFile, boolean textOnly) throws IOException {
         var projectName = FilenameUtils.removeExtension(inputFile.getName());
         var project = new Project(projectName);
         var db = Nitrite.builder()

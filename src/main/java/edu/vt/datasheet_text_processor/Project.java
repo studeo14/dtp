@@ -7,8 +7,6 @@ import org.dizitart.no2.Nitrite;
 import org.dizitart.no2.SortOrder;
 import org.dizitart.no2.objects.Cursor;
 
-import java.sql.Connection;
-
 public class Project {
     private Logger logger;
     private String name;
