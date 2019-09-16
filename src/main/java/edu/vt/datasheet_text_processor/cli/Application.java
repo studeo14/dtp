@@ -38,8 +38,16 @@ public class Application {
         public boolean addNew;
     }
 
-    @Option(names = {"-t", "--tokenize"}, description = "tokenize sentences")
-    public boolean doToken;
+    @ArgGroup(exclusive = false, heading = "Tokenizer options")
+    public TokenOptions tokenOptions;
+    public static class TokenOptions {
+        @Option(names = {"-t", "--tokenize"}, description = "tokenize sentences")
+        public boolean doToken;
+        @Option(names = {"-q", "--token-mappings"}, description = "mapping file (JSON)", required = true)
+        public File mappingFile;
+        @Option(names = {"--compile-tokens"}, description = "input token mapping file contains raw text rather than wordid streams", required = false)
+        public boolean compileTokens;
+    }
 
     // debugging options
     @ArgGroup(exclusive = true, heading = "Debugging options for classification%n")

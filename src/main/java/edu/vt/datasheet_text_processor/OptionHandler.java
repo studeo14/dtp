@@ -2,6 +2,7 @@ package edu.vt.datasheet_text_processor;
 
 import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
+import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -57,8 +58,12 @@ public class OptionHandler {
                 }
             }
         }
-        if ( options.doToken ) {
-
+        if ( options.tokenOptions != null && options.wordIDOptions != null) {
+            if ( options.tokenOptions.doToken ) {
+                var serializer = new Serializer( options.wordIDOptions.mappingFile );
+                var tokenizer = new Tokenizer(options.tokenOptions.mappingFile, options.tokenOptions.compileTokens, serializer);
+                System.out.print(tokenizer.getTokenSearchTree().toString());
+            }
         }
         if ( options.debugOptions != null ) {
             if ( options.debugOptions.doPrint ) {

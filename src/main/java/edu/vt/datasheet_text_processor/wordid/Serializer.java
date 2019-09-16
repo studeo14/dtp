@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static edu.vt.datasheet_text_processor.wordid.WordIdUtils.*;
+
 /**
  * Class that takes in a wordid mapping dataset and sentence
  * and returns a stream (List) of word ids (integers) instead
@@ -61,57 +63,6 @@ public class Serializer {
         return mapping.getAliases().getOrDefault( input, input );
     }
 
-    public WordIDClass getWordIdClass ( Integer wordId ) {
-        var classNum = ( wordId / 10000 );
-        return classNumToClass( classNum );
-    }
-
-    public WordIDClass classNumToClass ( Integer classNum ) {
-        switch ( classNum ) {
-            default:
-            case 0:
-                return WordIDClass.JUNK;
-            case 1:
-                return WordIDClass.OBJECT;
-            case 2:
-                return WordIDClass.VERB;
-            case 3:
-                return WordIDClass.NUMBER;
-            case 4:
-                return WordIDClass.MODIFIER;
-            case 5:
-                return WordIDClass.ADJECTIVE;
-            case 6:
-                return WordIDClass.PRONOUN;
-            case 7:
-                return WordIDClass.CONDITION;
-        }
-    }
-
-    public Integer getWordIdNumber ( Integer wordId ) {
-        return ( wordId / 10 ) % 1000;
-    }
-
-    public Integer getWordIdOption ( Integer wordId ) {
-        return ( wordId % 10 );
-    }
-
-    public VerbEndings getVerbEnding ( Integer wordId ) {
-        if ( getWordIdClass( wordId ) == WordIDClass.VERB ) {
-            switch ( getWordIdOption( wordId ) ) {
-                default:
-                case 0:
-                    return VerbEndings.NONE;
-                case 1:
-                    return VerbEndings.ING;
-                case 2:
-                    return VerbEndings.ED;
-                case 3:
-                    return VerbEndings.S;
-            }
-        }
-        return VerbEndings.NONE;
-    }
 
     private Integer addNewMapping ( String input ) {
         Integer cat;

@@ -1,0 +1,15 @@
+{
+  "0": {
+    "id": "0",
+    "stream": "_ is reset",
+    "aliases": [
+    ]
+  },
+  "1": {
+    "id": "1",
+    "stream": "_ resets _",
+    "aliases": [
+      "_ is reset by _"
+    ]
+  }
+}
