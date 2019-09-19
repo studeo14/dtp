@@ -27,8 +27,10 @@ public class ProjectUtils {
             var repo = db.getRepository(Sentence.class);
             Integer index = 1;
             for (String line : Files.readAllLines(inputFile.toPath())) {
+                line = line.toLowerCase();
                 if (textOnly) {
                     var result = repo.insert(new Sentence(index, line));
+                    index += 1;
                 } else {
                     var splits = line.split("::");
                     var id = Integer.parseInt(splits[0]);

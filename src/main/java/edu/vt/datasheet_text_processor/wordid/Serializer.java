@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,12 +22,13 @@ import static edu.vt.datasheet_text_processor.wordid.WordIdUtils.*;
  * and returns a stream (List) of word ids (integers) instead
  */
 public class Serializer {
+    private final static Logger logger = LogManager.getLogger(Serializer.class);
     public enum WordIDClass {
         JUNK, OBJECT, VERB, NUMBER, MODIFIER, ADJECTIVE, PRONOUN, CONDITION
     }
 
     public enum VerbEndings {
-        NONE, S, ED, ING
+        NONE, S, ED, ING, EN
     }
 
     private Mapping mapping;
@@ -46,11 +49,19 @@ public class Serializer {
                 } );
     }
 
-    public List< Integer > serialize ( String sentence, boolean addNew ) {
+    public List< Integer > serialize (String sentence, AddNewWrapper addNew ) {
+
         // convert to list of base words (stemming)
         return Arrays.stream( tokenizer.tokenize( sentence ) )
                 .map( this::stem )
-                .map( s -> convert( s, addNew ) )
+                .map( s -> {
+                    try {
+                        return convert( s, addNew.isValue() );
+                    } catch (StopAddNewException e) {
+                        addNew.setValue(false);
+                        return 0;
+                    }
+                })
                 .collect( Collectors.toList() );
 
     }
@@ -64,10 +75,18 @@ public class Serializer {
     }
 
 
-    private Integer addNewMapping ( String input ) {
+    private Integer addNewMapping ( String input ) throws StopAddNewException {
         Integer cat;
         do {
-            cat = Integer.parseInt( System.console().readLine( "%s is unmapped. Enter category to add to mapping (0/1/2/3/4/5/6/7): ", input ) );
+            var res = System.console().readLine( "%s is unmapped. Enter category to add to mapping (0/1/2/3/4/5/6/7) 'q' to stop adding new (this may result in unmapped words!): ", input );
+            if (res.toLowerCase().equals("q")) {
+                throw new StopAddNewException();
+            }
+            try {
+                cat = Integer.parseInt(res);
+            } catch (NumberFormatException e) {
+                cat = -1;
+            }
         } while ( cat < 0 || cat > 7 );
         var catClass = classNumToClass( cat );
         var num = currentNumber.getOrDefault( catClass, 0 ) + 1;
@@ -91,7 +110,8 @@ public class Serializer {
         return mappingInteger;
     }
 
-    private Integer convert ( String input, boolean addNew ) {
+    private Integer convert ( String input, boolean addNew ) throws StopAddNewException {
+        logger.debug("{}", addNew);
         // get base convertion
         var base = mapping.getBaseMapping().getOrDefault( input, 0 );
         if ( base == 0 && addNew ) {
@@ -106,6 +126,8 @@ public class Serializer {
                 base += 2;
             } else if ( input.endsWith( "s" ) ) {
                 base += 3;
+            } else if ( input.endsWith( "en" ) ) {
+                base += 4;
             }
         } else if ( baseClass == WordIDClass.OBJECT ) {
             if ( input.endsWith( "s" ) ) {

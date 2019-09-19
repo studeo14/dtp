@@ -20,6 +20,7 @@ public class DatasheetBOW {
     private static final String values = "(zero|one|0|1|high|low|enabled|disabled|asserted|deasserted)";
     private static final String signals = "(input|output|register|signal|bit|bus|value)";
 
+    // regexes sorted by most used
     private static final Pattern[] patterns = {
             Pattern.compile("writing .+? to .+?"),
             Pattern.compile("reset value"),

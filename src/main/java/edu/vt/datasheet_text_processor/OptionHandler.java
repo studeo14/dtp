@@ -3,6 +3,7 @@ package edu.vt.datasheet_text_processor;
 import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
+import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -44,17 +45,17 @@ public class OptionHandler {
                 var db = project.getDB();
                 var repo = db.getRepository( Sentence.class );
                 var documents = repo.find( FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
+                var t = new AddNewWrapper(options.wordIDOptions.addNew);
                 for ( Sentence s : documents ) {
                     // do serializee
                     if ( s.getType() == Sentence.Type.NONCOMMENT ) {
-                        var wordIds = serializer.serialize( s.getText(), options.wordIDOptions.addNew );
+                        var wordIds = serializer.serialize( s.getText(), t );
                         s.setWordIds( wordIds );
                         repo.update( s );
                     }
                 }
                 if ( options.wordIDOptions.addNew ) {
-                    var fileName = FilenameUtils.removeExtension( options.wordIDOptions.mappingFile.getName() ) + ".json";
-                    serializer.exportMapping( new File( fileName ) );
+                    serializer.exportMapping( options.wordIDOptions.mappingFile );
                 }
             }
         }

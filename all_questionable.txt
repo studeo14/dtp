@@ -1,0 +1,384 @@
+The registers can be accessed when the 7th (DLAB) bit of the Line Control Register is set to ‘1’.
+At this time the above registers at addresses 0-1 can’t be accessed.
+Reset Value: 00h.
+In addition, the FIFOs can be cleared using this register.
+Writing a ‘1’ to bit 1 clears the Receiver FIFO and resets its logic.
+But it doesn’t clear the shift register, i.e. receiving of the current character continues.
+Writing a ‘1’ to bit 2 clears the Transmitter FIFO and resets its logic.
+The shift register is not cleared, i.e. transmitting of the current character continues.
+Reset Value : 11000000b.
+Reset Value: 00000011b.
+If another character is starting to arrive, it will overwrite the data in the shift register but the FIFO will remain intact.
+The bit is cleared upon reading from the register.
+The bit is cleared upon reading from the register.
+The bit is cleared upon reading from the register.
+In that case, one zero character enters the FIFO and the UART waits for a valid start bit to receive next character.
+The bit is cleared upon reading from the register.
+The bit is cleared when data is being been written to the transmitter FIFO.
+The bit is cleared when data is being been written to the transmitter FIFO.
+These bits are set to ‘1’ when a change in corresponding line has been detected and they are reset when the register is being read.
+The divisor latches can be accessed by setting the 7th bit of LCR to ‘1’.
+The register is set to the default value of 0 on reset, which disables all serial I/O operations in order to ensure explicit setup of the register in the software.
+The value set should be equal to (system clock speed) / (16 x desired baud rate).
+Upon reset the core performs the following tasks: The receiver and transmitter FIFOs are cleared, The receiver and transmitter shift registers are cleared, The Divisor Latch register is set to 0, The Line Control Register is set to communication of 8 bits of data, no parity, 1 stop bit, All interrupts are disabled in the Interrupt Enable Register.
+Reset Value: C1h.
+In addition, the FIFOs can be cleared using this register.
+The IO Bus has a ready handshake to handle different waitstate needs, from IO_Ready asserted the cycle after the IO_Addr_Strobe is asserted to as many cycles as needed.
+There is no time-out on the IO Bus and MicroBlaze is stalled until IO_Ready is asserted.
+IO_Address, IO_Byte_Enable, IO_Write_Data, IO_Read_Strobe, IO_Write_Strobe are only valid when IO_Addr_Strobe is asserted.
+For read access IO_Read_Data is sampled at the rising Clk edge, when the slave has asserted IO_Ready.
+The Fixed Interval Timer asserts the output signal FITx_Interrupt one clock cycle every C_FITx_NO_CLOCKS.
+When the counter reaches zero, the timer lapses, and the interrupt signal is generated.
+The timer starts counting when it is enabled by setting the EN bit in the PITx Control Register.
+The PITx_Toggle output signal is toggled each time PITx_Interrupt is asserted, creating a 50% duty cycle output with twice the PITx_Interrupt period when the timer is operated in continuous mode.
+An interrupt is cleared in both the Interrupt Status and Interrupt Pending Registers by writing to the Interrupt Acknowledge Register, with bits set corresponding to the interrupts that should be cleared.
+The EN bit in this register enables/disables counting.
+The allowed range of values on these parameters is 1/12 to 12: (0x015555 to 0xC00000).
+This line counter is reset on Start-of-frame (s_axis_video_tuser => 1), and increments end-of-line (s_axis_video_tlast => 1).
+Following SOF of every frame (s_axis_video_tuser = 1), intr_coef_fifo_rdy will be asserted to indicate that the FIFO is ready to receive a coefficient.
+Coefficients may only be read from the Dual-Port RAM when control bit (3) is set High.
+The FITx_Toggle output signal is toggled each time FITx_Interrupt is asserted, creating a 50% duty cycle output with twice the FITx_Interrupt period.
+The PITx_Interrupt output signal is asserted one clock cycle when the timer lapses.
+This register is a read-only register.
+This is write only location.
+Writing this register when the character has not been transmitted will overwrite previously written data, resulting in loss of data.
+This is read only register.
+This bit is cleared when the status register is read.
+The receive character is ignored and not written to the receive register.
+This bit is cleared when the status register is read.
+The received character is ignored and not written into the receive register.
+This bit is cleared when the status register is read.
+All bits in the register are updated when the register is written.
+All bits written ‘1’ will clear the corresponding bits in the IRQ_STATUS and IRQ_PENDING registers.
+The register is write-only.
+The UART also asserts the UART_Interrupt output when the receiver becomes non-empty, when the transmitter becomes empty or when an error condition has occurred.
+All signals on the Slave (data input) AXI4-Stream interface s_axis_video and AXI4-Lite component interfaces, must be synchronous to this clock signal.
+All interface input signals are sampled on the rising edge of s_axis_video_aclk.
+All output signals changes occur after the rising edge of s_axis_video_aclk.
+All signals on the Master (data output) AXI4-Stream interface m_axis_video must be synchronous to this clock signal.
+All interface input signals are sampled on the rising edge of m_axis_video_aclk.
+All output signals changes occur after the rising edge of m_axis_video_aclk.
+The AXI4-Stream interface must be synchronous to the core clock signal ACLK.
+AXI4-Stream interface input signals are sampled on the rising edge of ACLK.
+All AXI4-Stream output signal changes occur after the rising edge of ACLK.
+The AXI4-Lite interface is unaffected by the ACLK signal.
+The ARESETn pin is an active-low, synchronous reset input pertaining to only AXI4-Stream interfaces.
+The AXI4-Lite interface is unaffected by the ARESETn signal.
+0-padding should be used for unused AXI4-Stream bits.
+A valid transfer occurs whenever READY, VALID, and ARESETn are high at the rising edge of ACLK, as seen in Figure 2-4.
+During valid transfers, DATA only carries active video data.
+Once tvalid is asserted, no interface signals (except the Video Scaler core driving tready) may change value until the transaction completes (tready, tvalid high on the rising edge of ACLK).
+Once asserted, tvalid may only be de-asserted after a transaction has completed.
+In any cycle following a transaction, tvalid can either be de-asserted or remain asserted to initiate a new transfer.
+The tready signal may be asserted before, during or after the cycle in which the Video Scaler core asserted tvalid.
+The assertion of tready may be dependent on the value of tvalid.
+A slave that can immediately accept data qualified by tvalid, should pre-assert its tready signal until data is received.
+Alternatively, tready can be registered and driven the cycle following TVALID assertion.
+The SOF signal may be asserted an arbitrary number of ACLK cycles before the first pixel value is presented on TDATA, as long as a TVALID is not asserted.
+Writing '0' to this bit effectively disables the core halting further operations, which blocks the propagation of all video signals.
+New values written to the processor registers will get copied over to the active set at the end of the AXI4-Stream frame, if and only if REG_UPDATE is set.
+Following the input of the final coefficient, this bit will be set low.
+Unlike STATUS and ERROR flags, INTC_IF signals are not held, rather stay asserted only while the corresponding event persists.
+The S_AXI_ARESETn signal is synchronous to the S_AXI_ACLK clock domain, but is internally synchronized to the video clock domains.
+The S_AXI_ARESETn signal will reset the entire core including the AXI4-Lite and AXI4-Stream interfaces.
+Loading the FIFO must take place during the frame period before it is required.
+Following the delivery of the final coefficient of a set into the scaler, intr_coef_fifo_rdy will be driven low.
+However, it is only possible to populate it with a new coefficient bank when this bit is set Low.
+The m_axis_video_tready signal must be High for any data to come out of the core.
+ARESETn supersedes ACLKEN, and when set to 0, the core resets at the next rising edge of ACLK even if ACLKEN is de-asserted.
+The ARESETn signal must be synchronous to the ACLK and must be held low for a minimum of 32 clock cycles of the slowest clock.
+For the AXI4-Lite interface, after Power up, or Global Reset, the SW_ENABLE defaults to 0.
+Bits of the STATUS register can be cleared individually by writing '1' to the bit position.
+Bits of the STATUS register can be cleared individually by writing '1' to the bit position to be cleared.
+Bits of the ERROR register can be cleared individually by writing '1' to the bit position to be cleared.
+Once set by the corresponding event, bits of the STATUS register stay set until the user application clears them by writing '1' to the desired bit positions.
+An error condition will be asserted if the loading procedure comes up less than 2 x max_phases*Max(num_h_taps, num_v_taps) when coef_set_addr is updated.The system reset signal is an asynchronous input.
+The assertion of sys_reset causes a hard reset of the entire core.
+The reset provided by the PCI Express system is typically active Low (for example, PERST#) and needs to be inverted before connecting to the sys_reset signal.
+Transaction Clock: Transaction, Configuration, and Physical Layer Control and Status Interface operations are referenced to and synchronous with the rising edge of this clock.
+This signal is active after power-on, and sys_reset has no effect on it.
+This signal is guaranteed to be stable at the selected operating frequency only after user_reset_out is deasserted.
+This signal is deasserted synchronously with respect to user_clk_out, and is deasserted and asserted asynchronously with sys_reset assertion.
+This signal is asserted for core in-band reset events such as Hot Reset or Link Disable.
+Transaction link-up is deasserted when the core and link partner are attempting to establish communication, or when communication with the link partner is lost due to errors on the transmission channel.
+This signal is also deasserted when the core is driven to Hot Reset or Link Disable state by the link partner, and all 
+Possible values: 000: Receive buffer available space; 001: Receive credits granted to the link partner; 010: Receive credits consumed; 100: Transmit user credits available; 101: Transmit credit limit; 110: Transmit credits consumed.
+Valid only along with assertion of s_axis_tx_tvalid.
+When s_axis_tx_tlast is not asserted, the only valid values are 0xFF (64-bit) or 0xFFFF (128-bit).
+When s_axis_tx_tlast is asserted, valid values are: 64-bit: only 0x0F and 0xFF are valid; 128-bit: 0x000F, 0x00FF, 0x0FFF, and 0xFFFF are valid.
+Transmit Source Discontinue: Can be asserted any time starting on the first cycle after SOF.
+Assert s_axis_tx_tlast simultaneously with s_axis_tx_tuser[3].
+Holding tx_cfg_gnt deasserted after tx_cfg_req allows user-initiated TLPs to be given a higher priority of transmission over core-generated TLPs.
+tx_cfg_req is asserted once for each internally generated packet.
+It cannot be deasserted immediately following tx_cfg_gnt if there are no transmit buffers available.
+The terr_fwd signal must not be asserted if s_axis_tx_tuser[2] is asserted.
+Valid only if m_axis_rx_tvalid is also asserted.
+Valid only if m_axis_rx_tvalid is also asserted.
+When m_axis_rx_tlast is asserted, valid values are: 64-bit:, only 0x0F and 0xFF are valid.
+Asserted by the core for the entire length of the packet.
+Asserted by the core for the entire length of the packet.
+The simultaneous assertion of m_axis_rx_tvalid and m_axis_rx_tready marks the successful transfer of one data beat on m_axis_rx_tdata.
+When the User Application approaches a state where it is unable to service Non-Posted Requests, it must deassert rx_np_ok two clock cycle before the core asserts m_axis_rx_tlast of the next-to-last Non-Posted TLP the User Application can accept.
+Asserted from the beginning of the packet to m_axis_rx_tlast.
+Valid only when user_lnk_up is asserted.
+Valid only when user_lnk_up is asserted.
+Valid only when user_lnk_up is asserted.
+Valid only when user_lnk_up is asserted.
+Transmit Hot Reset: Active High.
+Default value after reset is 00h.
+Default value after reset is 00000b.
+Function number is hardwired to 000b.
+After cfg_turnoff_ok is asserted, CMM sends a PME_To_Ack message to the upstream device.
+Configuration Power Management Wake: A one-clock cycle assertion informs the core to generate and send a Power Management Wake Event (PM_PME) Message TLP to the upstream link partner.
+Message Received: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received ERR_COR Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received ERR_NONFATAL Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received ERR_FATAL Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received PME_TO_Ack Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received Assert_INTA Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received Assert_INTB Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received Assert_INTC Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received Assert_INTD Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received Deassert_INTA Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received Deassert_INTB Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received Deassert_INTC Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+Received Deassert_INTD Message: Active High.
+Valid only along with assertion of cfg_msg_received.
+The simultaneous assertion of s_axis_tx_tvalid and s_axis_tx_tready marks the successful transfer of one data beat on s_axis_tx_tdata.The signal should be held asserted until cfg_interrupt_rdy is asserted.
+The simultaneous assertion of cfg_interrupt_rdy and cfg_interrupt indicates that the core has successfully transmitted the requested interrupt message.
+Values range from 000b to 101b.
+Assertions on cfg_err_ur and cfg_err_cpl_abort are ignored when cfg_err_cpl_rdy is deasserted.
+In the case of a DRP read, the drp_do bus must be captured on the rising edge of drp_clk in the cycle that drp_drdy is active.
+The earliest that drp_den can go active to start the next port cycle is the same clock cycle that drp_drdy is active.
+PCI Express DRP Data Out: If drp_dwe was inactive when drp_den was activated, the value on this bus when drp_drdy goes active is the data read from the addressed cell.
+At all other times, the value on drp_do[15:0] is undefined.
+The default value is 0000_0000h; the value range is 0000_0000h-FFFF_FFFFh.
+If all eight data bytes of the last transfer are valid, they are presented on s_axis_tx_tdata[63:0] and s_axis_tx_tkeep[7:0] is driven to 0xFF; otherwise, the four remaining data bytes are presented on s_axis_tx_tdata[31:0] and s_axis_tx_tkeep[7:0] is driven to 0x0F; At the next clock cycle, the User Application deasserts s_axis_tx_tvalid to signal the end of valid transfers on s_axis_tx_tdata[63:0].
+When the User Application asserts s_axis_tx_tlast, it also places a value of 0xFF on s_axis_tx_tkeep[7:0], notifying the core that s_axis_tx_tdata[63:0] contains valid data.
+The User Application keeps s_axis_tx_tvalid asserted and presents a new TLP on the next clock cycle after asserting s_axis_tx_tlast for the previous TLP.
+When this condition occurs, the User Application deasserts s_axis_tx_tvalid, which instructs the core AXI4-Stream interface to disregard data presented on s_axis_tx_tdata[63:0].
+Figure 5-8 illustrates the source throttling mechanism, where the User Application does not have data to present every clock cycle, and for this reason must deassert s_axis_tx_tvalid during these cycles.
+The core transmit AXI4-Stream interface deasserts s_axis_tx_tready only under these conditions: After it has accepted the TLP completely and has no buffer space available for a new TLP; When the core is transmitting an internally generated TLP (Completion TLP because of a Configuration Read or Write, error Message TLP or error response as requested by the User Application on the cfg_err interface), after it has been granted use of the transmit datapath by the User Application, by assertion of tx_cfg_gnt.
+The core subsequently asserts s_axis_tx_tready after transmitting the internally generated TLP.
+When this occurs, any ongoing TLP is accepted completely and s_axis_tx_tready is subsequently deasserted, disallowing the User Application from initiating any new transactions for the duration that the core is in the non-D0 power state.
+On deassertion of s_axis_tx_tready by the core, the User Application needs to hold all control and data signals until the core asserts s_axis_tx_tready.
+The core AXI4-Stream interface lets the User Application terminate transmission of a TLP by asserting src_dsc.
+Both s_axis_tx_tvalid and s_axis_tx_tready must be asserted together with src_dsc for the TLP to be discontinued.
+The signal src_dsc must not be asserted at the beginning of a new packet.
+It can be asserted on any cycle after the first beat of a new packet has been accepted by the core up to and including the assertion of s_axis_tx_tlast.
+Asserting src_dsc has no effect if no TLP transaction is in progress on the transmit interface.
+This sequence of events must occur on the receive AXI4-Stream interface for the Endpoint core to present a TLP to the User Application logic: When the User Application is ready to receive data, it asserts m_axis_rx_tready; When the core is ready to transfer data, the core asserts m_axis_rx_tvalid and presents the first complete TLP QWORD on m_axis_rx_tdata[63:0]; The core keeps m_axis_rx_tvalid asserted, and presents TLP QWORDs on m_axis_rx_tdata[63:0] on subsequent clock cycles (provided the User Application logic asserts m_axis_rx_tready); The core then asserts m_axis_rx_tvalid with m_axis_rx_tlast and presents either the last QWORD on s_axis_tx_tdata[63:0] and a value of 0xFF on m_axis_rx_tkeep[7:0] or the last DWORD on s_axis_tx_tdata[31:0] and a value of 0x0F on m_axis_rx_tkeep[7:0]; If no further TLPs are available at the next clock cycle, the core deasserts m_axis_rx_tvalid to signal the end of valid transfers on m_axis_rx_tdata[63:0].
+Note: The User Application should ignore any assertions of m_axis_rx_tlast, m_axis_rx_tkeep[7:0], and m_axis_rx_tdata unless m_axis_rx_tvalid is concurrently asserted.
+Signal m_axis_rx_tvalid is never deasserted mid-packet.
+When the core asserts m_axis_rx_tlast, it also places a value of 0x0F on m_axis_rx_tkeep[7:0], notifying the user that only m_axis_rx_tdata[31:0] contains valid data.
+When the core asserts m_axis_rx_tlast, it also places a value of 0xFF on m_axis_rx_tkeep[7:0], notifying the user that m_axis_rx_tdata[63:0] contains valid data.
+When the core asserts m_axis_rx_tlast, it also places a value of 0xFF on m_axis_rx_tkeep[7:0], notifying the user that m_axis_rx_tdata[63:0] contains valid data.
+When the core asserts m_axis_rx_tlast, it also places a value of 0x0F on m_axis_rx_tkeep[7:0], notifying the user that only m_axis_rx_tdata[31:0] contains valid data.
+If the user deasserts m_axis_rx_tready while no transfer is in progress and if a TLP becomes available, the core asserts m_axis_rx_tvalid and presents the first TLP QWORD on m_axis_rx_tdata[63:0].
+At that point, the core presents subsequent TLP QWORDs as long as m_axis_rx_tready remains asserted.
+If the user deasserts m_axis_rx_tready during the middle of a transfer, the core stalls the transfer of data until the user asserts m_axis_rx_tready again.
+The User Application logic inserts wait states by deasserting m_axis_rx_tready.
+The core does not present the next TLP QWORD until it detects m_axis_rx_tready assertion.
+The User Application must deassert rx_np_ok at least two clock cycles before m_axis_rx_tlast of the second-to-last Non-Posted TLP the user can accept.
+The rx_np_ok signaling restrictions require that the User Application be able to receive and buffer at least three Non-Posted TLPs.
+To transmit a TLP, the User Application must perform this sequence of events on the transmit AXI4-Stream interface: The User Application logic asserts s_axis_tx_tvalid, and presents the first TLP Double-Quad Word (DQWORD = 128 bits) on s_axis_tx_tdata[127:0].
+If the core is asserting s_axis_tx_tready, the DQWORD is accepted immediately; otherwise, the User Application must keep the DQWORD presented until the core asserts s_axis_tx_tready; The User Application asserts s_axis_tx_tvalid and presents the remainder of the TLP DQWORDs on s_axis_tx_tdata[127:0] for subsequent clock cycles (for which the core asserts s_axis_tx_tready); The User Application asserts s_axis_tx_tvalid and s_axis_tx_tlast together with the last DQWORD data.
+For more information on the s_axis_tx_tkeep[15:0] signaling, refer to Table 5-2 and Table 5-3; At the next clock cycle, the User Application deasserts s_axis_tx_tvalid to signal the end of valid transfers on s_axis_tx_tdata[127:0].
+When the User Application asserts s_axis_tx_tlast, it also places a value of 0x0FFF on s_axis_tx_tkeep[15:0], notifying the core that only s_axis_tx_tdata[95:0] contains valid data.
+When the User Application asserts s_axis_tx_tlast, it also places a value of 0xFFFF on s_axis_tx_tkeep[15:0] notifying the core that s_axis_tx_tdata[127:0] contains valid data and the EOF occurs in the upper-most DW.
+When the User Application asserts s_axis_tx_tlast, it also puts a value of 0x0FFF on s_axis_tx_tkeep[15:0] notifying the core that s_axis_tx_tdata[95:0] contains valid data and the EOF occurs in DWORD 2.
+When the User Application asserts s_axis_tx_tlast, it also puts a value of 0x0FFF on s_axis_tx_tkeep[15:0] notifying the core that s_axis_tx_tdata[95:0] contains valid data and the EOF occurs in DWORD 2.
+The User Application keeps s_axis_tx_tvalid asserted and presents a new TLP on the next clock cycle after asserting s_axis_tx_tlast for the previous TLP.
+Figure 5-32 illustrates the source throttling mechanism, where the User Application does not have data to present every clock cycle, and therefore must deassert s_axis_tx_tvalid during these cycles.
+If the core transmit AXI4-Stream interface accepts the start of a TLP by asserting s_axis_tx_tready, it is guaranteed to accept the complete TLP with a size up to the value contained in the Max_Payload_Size field of the PCI Express Device Capability Register (offset 04H).
+The core transmit AXI4-Stream interface deasserts s_axis_tx_tready only under these conditions: After it has accepted the TLP completely and has no buffer space available for a new TLP; When the core is transmitting an internally generated TLP (Completion TLP because of a Configuration Read or Write, error Message TLP or error response as requested by the User Application on the cfg_err interface), after it has been granted use of the transmit datapath by the User Application, by assertion of tx_cfg_gnt, the core subsequently asserts s_axis_tx_tready after transmitting the internally generated TLP.
+On deassertion of s_axis_tx_tready by the core, the User Application needs to hold all control and data signals until the core asserts s_axis_tx_tready.
+The core AXI4-Stream interface lets the User Application terminate transmission of a TLP by asserting src_dsc.
+Both s_axis_tx_tvalid and s_axis_tx_tready must be asserted together with src_dsc for the TLP to be discontinued.
+The signal src_dsc must not be asserted at the beginning of a TLP.
+It can be asserted on any cycle after the first beat of a new TLP up to and including the assertion of s_axis_tx_tlast.
+It is the user’s responsibility to not violate the Max_Payload_Size field of the Device Control Register (offset 08H); str is asserted and data is not presented on consecutive clock cycles, that is, s_axis_tx_tvalid is deasserted in the middle of a TLP transfer.
+This sequence of events must occur on the receive AXI4-Stream interface for the Endpoint core to present a TLP to the User Application logic: When the User Application is ready to receive data, it asserts m_axis_rx_tready; When the core is ready to transfer data, the core asserts m_axis_rx_tvalid with is_sof[4] and presents the first complete TLP DQWORD on m_axis_rx_tdata[127:0]; The core then deasserts is_sof[4], keeps m_axis_rx_tvalid asserted, and presents TLP DQWORDs on m_axis_rx_tdata[127:0] on subsequent clock cycles (provided the User Application logic asserts m_axis_rx_tready).
+Signal m_axis_rx_tvalid never deasserts mid-packet.
+When the core asserts is_eof[4], it also places a value of 1011b on is_eof[3:0], notifying the user that EOF occurs on byte 11 (DWORD 2) and only m_axis_rx_tdata[95:0] contains valid data.
+When the core asserts is_eof[4], it also places a value of 1111b on is_eof[3:0], notifying the user that the EOF occurs on byte 15 (DWORD 3) and m_axis_rx_tdata[127:0] contains valid data.
+When the core asserts is_eof[4], it also places a value of 1111b on is_eof[3:0], notifying the user that EOF occurs on Byte 15 (DWORD 3) and m_axis_rx_tdata[127:0] contains valid data.
+When the core asserts is_eof[4], it also places a value of 0011b on is_eof[3:0], notifying the user that EOF occurs on byte 3 (DWORD 0) and only m_axis_rx_tdata[31:0] contains valid data.
+Wired to 0.
+If set to “1”, the cfg_interrupt* interface is unable to cause INTx messages to be sent.
+When set to 0, the Root Port responds to target transactions such as an Upstream Mem or I/O TLPs as a UR (that is, UR bit set if enabled or Cpl w/ UR packet sent if TLP was a Non-Posted).
+When set to 1, all target transactions are passed to the user.
+Wired to 1.
+These signals should be held asserted until cfg_rd_wr_done is asserted.
+Start Loopback: When set to 1b and pl_ltssm_state[5:0] is indicating L0 (16H), the block transitions to Loopback Master state and starts the loopback test.
+When set to 0b, the block exits the loopback master mode.
+Loopback Suppress SKP OS: When this bit is set to 1b then SKP OS are not transmitted by Loopback Master.
+When this bit is set to 1b, the Start Loopback bit must not be set to 1b.
+This bit is never set to 1b, when the Force Loopback bit is set to 1b.
+Setting the Start Loopback bit to 1b clears this bit to 0b.
+Loopback Tested: These bits are set to 0b, when the Start Loopback bit is set to 1b.
+These bits are set to 1b when loopback test has been performed on a given lane and the Loopback_Err_count_n for the corresponding lane is valid.
+The start bit must be set to 1b when force is set to 1b.
+This bit is ignored when send_modified_compliance pattern is set to 0b.
+Setting Loopback Start bit to 1b clears the error count to 0h.
+Setting Loopback Start bit to 1b clears the error count to 0h.
+Setting Loopback Start bit to 1b clears the error count to 0h.
+Setting Loopback Start bit to 1b clears the error count to 0h.
+Setting Loopback Start bit to 1b clears the error count to 0h.
+The user can signal only one error per clock cycle.
+If the PowerState is not set to 2'b00 (the core is in a non-D0 power state) and PME_EN cfg_pmcsr_pme_en is asserted (1'b1), then the user can assert (pulse) cfg_pm_wake and wait for the Root to set the PMCSR PowerState bits to 2'b00.
+If the PowerState (cfg_pmcsr_pme_powerstate) is not equal to 2'b00 and PME_EN cfg_pmcsr_pme_en is deasserted (1'b0), the user must wait for the Root to set the PowerState to 2'b00.
+After assertion, cfg_to_turnoff remains asserted until the user asserts cfg_turnoff_ok.
+The core then asserts cfg_interrupt_rdy to indicate the interrupt has been accepted.
+On the following clock cycle, the User Application deasserts cfg_interrupt and, if the Interrupt Disable bit in the PCI Command register is set to 0, the core sends an assert interrupt message (Assert_INTA, Assert_INTB, and so forth).
+The core then asserts cfg_interrupt_rdy to indicate the interrupt deassertion has been accepted.
+On the following clock cycle, the User Application deasserts cfg_interrupt and the core sends a deassert interrupt message (Deassert_INTA, Deassert_INTB, and so forth).
+The core asserts cfg_interrupt_rdy to signal that the interrupt has been accepted and the core sends a MSI Memory Write TLP.
+On the following clock cycle, the User Application deasserts cfg_interrupt if no further interrupts are to be sent.
+After the User Application has determined that the interrupt has been serviced, it asserts cfg_interrupt while deasserting cfg_interrupt_assert to deassert the interrupt.
+Asserting this signal causes a hard reset of the entire core, including the GTX transceivers.
+In the case of Hot Reset, the received_hot_reset signal is asserted to indicate the source of the reset.
+The sys_reset signal is asserted to cause the warm reset to the core; Hot Reset: In-band propagation of a reset across the PCI Express Link through the protocol.
+This signal is deasserted synchronously with respect to user_clk_out.
+PWR_OK is asserted High after some delay when the power supply has reached 95% of nominal.
+This indicates that only bit 0 in the MSI Mask register is read/write; bits [31:1] should be read-only.
+Along with the start of packet, end of packet, and ready handshaking signals, the Receive AXI4-Stream interface also asserts the appropriate bar_hit[6:0] signal to indicate to the PIO design the specific destination BAR that matched the incoming TLP.
+While the write is being carried out to the FPGA block RAM, the PIO design RX state machine deasserts the m_axis_rx_tready, causing the Receive AXI4-Stream interface to stall receiving any further TLPs until the internal Memory Write controller completes the write to the block RAM.
+Along with the start of packet, end of packet, and ready handshaking signals, the Receive AXI4-Stream interface also asserts the appropriate bar_hit[6:0] signal to indicate to the PIO design the specific destination BAR that matched the incoming TLP.
+For an ongoing Memory or I/O Read transaction, the module waits for compl_done_i input to be asserted before it accepts the next TLP, while an ongoing Memory or I/O Write transaction is deemed complete after wr_busy_i is deasserted.
+The end of configuration is signaled by the assertion of finished_config.
+If configuration is unsuccessful for some reason, failed_config is also asserted.
+If the readback data matches what was written, the PIO Master asserts its pio_test_finished output.
+The PIO Master waits until user_lnk_up is asserted by the Root Port.
+It then asserts start_config to the Configurator Block.
+For the User Application generated TLP to get priority over the core generated TLP, the User Application must hold the core input signal trn_tcfg_gnt_n deasserted until the user transaction is complete, and then assert it for 1 cycle.
+Streaming Memory Reads are allowed only if m_axis_rx_tready can be held asserted; so that Downstream Completion Transactions, along with Posted Transactions, can be presented on the integrated block’s receive Transaction (AXI4-Stream) interface and processed at line rate.
+This input must be tied High.
+When asserted, this output indicates an in-band hot reset has been received.
+When asserted, this input directs the integrated block to transmit an in-band hot reset.
+When asserted, this output indicates that the integrated block is aborting the current packet transfer.
+Tie-off to 1.
+Valid values are: 0: Packet data on all of TRNRD[63:0]; 1: Packet data only on TRNRD[63:32].
+The maximum number is 32.
+It is asserted when the physical link is going into reset.
+When asserted, this output indicates the start of a packet.
+When asserted, this output indicates that the integrated block is presenting valid data on TRNRD.
+This output is asserted when the integrated block is ready to transmit a Configuration Completion or other internally generated TLP.
+When asserted, this output indicates that the integrated block is ready to accept data on TRNTD.
+When asserted, this output indicates that the integrated block discarded a packet because of a length violation or, when streaming, data was not presented on consecutive clock cycles.
+It can be asserted any time between SOF and EOF, inclusive.
+When asserted, this input indicates the start of a packet.
+When asserted, this input indicates that the user application is aborting the current packet.
+When asserted, this input indicates that the user application is presenting valid data on TRNTD.
+When asserted, this input indicates a packet will be presented on consecutive clock cycles and transmission on the link can begin before the entire packet has been written to the integrated block.
+When asserted, this output either initiates a receiver detection operation (in power state P1) or begins loopback (in power state P0).
+When asserted, this output resets the PCS portion of the GTX transceiver.
+When asserted, this output forces the running disparity to negative.
+When asserted, this input indicates the current write should treat a read-only (RO) bit as a read/write (RW) bit, not including bits set by attributes, reserved bits, and bits that reflect status.
+When asserted, this input indicates the current write should treat any RW1C bit as a RW bit.
+Tie-off to 0.
+When asserted, this output indicates that the Message Signaling Interrupt (MSI-X) messaging is enabled.
+When asserted, this input causes the selected interrupt message type to be transmitted by the integrated block.
+Tie-off to 0 for Endpoints.
+Tie-off to 0 for Endpoints.
+Tie-off to 0 for Endpoints.
+Tie-off to 0 for Endpoints.
+This output is only asserted if a message was received on the link.
+It is not asserted if an upstreammoving message was generated internally by a Root Port (although the appropriate CFGMSGRECEIVEDERR* signal is asserted).
+Asserting this active-Low input causes the Root Port to send Turn Off Message.
+When asserted, this output indicates that a PMREQUESTACK DLLP has been received by an Endpoint after it sends a PMENTERL1, a PMENTERL23, or a PM AS Req L1.
+Tie-off to 1 for Endpoint.
+A one-clock cycle assertion of this input signals the integrated block to send a Power Management Wake Event (PMPME) Message TLP to the upstream link partner.
+Endpoints: When this output is asserted, the user logic is allowed o issue Memory or I/O Requests (including MSI/X interrupts); otherwise, the user logic must not issue those requests.
+Root Ports: When this output is asserted, received Memory or I/O Requests can be forwarded upstream; otherwise these requests must be handled as URs.
+When this output is asserted, the integrated block is prevented from asserting INTx interrupts.
+When asserted, this output should cause the user to disable the Completion Timeout counters.
+When this output is asserted, the user logic is permitted to set the Relaxed Ordering bit in the Attributes field of transactions it initiates that do not require strong write ordering.
+When this output is asserted, the user logic can use an 8-bit Tag field as a Requester.
+When this output is deasserted, the user logic is restricted to a 5-bit Tag field.
+When this output is asserted, the user logic is permitted to set the No Snoop bit in TLPs it initiates that do not require hardware-enforced cache coherency.
+When this output is asserted, the user logic can use unclaimed Functions as Phantom Functions to extend the number of outstanding transaction identifiers.
+If this output is deasserted, the user logic is not allowed to use Phantom Functions.
+When asserted, active-Low, enables the generation of an interrupt to indicate that the Link Bandwidth Management Status bit has been set.
+When this output is asserted, this component and the component at the opposite end of this Link are operating with a distributed common reference clock.
+When this output is deasserted, the components are operating with an asynchronous reference clock.
+When this output is asserted, the transmission of additional ordered sets is forced when exiting the L0s state and when in the Recovery state.
+When this output is asserted, the integrated block is disabled from changing the Link width for reasons other than attempting to correct an unreliable Link operation by reducing the Link width.
+When this output is asserted, indicates the Link is disabled and directs the LTSSM to the Disabled state.
+This bit is set if the Physical Layer reports a speed or width change was initiated by the Downstream component that was not indicated as an autonomous change.
+Note: This bit is Set following any write of 1b to the Retrain Link bit, including when the Link is in the process of retraining for some other reason; Hardware has changed Link speed or width to attempt to correct unreliable Link operation, either through an LTSSM timeout or a higher level process.
+When asserted, this input sets the Transactions Pending bit in the Device Status Register (DEVICESTATUS[5]).
+If set to FALSE, this field is hardwired to 0.
+If set to TRUE, this field is hardwired to 1.
+When this attribute is set to TRUE, Device Control[10] is writable.
+When this attribute is set to TRUE, the internal timer that causes an Endpoint to enter into ASPM L1 is disabled.
+When this attribute is set to TRUE, BAR filtering is disabled.
+When this attribute is set to TRUE, checking for Requester ID of received completions is disabled.
+When this attribute is set to FALSE, the device is capable of lane reversal.
+When this attribute is set to TRUE, lane reversal is disabled.
+When this attribute is set to TRUE, TC filtering of received TLPs is disabled.
+When this attribute is TRUE, Scrambling of transmit data is turned off.
+This attribute must be set to 1h.
+This attribute must be set to TRUE.
+This mechanism can be used if the payload is known to be poisoned when the first DWORD of the header is presented to the core on the AXI4-Stream interface; Assert terr_fwd for at least 1 valid data transfer cycle any time during the packet transmission, as shown in Figure 5-36.
+The core remains in this state until the user asserts m_axis_rx_tready to signal the acceptance of the data presented on m_axis_rx_tdata[127:0].
+The core does not present the next TLP DQWORD until it detects m_axis_rx_tready assertion.
+After the User Application is ready to accept Non-Posted Transactions, it must reassert rx_np_ok.
+The core asserts the rerr_fwd signal for the duration of each poisoned TLP, as illustrated in Figure 5-47.
+When user_lnk_up is deasserted, it effectively acts as a Hot Reset to the entire core and all TLPs stored inside the core or being presented to the receive interface are irrecoverably lost.
+The value on cfg_do[31:0] is qualified by signal assertion on cfg_rd_wr_done.
+If that occurs, then cfg_err_cpl_rdy is deasserted and the user must cease signaling those types of errors on the same cycle.
+The user must not resume signaling those types of errors until cfg_err_cpl_rdy is reasserted (see Figure 5-60).
+If a request times out, the User Application must assert cfg_err_cpl_timeout, which causes an error message to be sent to the Root Complex.
+If the User Application receives an inbound Request it does not support or recognize, it must assert cfg_err_ur to signal an Unsupported Request.
+If the User Application chooses to check this field, and finds the CRC is in error, it can assert cfg_err_ecrc, causing a Non-Fatal Error Message to be sent.
+Asserted if a power-down request TLP is received from the upstream device.
+Asserted by the User Application when it is safe to power down.
+After the User Application is ready to be turned off, it asserts cfg_turnoff_ok to the core.
+Leave asserted until the interrupt is serviced.
+Asserted when the core accepts the signaled interrupt request.
+The signal sys_reset is asserted to cause the cold reset of the core; Warm Reset.
+Signal user_reset_out is asserted as a result of any of these conditions: Fundamental Reset: Occurs (cold or warm) due to assertion of sys_reset; PLL within the core wrapper: Loses lock, indicating an issue with the stability of the clock input; Loss of Transceiver PLL Lock: Any transceiver loses lock, indicating an issue with the PCI Express Link.
+The user_reset_out signal deasserts synchronously with user_clk_out after all of the above reasons are resolved, allowing the core to attempt to train and resume normal operation.
+While the memory controller is processing the write, it asserts the wr_busy_o output indicating it is busy.
+This is accomplished by m_axis_rx_tready deassertion.
+The next Read transaction is accepted only after compl_done_o is asserted by the transmit engine, indicating that Completion for the first request was successfully transmitted.
+The next Write transaction is accepted only after wr_busy_o is deasserted by the memory access unit, indicating that data associated with the first request was successfully written to the memory aperture.
+The receive engine deasserts m_axis_rx_tready as soon as the first TLP is completely received.
+When asserted, this core output signal warns the User Application that a core internally generated TLP will arbitrate for the transmit datapath.
+Alternately, the User Application can choose to ignore trn_tcfg_req_n by driving trn_tcfg_gnt_n asserted (0b) permanently.
+When this input is asserted, the integrated block is held in reset until PLL LOCK; thus it can be used to reset the integrated block.
+This output is valid only when both TRNREOFN and TRNRDSTRDYN are asserted.
+Simultaneous assertion of TRNTSRCRDYN and TRNTDSTRDYN marks a successful transfer of data on TRNTD.
+The completion is indicated by a single cycle assertion of PIPERXnPHYSTATUS.
+When this output is asserted, the internal FIFO that buffers headers from CFGERRTLPCPLHEADER[47:0] can accept entries.
+When this output is deasserted, CFGERRURN and CFGERRCPLABORTN are ignored by the integrated block.
+This signal is ignored if CFGERRCPLRDYN is deasserted.
+The signal should be asserted until CFGINTERRUPTRDYN is asserted.
+The simultaneous assertion of CFGINTERRUPTRDYN and CFGINTERRUPTN indicates that the integrated block has successfully transmitted the requested interrupt message.
+The simultaneous assertion of s_axis_tx_tvalid and s_axis_tx_tready marks the successful transfer of one data beat on s_axis_tx_tdata.
+It can be asserted any time between SOF and EOF, inclusive.
+If two BARs are configured into a single 64-bit address, both corresponding bar_hit bits are asserted.
+Link change operation must be initiated when user_lnk_up is asserted.
+User Transaction Pending: If asserted, sets the Transactions Pending bit in the Device Status Register.
+The core can assert is_sof[4] for a new TLP at the clock cycle after is_eof[4] assertion for the previous TLP.
+When this condition occurs, the User Application deasserts s_axis_tx_tvalid, which instructs the core AXI4-Stream interface to disregard data presented on s_axis_tx_tdata[127:0].
+When user_lnk_up is deasserted, it effectively acts as a Hot Reset to the entire core.
+The core asserts the rerr_fwd signal for the duration of each poisoned TLP, as illustrated in Figure 5-22.
+While rx_np_ok is deasserted, received Posted and Completion Transactions pass Non-Posted Transactions.
+After the User Application is ready to accept Non-Posted Transactions, it must reassert rx_np_ok.
+The User Application can stall the transfer of data from the core at any time by deasserting m_axis_rx_tready.
+Bit 7 should be set to 0 indicating a single-function device.
+This input is sampled during or after the cycle in which CFGMSGRECEIVEDPMETO pulses.

@@ -2,6 +2,7 @@ package edu.vt.datasheet_text_processor.tokens.TokenModel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 
 import java.util.ArrayList;
@@ -61,9 +62,10 @@ public class RawToken {
     }
 
     public Token toToken(Serializer serializer) {
-        var convertedStream = serializer.serialize(stream, false);
+        final var t = new AddNewWrapper(false);
+        var convertedStream = serializer.serialize(stream, t);
         var convertedAliases = aliases.stream()
-                .map(a -> serializer.serialize(a, false))
+                .map(a -> serializer.serialize(a, t))
                 .collect(Collectors.toList());
         return new Token(id, convertedStream, convertedAliases);
     }

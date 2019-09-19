@@ -48,6 +48,8 @@ public class WordIdUtils {
                     return Serializer.VerbEndings.ED;
                 case 3:
                     return Serializer.VerbEndings.S;
+                case 4:
+                    return Serializer.VerbEndings.EN;
             }
         }
         return Serializer.VerbEndings.NONE;
