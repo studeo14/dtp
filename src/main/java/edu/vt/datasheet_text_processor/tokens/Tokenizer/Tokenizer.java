@@ -2,14 +2,23 @@ package edu.vt.datasheet_text_processor.tokens.Tokenizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.RawTokenModel;
+import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.SearchTreeLeafNode;
+import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.SearchTreeNode;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.TokenModel;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.TokenSearchTree;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
+import edu.vt.datasheet_text_processor.wordid.WordIdUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 public class Tokenizer {
+    private final static Logger logger = LogManager.getLogger(Tokenizer.class);
 
     private TokenModel tokenModel;
     private TokenSearchTree tokenSearchTree;
@@ -18,6 +27,7 @@ public class Tokenizer {
     public Tokenizer(File mappingFile, boolean useRaw, Serializer serializer) throws IOException {
         this.serializer = serializer;
         if (useRaw) {
+            logger.info("Using string token inputs. Will serialize to wordids before tokeniztion.");
             var rawTokenModel = new ObjectMapper().readValue(mappingFile, RawTokenModel.class);
             this.tokenModel = rawTokenModel.toTokenModel(serializer);
         } else {
@@ -36,5 +46,98 @@ public class Tokenizer {
 
     public Serializer getSerializer() {
         return serializer;
+    }
+
+    public void exportMapping(File exportFile) throws IOException {
+        new ObjectMapper().writeValue(exportFile, tokenModel);
+    }
+
+    public List<TokenInstance> tokenize(List<Integer> sentence) throws TokenizerException {
+        var iter = sentence.listIterator();
+        return processWordIdStream(iter);
+    }
+
+    private enum ProcessState {BEGIN, INSIDE, LITERAL, END};
+
+    private List<TokenInstance> processWordIdStream(ListIterator<Integer> iter) throws TokenizerException {
+        var retVal = new ArrayList<TokenInstance>();
+        while(iter.hasNext()) {
+            retVal.add(getNextToken(iter));
+        }
+        return retVal;
+    }
+
+    private TokenInstance getNextToken(ListIterator<Integer> iter) throws TokenizerException {
+        var current = new TokenInstance();
+        SearchTreeNode currentSearchTreeNode = new SearchTreeNode(-1);
+        ProcessState state = ProcessState.BEGIN;
+        while(iter.hasNext()) {
+            switch (state) {
+                case BEGIN:
+                {
+                    var currentWord = iter.next();
+                    if (WordIdUtils.getWordIdClass(currentWord) == Serializer.WordIDClass.JUNK) {
+                        break;
+                    }
+                    if (tokenSearchTree.getRootNode().getChildren().contains(currentWord)) {
+                        logger.info("Start token: {}", currentWord);
+                        current.setType(TokenInstance.Type.TOKEN);
+                        state = ProcessState.INSIDE;
+                        currentSearchTreeNode = tokenSearchTree.getRootNode().getChildren().get(currentWord);
+                    } else {
+                        current.setType(TokenInstance.Type.LITERAL);
+                        state = ProcessState.LITERAL;
+                        logger.info("Start literal: {}", currentWord);
+                    }
+                    current.getStream().add(currentWord);
+                    break;
+                }
+                case INSIDE:
+                {
+                    // is the current word a child of the current search tree node?
+                    // yes - continue
+                    // no
+                    //  if leaf?
+                    //      yes - GOTO end
+                    //      no  - ERROR
+                    var currentWord = iter.next();
+                    current.getStream().add(currentWord);
+                    logger.info("Current Node: {}, CW: {}", currentSearchTreeNode.getWordId(), currentWord);
+                    if (currentSearchTreeNode.getChildren().contains(currentWord)) {
+                        currentSearchTreeNode = currentSearchTreeNode.getChildren().get(currentWord);
+                    } else if (currentSearchTreeNode.getChildren().containsKey(-1)){
+                        current.setId(((SearchTreeLeafNode)currentSearchTreeNode.getChildren().get(-1)).getTokenId());
+                        state = ProcessState.END;
+                        iter.previous();
+                    } else {
+                        current.setId(-1);
+                        state = ProcessState.END;
+                        iter.previous();
+                        logger.info("Unknown token found at word {}. Defaulting to invalid token.", currentWord);
+//                        throw new TokenizerException(String.format("Unknown token found at word %s", currentWord));
+                    }
+                    break;
+                }
+                case LITERAL:
+                {
+                    // add until new token begin found
+                    // peek ahead
+                    var peek = iter.next();
+                    if (tokenSearchTree.getRootNode().getChildren().contains(peek)) {
+                        state = ProcessState.END;
+                        iter.previous();
+                    } else {
+                        current.getStream().add(peek);
+                    }
+                    break;
+                }
+                case END:
+                {
+                    // wrap up
+                    return current;
+                }
+            }
+        }
+        return current;
     }
 }

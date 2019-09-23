@@ -11,6 +11,10 @@ public class TokenSearchTree {
 
     private SearchTreeNode rootNode;
 
+    public SearchTreeNode getRootNode() {
+        return rootNode;
+    }
+
     public TokenSearchTree(TokenModel model) {
         this.rootNode = new SearchTreeNode(0);
         // go through and each token stream and add to tree
@@ -38,12 +42,12 @@ public class TokenSearchTree {
             } else {
                 // add
                 newNode = new SearchTreeNode(wordId);
-                // if there is a leaf node
-                if (!listIterator.hasNext()) {
-                    var leaf = new SearchTreeLeafNode(-1, tokenId);
-                    newNode.getChildren().put(leaf.getWordId(), leaf);
-                }
                 currentNode.getChildren().put(wordId, newNode);
+            }
+            // if there is a leaf node
+            if (!listIterator.hasNext()) {
+                var leaf = new SearchTreeLeafNode(-1, tokenId);
+                newNode.getChildren().put(leaf.getWordId(), leaf);
             }
             // recurse
             addStreamToTree(listIterator, newNode, tokenId);

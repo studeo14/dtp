@@ -8,7 +8,7 @@ import java.util.Map;
 public class SearchTreeNode {
 
     private Integer wordId;
-    private Map<Integer, SearchTreeNode> children;
+    private SearchTreeNodeChildren children;
 
     public Integer getWordId() {
         return wordId;
@@ -18,17 +18,17 @@ public class SearchTreeNode {
         this.wordId = wordId;
     }
 
-    public Map<Integer, SearchTreeNode> getChildren() {
+    public SearchTreeNodeChildren getChildren() {
         return children;
     }
 
-    public void setChildren(Map<Integer, SearchTreeNode> children) {
+    public void setChildren(SearchTreeNodeChildren children) {
         this.children = children;
     }
 
     public SearchTreeNode(Integer wordId) {
         this.wordId = wordId;
-        this.children = new HashMap<>();
+        this.children = new SearchTreeNodeChildren();
     }
 
     public String getString(int index) {
@@ -43,7 +43,6 @@ public class SearchTreeNode {
             str.append(child.getString(index + 1));
         }
         // new line
-        str.append('\n');
         return str.toString();
     }
 }

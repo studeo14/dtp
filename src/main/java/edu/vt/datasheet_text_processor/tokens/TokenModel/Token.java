@@ -43,6 +43,10 @@ public class Token {
         this.aliases = aliases;
     }
 
+    public Token() {
+
+    }
+
     public Token(Integer id, List<Integer> stream, List<List<Integer>> aliases) {
         this.id = id;
         this.stream = stream;

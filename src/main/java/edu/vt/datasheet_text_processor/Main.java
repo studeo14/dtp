@@ -1,6 +1,7 @@
 package edu.vt.datasheet_text_processor;
 
 import edu.vt.datasheet_text_processor.cli.Application;
+import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine;
@@ -17,8 +18,10 @@ class Main {
         try {
             cli.parseArgs(args);
             handleCli(cli, options);
-        } catch (IOException | SQLException e) {
+        } catch (IOException e) {
             logger.error(e.getMessage());
+        } catch (TokenizerException e) {
+            e.printStackTrace();
         } catch (CommandLine.ParameterException e) {
             logger.error(e.getMessage());
             cli.usage(System.out);
@@ -29,7 +32,7 @@ class Main {
         }
     }
 
-    private static void handleCli(CommandLine cli, Application options) throws IOException, SQLException {
+    private static void handleCli(CommandLine cli, Application options) throws IOException, TokenizerException {
         if (cli.isUsageHelpRequested()) {
             cli.usage(System.out);
         } else {

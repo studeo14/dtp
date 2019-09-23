@@ -1,0 +1,47 @@
+in addition
+there are
+#2
+#clock divisor
+#registers
+that
+together
+form
+one
+16-bit
+
+#register
+can be
+accessed
+when
+bit
+of
+is set
+to
+
+at this time
+above
+at
+can't be
+accessed
+
+when
+using
+additional
+are
+available
+for
+reset value
+
+enables
+to retrieve
+what is
+current
+
+following
+displays
+list of
+along with
+they
+enable
+priority
+their

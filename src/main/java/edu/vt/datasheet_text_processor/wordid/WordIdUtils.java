@@ -6,6 +6,10 @@ public class WordIdUtils {
         return classNumToClass( classNum );
     }
 
+    public static Integer getBase(Integer wordId) {
+        return (wordId / 10 ) * 10;
+    }
+
     public static Serializer.WordIDClass classNumToClass (Integer classNum ) {
         switch ( classNum ) {
             default:

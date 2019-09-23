@@ -1,6 +1,7 @@
 package edu.vt.datasheet_text_processor;
 
 
+import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance;
 import org.dizitart.no2.IndexType;
 import org.dizitart.no2.NitriteId;
 import org.dizitart.no2.objects.Id;
@@ -27,7 +28,7 @@ public class Sentence implements Serializable {
     private String text;
     private Type type;
     private List<Integer> wordIds;
-//    private List<Token> tokens;
+    private List<TokenInstance> tokens;
 
     public Sentence() {
 
@@ -38,6 +39,7 @@ public class Sentence implements Serializable {
         this.text = text;
         this.type = Type.NA;
         this.wordIds = new ArrayList<>();
+        this.tokens = new ArrayList<>();
     }
 
     public NitriteId getEmpId() {
@@ -78,5 +80,13 @@ public class Sentence implements Serializable {
 
     public void setWordIds(List<Integer> wordIds) {
         this.wordIds = wordIds;
+    }
+
+    public List<TokenInstance> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(List<TokenInstance> tokens) {
+        this.tokens = tokens;
     }
 }
