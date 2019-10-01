@@ -1,4 +1,4 @@
-package edu.vt.datasheet_text_processor.tokens.Tokenizer;
+package edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +17,11 @@ public class TokenInstance {
     public TokenInstance(Type type) {
         this.type = type;
         this.stream = new ArrayList<>();
+    }
+
+    public TokenInstance(Type type, List<Integer> stream) {
+        this.type = type;
+        this.stream = stream;
     }
 
     public Type getType() {

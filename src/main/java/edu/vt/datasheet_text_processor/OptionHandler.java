@@ -2,7 +2,7 @@ package edu.vt.datasheet_text_processor;
 
 import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance;
+import edu.vt.datasheet_text_processor.signals.Signal;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
@@ -15,12 +15,35 @@ import org.dizitart.no2.SortOrder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import static org.dizitart.no2.Document.createDocument;
 
 public class OptionHandler {
     private static final Logger logger = LogManager.getLogger( OptionHandler.class );
 
     public static void handle ( Project project, Application options ) throws IOException, TokenizerException {
+        if (options.signalNames != null ) {
+            // add signal names to the project
+            // first check if the list is already present
+            var db = project.getDB();
+            var collection = db.getRepository(Signal.class); // creates if not already present
+            // read in signal names
+            for (String line: Files.readAllLines(options.signalNames.toPath())) {
+                // split into name and acronyms
+                var split = line.split("::");
+                if (split.length == 2) {
+                    var acronyms = Arrays.stream(split[1].split(","))
+                            .map(String::toLowerCase)
+                            .collect(Collectors.toList());
+                    collection.insert(new Signal(split[0].toLowerCase(), acronyms));
+                } else {
+                    collection.insert(new Signal(split[0].toLowerCase()));
+                }
+            }
+        }
         if ( options.doClassify ) {
             // create classify table
             var db = project.getDB();

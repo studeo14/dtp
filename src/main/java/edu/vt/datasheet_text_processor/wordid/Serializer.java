@@ -6,6 +6,7 @@ import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.util.ConcurrentReferenceHashMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class Serializer {
     }
 
     private Mapping mapping;
+    private InverseMapping inverseMapping;
     private Map< WordIDClass, Integer > currentNumber;
     private static final Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
 
@@ -47,6 +49,9 @@ public class Serializer {
                         currentNumber.put( c, num );
                     }
                 } );
+        var t = this.mapping.getBaseMapping().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+        this.inverseMapping = new InverseMapping(t);
     }
 
     public List< Integer > serialize (String sentence, AddNewWrapper addNew ) {
@@ -64,6 +69,20 @@ public class Serializer {
                 })
                 .collect( Collectors.toList() );
 
+    }
+
+    public List<String> deserialize( List<Integer> sentence) {
+        return sentence.stream()
+                .map(this::unconvert)
+                .collect(Collectors.toList());
+    }
+
+    public static String mergeWords(List<String> sentence) {
+        return String.join("", sentence);
+    }
+
+    private String unconvert( Integer wordId ) {
+        return inverseMapping.getMapping().getOrDefault(wordId, "");
     }
 
     public void exportMapping ( File outputFile ) throws IOException {

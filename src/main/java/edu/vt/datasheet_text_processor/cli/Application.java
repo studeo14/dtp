@@ -17,6 +17,9 @@ public class Application {
     @Option(names = {"--text"}, description = "input file only has raw text, use implied sentence ids")
     public boolean text;
 
+    @Option(names = {"-s", "--signal-names"}, description = "a list of the signal names in the document", paramLabel = "SIGNALFILE")
+    public File signalNames;
+
     // processing steps
     // print
     // classification
@@ -32,7 +35,7 @@ public class Application {
     public static class WordIDOptions {
         @Option(names = {"-w", "--word-id"}, description = "translate to word ids", required = true)
         public boolean doWordId;
-        @Option(names = {"-m", "--word-id-mappings"}, description = "mapping file (JSON)", required = true)
+        @Option(names = {"-m", "--word-id-mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
         public File mappingFile;
         @Option(names = {"--add-new"}, description = "add new mappings from unmapped words", required = false)
         public boolean addNew;
@@ -43,7 +46,7 @@ public class Application {
     public static class TokenOptions {
         @Option(names = {"-t", "--tokenize"}, description = "tokenize sentences")
         public boolean doToken;
-        @Option(names = {"-q", "--token-mappings"}, description = "mapping file (JSON)", required = true)
+        @Option(names = {"-q", "--token-mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
         public File mappingFile;
         @Option(names = {"--compile-tokens"}, description = "input token mapping file contains raw text rather than wordid streams", required = false)
         public boolean compileTokens;
@@ -64,8 +67,10 @@ public class Application {
         public boolean doShowComments;
         @Option(names = {"--show-non-comments"}, description = "print out only the non-comments")
         public boolean doShowNonComments;
-        @Option(names = {"--show-wordids"}, description = "print out only the non-comments")
+        @Option(names = {"--show-wordids"}, description = "print out the word id streams")
         public boolean doShowWordIds;
+        @Option(names = {"--show-tokens"}, description = "print out the token streams")
+        public boolean doShowTokens;
     }
 
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
