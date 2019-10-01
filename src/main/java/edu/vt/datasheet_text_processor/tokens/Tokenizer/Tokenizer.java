@@ -6,6 +6,7 @@ import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.SearchTreeLe
 import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.SearchTreeNode;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.TokenModel;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.TokenSearchTree;
+import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import edu.vt.datasheet_text_processor.wordid.WordIdUtils;
 import org.apache.logging.log4j.LogManager;
