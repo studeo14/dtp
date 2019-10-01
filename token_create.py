@@ -19,14 +19,25 @@ def main():
                 if line.startswith("#") or len(line) == 0:
                     pass
                 else:
-                    if line in tokenStrings:
+                    # split line into main + aliases
+                    lr = line.split("::")
+                    mainText = lr[0]
+                    if len(lr) == 2:
+                        aliases = lr[1].split("||")
+                    elif len(lr) == 1:
+                        aliases = []
+                    if mainText in tokenStrings:
+                        pass
+                    elif any(alias in tokenStrings for alias in aliases):
                         pass
                     else:
-                        tokenStrings.add(line)
+                        tokenStrings.add(mainText)
+                        for alias in aliases:
+                            tokenStrings.add(alias)
                         tokens[index] = {
                             "id": index,
-                            "stream": line,
-                            "aliases": []
+                            "stream": mainText,
+                            "aliases": aliases
                         }
                         index+=1;
             # done

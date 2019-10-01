@@ -85,7 +85,10 @@
         "stream": "at"
     },
     "17": {
-        "aliases": ["can‘t be", "can’t be"],
+        "aliases": [
+            "can\u2018t be",
+            "can\u2019t be"
+        ],
         "id": 17,
         "stream": "can't be"
     },
