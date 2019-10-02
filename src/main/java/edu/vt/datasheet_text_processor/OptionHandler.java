@@ -7,11 +7,13 @@ import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
+import edu.vt.datasheet_text_processor.Sentence;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.FindOptions;
 import org.dizitart.no2.SortOrder;
+import org.dizitart.no2.objects.filters.ObjectFilters;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +52,9 @@ public class OptionHandler {
             var repo = db.getRepository( Sentence.class );
             var documents = repo.find( FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
             for ( Sentence s : documents ) {
+                if (s.getType() == Sentence.Type.META) {
+                    continue;
+                }
                 // do classify
                 var isComment = DatasheetBOW.is_questionable( s.getText() );
                 if ( isComment ) {
@@ -111,15 +116,6 @@ public class OptionHandler {
                         repo.update( s );
                     }
                 }
-                for ( Sentence s : documents ) {
-                    // do serialize
-                    if ( s.getType() == Sentence.Type.NONCOMMENT ) {
-                        var tokens = s.getTokens().stream()
-                                .map(t -> String.format("%s::%s", t.getType(), t.getId()))
-                                .collect(Collectors.toList());
-                        logger.info( "{}\n->\n{}", s.getText(), tokens );
-                    }
-                }
             }
         }
         if ( options.debugOptions != null ) {
@@ -152,7 +148,19 @@ public class OptionHandler {
                         logger.info( "{}\n->\n{}", s.getText(), s.getWordIds() );
                     }
                 }
-
+            } else if (options.debugOptions.doShowTokens) {
+                var db = project.getDB();
+                var repo = db.getRepository( Sentence.class );
+                var documents = repo.find( FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
+                for ( Sentence s : documents ) {
+                    // do serialize
+                    if ( s.getType() == Sentence.Type.NONCOMMENT ) {
+                        var tokens = s.getTokens().stream()
+                                .map(t -> String.format("%s::%s", t.getType(), t.getId()))
+                                .collect(Collectors.toList());
+                        logger.info( "{}\n->\n{}", s.getText(), tokens );
+                    }
+                }
             }
         }
     }

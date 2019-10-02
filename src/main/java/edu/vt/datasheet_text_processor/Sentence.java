@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Indices({
-        @Index(value = "sentenceId", type = IndexType.Unique),
+        @Index(value = "sentenceId", type = IndexType.NonUnique),
         @Index(value = "type", type = IndexType.NonUnique)
 })
 public class Sentence implements Serializable {
     public enum Type {
-        COMMENT, NONCOMMENT, NA;
+        COMMENT, NONCOMMENT, META, NA;
     }
 
     @Id

@@ -34,7 +34,12 @@ public class ProjectUtils {
                 } else {
                     var splits = line.split("::");
                     var id = Integer.parseInt(splits[0]);
-                    var result = repo.insert(new Sentence(id, splits[1].toLowerCase()));
+                    var newSentence = new Sentence(id, splits[2].toLowerCase());
+                    // check for meta tag
+                    if (splits[1].equals("M") || splits[1].equals("m")) {
+                        newSentence.setType(Sentence.Type.META);
+                    }
+                    var result = repo.insert(newSentence);
                 }
             }
             logger.info("Created new project at {}.project", projectName);

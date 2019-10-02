@@ -481,7 +481,10 @@
     "snooping" : "snoop",
     "supports" : "support",
     "supported" : "support",
-    "supporting" : "support"
+    "supporting" : "support",
+    "produces" : "produce",
+    "produced" : "produce",
+    "producing" : "produce"
   },
   "baseMapping" : {
     "the" : 10,
@@ -1397,6 +1400,8 @@
     "cfgerrcplrdyn" : 14090,
     "cfginterruptrdyn" : 14100,
     "cfginterruptn" : 14110,
-    "cfgmsgreceivedpmeto" : 14120
+    "cfgmsgreceivedpmeto" : 14120,
+    "generally" : 41170,
+    "produce" : 21630
   }
 }
