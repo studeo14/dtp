@@ -18,22 +18,20 @@ check_github_remote () {
 }
 
 add_github_remote () {
-    set +x
+    echo git remote add $GITHUB_ORIGIN git@github.com:grc4delv/datasheet_processor.git
     git remote add $GITHUB_ORIGIN git@github.com:grc4delv/datasheet_processor.git
-    set -x
 }
 
 remove_github_remote () {
-    set +x
+    echo git remote remove $GITHUB_ORIGIN
     git remote remove $GITHUB_ORIGIN
-    set -x
 }
 
 push_to_github () {
+    # get the current branch name
     local branch=$(git branch | grep \* | cut -d ' ' -f2)
-    set +x
+    echo git push $GITHUB_ORIGIN $branch
     git push $GITHUB_ORIGIN $branch
-    set -x
 }
 
 main () {
