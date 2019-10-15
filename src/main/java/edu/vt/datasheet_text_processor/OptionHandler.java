@@ -2,26 +2,27 @@ package edu.vt.datasheet_text_processor;
 
 import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
+import edu.vt.datasheet_text_processor.signals.Acronym;
+import edu.vt.datasheet_text_processor.signals.AcronymFinder;
 import edu.vt.datasheet_text_processor.signals.Signal;
+import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
+import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.BitAccessNormalizer;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
-import edu.vt.datasheet_text_processor.Sentence;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.FindOptions;
 import org.dizitart.no2.SortOrder;
-import org.dizitart.no2.objects.filters.ObjectFilters;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.dizitart.no2.Document.createDocument;
 
 public class OptionHandler {
     private static final Logger logger = LogManager.getLogger( OptionHandler.class );
@@ -96,7 +97,7 @@ public class OptionHandler {
             if ( options.tokenOptions.doToken ) {
                 var serializer = new Serializer( options.wordIDOptions.mappingFile );
                 var tokenizer = new Tokenizer(options.tokenOptions.mappingFile, options.tokenOptions.compileTokens, serializer);
-                System.out.print(tokenizer.getTokenSearchTree().toString());
+                logger.debug("\ntokenizer.getTokenSearchTree().toString()");
                 if (options.tokenOptions.compileTokens) {
                     var exportFileBase = FilenameUtils.removeExtension(options.tokenOptions.mappingFile.getName());
                     var exportFile = new File(exportFileBase + "_compiled.json");
@@ -110,11 +111,20 @@ public class OptionHandler {
                 for ( Sentence s : documents ) {
                     // do serialize
                     if ( s.getType() == Sentence.Type.NONCOMMENT ) {
-                        logger.info( "{}\n->\n{}", s.getText(), s.getWordIds() );
-                        var tokens = tokenizer.tokenize(s.getWordIds());
+                        List<TokenInstance> tokens = tokenizer.tokenize(s.getWordIds());
                         s.setTokens( tokens );
                         repo.update( s );
                     }
+                }
+                if (options.tokenOptions.normalize) {
+                    // find and add acronyms
+                    AcronymFinder.initializeAcronyms(project);
+                    AcronymFinder.findAcronyms(project, serializer);
+                    // normalize acronyms
+                    // TODO
+                    // normalize bit accesses
+                    BitAccessNormalizer.normalizeBitAccesses(project, serializer);
+
                 }
             }
         }
@@ -156,9 +166,17 @@ public class OptionHandler {
                     // do serialize
                     if ( s.getType() == Sentence.Type.NONCOMMENT ) {
                         var tokens = s.getTokens().stream()
-                                .map(t -> String.format("%s::%s", t.getType(), t.getId()))
+                                .map(TokenInstance::toString)
                                 .collect(Collectors.toList());
                         logger.info( "{}\n->\n{}", s.getText(), tokens );
+                    }
+                }
+            } else if (options.debugOptions.doShowAcronyms) {
+                var db = project.getDB();
+                if (db.hasRepository(Sentence.class)) {
+                    var acronyms = db.getRepository(Acronym.class);
+                    for (var acronym: acronyms.find()) {
+                        logger.info("{} -> {}", acronym.getAcronym(), acronym.getExpanded());
                     }
                 }
             }

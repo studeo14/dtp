@@ -77,7 +77,7 @@ public class Serializer {
     }
 
     public static String mergeWords(List<String> sentence) {
-        return String.join("", sentence);
+        return String.join(" ", sentence);
     }
 
     public String unconvert( Integer wordId ) {
@@ -133,8 +133,12 @@ public class Serializer {
         logger.debug("{}", addNew);
         // get base convertion
         var base = mapping.getBaseMapping().getOrDefault( input, 0 );
-        if ( base == 0 && addNew ) {
-            base = addNewMapping( input );
+        if ( base == 0 ) {
+            if (addNew) {
+                base = addNewMapping( input );
+            } else {
+                logger.info("No existing mapping found for {}", input);
+            }
         }
         var baseClass = getWordIdClass( base );
         if ( baseClass == WordIDClass.VERB ) {

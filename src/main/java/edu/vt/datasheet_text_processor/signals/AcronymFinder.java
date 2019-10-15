@@ -61,11 +61,17 @@ public class AcronymFinder {
         var db = project.getDB();
         if (db.hasRepository(Sentence.class)) {
             var sentences = db.getRepository(Sentence.class);
+            var acronyms = db.getRepository(Acronym.class);
             var nonComments = sentences.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT));
             for (var sentence: nonComments) {
-                var literals = sentence.getTokens().stream()
+                // find acronyms and add to project
+                sentence.getTokens().stream()
                         .filter(t -> t.getType() == TokenInstance.Type.LITERAL)
-                        .collect(Collectors.toList());
+                        .map(literal -> getAcronym(literal, serializer))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .map(pair -> new Acronym(pair.getLeft(), pair.getRight()))
+                        .forEach(acronym -> acronyms.insert(acronym));
 
             }
         }
@@ -76,7 +82,7 @@ public class AcronymFinder {
      * @param literal
      * @return
      */
-    public static Optional<Pair<String, String>> getAcronym( TokenInstance literal, Serializer serializer){
+    public static Optional<Pair<String, String>> getAcronym(TokenInstance literal, Serializer serializer){
         if (literal.getType() == TokenInstance.Type.LITERAL) {
             // get words
             logger.debug("Tokens: {}", literal.getStream());

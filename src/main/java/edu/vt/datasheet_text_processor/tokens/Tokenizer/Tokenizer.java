@@ -61,7 +61,7 @@ public class Tokenizer {
     private enum ProcessState {BEGIN, INSIDE, LITERAL, END};
 
     private List<TokenInstance> processWordIdStream(ListIterator<Integer> iter) throws TokenizerException {
-        var retVal = new ArrayList<TokenInstance>();
+        ArrayList<TokenInstance> retVal = new ArrayList<>();
         while(iter.hasNext()) {
             retVal.add(getNextToken(iter));
         }
@@ -69,7 +69,7 @@ public class Tokenizer {
     }
 
     private TokenInstance getNextToken(ListIterator<Integer> iter) throws TokenizerException {
-        var current = new TokenInstance();
+        var current = new TokenInstance(TokenInstance.Type.NA);
         SearchTreeNode currentSearchTreeNode = new SearchTreeNode(-1);
         ProcessState state = ProcessState.BEGIN;
         while(iter.hasNext()) {
@@ -81,14 +81,14 @@ public class Tokenizer {
                         break;
                     }
                     if (tokenSearchTree.getRootNode().getChildren().contains(currentWord)) {
-                        logger.info("Start token: {}", currentWord);
+                        logger.debug("Start token: {}", currentWord);
                         current.setType(TokenInstance.Type.TOKEN);
                         state = ProcessState.INSIDE;
                         currentSearchTreeNode = tokenSearchTree.getRootNode().getChildren().get(currentWord);
                     } else {
                         current.setType(TokenInstance.Type.LITERAL);
                         state = ProcessState.LITERAL;
-                        logger.info("Start literal: {}", currentWord);
+                        logger.debug("Start literal: {}", currentWord);
                     }
                     current.getStream().add(currentWord);
                     break;
@@ -103,7 +103,7 @@ public class Tokenizer {
                     //      no  - ERROR
                     var currentWord = iter.next();
                     current.getStream().add(currentWord);
-                    logger.info("Current Node: {}, CW: {}", currentSearchTreeNode.getWordId(), currentWord);
+                    logger.debug("Current Node: {}, CW: {}", currentSearchTreeNode.getWordId(), currentWord);
                     if (currentSearchTreeNode.getChildren().contains(currentWord)) {
                         currentSearchTreeNode = currentSearchTreeNode.getChildren().get(currentWord);
                     } else if (currentSearchTreeNode.getChildren().containsKey(-1)){

@@ -50,7 +50,10 @@ public class Application {
         public File mappingFile;
         @Option(names = {"--compile-tokens"}, description = "input token mapping file contains raw text rather than wordid streams", required = false)
         public boolean compileTokens;
+        @Option(names = {"-N", "--normalize"}, description = "normalize the tokens", paramLabel = "NORMALIZATIONFILE")
+        public boolean normalize;
     }
+
 
     // debugging options
     @ArgGroup(exclusive = true, heading = "Debugging options for classification%n")
@@ -71,6 +74,8 @@ public class Application {
         public boolean doShowWordIds;
         @Option(names = {"--show-tokens"}, description = "print out the token streams")
         public boolean doShowTokens;
+        @Option(names = {"--show-acronyms"}, description = "print out the generated acronyms")
+        public boolean doShowAcronyms;
     }
 
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")

@@ -39,7 +39,7 @@ public class Sentence implements Serializable {
         this.text = text;
         this.type = Type.NA;
         this.wordIds = new ArrayList<>();
-        this.tokens = new ArrayList<>();
+        this.tokens = new ArrayList<TokenInstance>();
     }
 
     public NitriteId getEmpId() {

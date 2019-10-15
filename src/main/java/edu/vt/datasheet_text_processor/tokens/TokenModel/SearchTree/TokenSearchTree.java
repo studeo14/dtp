@@ -24,7 +24,7 @@ public class TokenSearchTree {
             // do for base stream
             addStreamToTree(stream.listIterator(), rootNode, token.getId());
             for (var alias: token.getAliases()) {
-                logger.info("Alias: {}", alias);
+                logger.debug("Alias: {}", alias);
                 addStreamToTree(alias.listIterator(), rootNode, token.getId());
             }
         }

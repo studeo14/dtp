@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TokenInstance {
-    public enum Type {TOKEN, LITERAL};
+    public enum Type {NA, TOKEN, LITERAL, ACCESS};
 
     private Type type;
-    private List<Integer> stream;
     private Integer id;
+    private List<Integer> stream;
+    private BitAccessToken bitAccessToken;
 
-    public TokenInstance() {
+    public TokenInstance () {
         this.stream = new ArrayList<>();
     }
 
@@ -22,6 +23,12 @@ public class TokenInstance {
     public TokenInstance(Type type, List<Integer> stream) {
         this.type = type;
         this.stream = stream;
+    }
+
+    public TokenInstance(Type type, List<Integer> stream, Integer id) {
+        this.type = type;
+        this.stream = stream;
+        this.id = id;
     }
 
     public Type getType() {
@@ -48,9 +55,20 @@ public class TokenInstance {
         this.id = id;
     }
 
-    public TokenInstance(Type type, List<Integer> stream, Integer id) {
-        this.type = type;
-        this.stream = stream;
-        this.id = id;
+    public BitAccessToken getBitAccessToken() {
+        return bitAccessToken;
+    }
+
+    public void setBitAccessToken(BitAccessToken bitAccessToken) {
+        this.bitAccessToken = bitAccessToken;
+    }
+
+    @Override
+    public String toString() {
+        if (getType() == Type.ACCESS) {
+            return getBitAccessToken().toString();
+        } else {
+            return String.format("%s::%d", getType(), getId());
+        }
     }
 }
