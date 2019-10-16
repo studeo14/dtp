@@ -23,10 +23,8 @@ public class Tokenizer {
 
     private TokenModel tokenModel;
     private TokenSearchTree tokenSearchTree;
-    private Serializer serializer;
 
     public Tokenizer(File mappingFile, boolean useRaw, Serializer serializer) throws IOException {
-        this.serializer = serializer;
         if (useRaw) {
             logger.info("Using string token inputs. Will serialize to wordids before tokeniztion.");
             var rawTokenModel = new ObjectMapper().readValue(mappingFile, RawTokenModel.class);
@@ -37,16 +35,23 @@ public class Tokenizer {
         this.tokenSearchTree = new TokenSearchTree(this.tokenModel);
     }
 
+    public Tokenizer(TokenModel tokenModel) {
+        this.tokenModel = tokenModel;
+        this.tokenSearchTree = new TokenSearchTree(this.tokenModel);
+    }
+
+    public Tokenizer(RawTokenModel rawTokenModel, Serializer serializer) {
+        logger.info("Using string token inputs. Will serialize to wordids before tokeniztion.");
+        this.tokenModel = rawTokenModel.toTokenModel(serializer);
+        this.tokenSearchTree = new TokenSearchTree(this.tokenModel);
+    }
+
     public TokenModel getTokenModel() {
         return tokenModel;
     }
 
     public TokenSearchTree getTokenSearchTree() {
         return tokenSearchTree;
-    }
-
-    public Serializer getSerializer() {
-        return serializer;
     }
 
     public void exportMapping(File exportFile) throws IOException {

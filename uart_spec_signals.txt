@@ -1,0 +1,34 @@
+CLK
+WB_RST_I
+WB_ADDR_I
+WB_SEL_I
+WB_DAT_I
+WB_DAT_O
+WB_WE_I
+WB_STB_I
+WB_STB_I
+WB_CYC_I
+WB_ACK_O
+INT_O
+BAUD_O
+STX_PAD_O
+SRX_PAD_I
+RTS_PAD_O
+DTR_PAD_O
+CTS_PAD_I
+DSR_PAD_I
+RI_PAD_O
+DCD_PAD_I
+Receiver Buffer::RB
+Transmitter Holding Register::THR
+Interrupt Enable::IER
+Interrupt Identification::IIR
+FIFO Control::FCR
+Line Control Register::LCR
+Modem Control::MCR
+Line Status Register::LSR
+Modem Status Register::MSR
+Divisor Latch::DLR
+Debug 1::D1R
+Debug 2::D2R
+WISHBONE

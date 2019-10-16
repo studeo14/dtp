@@ -4,9 +4,11 @@ import edu.vt.datasheet_text_processor.Project;
 import edu.vt.datasheet_text_processor.Sentence;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
+import edu.vt.datasheet_text_processor.wordid.StopAddNewException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dizitart.no2.exceptions.UniqueConstraintException;
 import org.dizitart.no2.objects.filters.ObjectFilters;
 
 import java.util.ArrayList;
@@ -36,19 +38,25 @@ public class AcronymFinder {
             var signals = db.getRepository(Signal.class);
             for (var signal: signals.find()) {
                 // if there are acronyms then add them
-                if (signal.getAcronyms() != null ){
-                    for (var acronym: signal.getAcronyms()) {
-                        collection.insert(new Acronym(acronym, signal.getName()));
+                try {
+                    if (signal.getAcronyms() != null ){
+                        for (var acronym: signal.getAcronyms()) {
+                            collection.insert(new Acronym(acronym, signal.getName()));
+                        }
+                    } else { // if not then convert signal name to an acronym (simple first letter of each word) only is len > 1
+                        var lowered = signal.getName();
+                        var acronym = "";
+                        for (var word: lowered.split(" ")) {
+                            acronym += word.charAt(0);
+                        }
+                        if (acronym.length() >= 2) {
+                            collection.insert(new Acronym(acronym, signal.getName()));
+                        }
+                        // else do not add an acronym
                     }
-                } else { // if not then convert signal name to an acronym (simple first letter of each word)
-                    var lowered = signal.getName();
-                    var acronym = "";
-                    for (var word: lowered.split(" ")) {
-                        acronym += word.charAt(0);
-                    }
-                    collection.insert(new Acronym(acronym, signal.getName()));
+                } catch (UniqueConstraintException e) {
+                    logger.debug("Skipping signal acronym {}. Already added.", signal.getName());
                 }
-
             }
         }
     }
@@ -75,6 +83,30 @@ public class AcronymFinder {
 
             }
         }
+    }
+
+    /**
+     * Add acronyms to the wordid mappings
+     * @param project
+     * @param serializer
+     */
+    public static boolean addAcronymsToMapping(Project project, Serializer serializer) {
+        var db = project.getDB();
+        var retVal = false;
+        logger.debug("Starting add acronym");
+        if (db.hasRepository(Acronym.class)) {
+            var acronyms = db.getRepository(Acronym.class);
+            for (var acronym: acronyms.find()) {
+                serializer.addWordToMapping(acronym.getAcronym(), Serializer.WordIDClass.OBJECT);
+                retVal = true;
+                try {
+                    logger.debug("{} -> {}", acronym.getAcronym(), serializer.convert(acronym.getAcronym(), false));
+                } catch (StopAddNewException e) {
+                    // ignore
+                }
+            }
+        }
+        return retVal;
     }
 
     /**

@@ -19,6 +19,10 @@ public class Application {
 
     @Option(names = {"-s", "--signal-names"}, description = "a list of the signal names in the document", paramLabel = "SIGNALFILE")
     public File signalNames;
+    @Option(names = {"-m", "--mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
+    public File mappingFile;
+    @Option(names = {"--compile-tokens"}, description = "indicates that the mapping file is a raw string token and needs to be compiled", required = false)
+    public boolean compileTokens;
 
     // processing steps
     // print
@@ -35,8 +39,6 @@ public class Application {
     public static class WordIDOptions {
         @Option(names = {"-w", "--word-id"}, description = "translate to word ids", required = true)
         public boolean doWordId;
-        @Option(names = {"-m", "--word-id-mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
-        public File mappingFile;
         @Option(names = {"--add-new"}, description = "add new mappings from unmapped words", required = false)
         public boolean addNew;
     }
@@ -46,10 +48,6 @@ public class Application {
     public static class TokenOptions {
         @Option(names = {"-t", "--tokenize"}, description = "tokenize sentences")
         public boolean doToken;
-        @Option(names = {"-q", "--token-mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
-        public File mappingFile;
-        @Option(names = {"--compile-tokens"}, description = "input token mapping file contains raw text rather than wordid streams", required = false)
-        public boolean compileTokens;
         @Option(names = {"-N", "--normalize"}, description = "normalize the tokens", paramLabel = "NORMALIZATIONFILE")
         public boolean normalize;
     }
@@ -74,6 +72,8 @@ public class Application {
         public boolean doShowWordIds;
         @Option(names = {"--show-tokens"}, description = "print out the token streams")
         public boolean doShowTokens;
+        @Option(names = {"--show-token-text"}, description = "print out the tokenized sentence in text form")
+        public boolean doShowTokenText;
         @Option(names = {"--show-acronyms"}, description = "print out the generated acronyms")
         public boolean doShowAcronyms;
     }
