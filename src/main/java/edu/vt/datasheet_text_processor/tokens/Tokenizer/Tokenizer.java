@@ -107,9 +107,9 @@ public class Tokenizer {
                     //      yes - GOTO end
                     //      no  - ERROR
                     var currentWord = iter.next();
-                    current.getStream().add(currentWord);
                     logger.debug("Current Node: {}, CW: {}", currentSearchTreeNode.getWordId(), currentWord);
                     if (currentSearchTreeNode.getChildren().contains(currentWord)) {
+                        current.getStream().add(currentWord);
                         currentSearchTreeNode = currentSearchTreeNode.getChildren().get(currentWord);
                     } else if (currentSearchTreeNode.getChildren().containsKey(-1)){
                         current.setId(((SearchTreeLeafNode)currentSearchTreeNode.getChildren().get(-1)).getTokenId());
