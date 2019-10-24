@@ -51,3 +51,12 @@ disable
 
 from
 through
+
+[
+]
+:
+
+is assert
+is deassert
+is reassert
+is high

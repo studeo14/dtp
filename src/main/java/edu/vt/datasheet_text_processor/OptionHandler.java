@@ -8,9 +8,7 @@ import edu.vt.datasheet_text_processor.input.AllMappingsRaw;
 import edu.vt.datasheet_text_processor.signals.Acronym;
 import edu.vt.datasheet_text_processor.signals.AcronymFinder;
 import edu.vt.datasheet_text_processor.signals.Signal;
-import edu.vt.datasheet_text_processor.tokens.TokenModel.RawTokenModel;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance.TokenInstance;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
+import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.AcronymNormalizer;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.BitAccessNormalizer;
@@ -147,7 +145,7 @@ public class OptionHandler {
                         AcronymNormalizer.normalizeAcronyms(project, allMappings.getSerializer());
                         // normalize bit accesses
                         logger.info("Normalizing Bit Accesses.");
-                        BitAccessNormalizer.normalizeBitAccesses(project, allMappings.getSerializer());
+                        BitAccessNormalizer.normalizeBitAccesses(project, allMappings.getFrameFinder(), allMappings.getSerializer());
                     }
                 }
             }
@@ -171,6 +169,8 @@ public class OptionHandler {
                     DatasheetBOW.debug_file_questionable( project );
                 } else if ( options.debugOptions.doShowMatches ) {
                     DatasheetBOW.debug_file_matches( project );
+                } else if ( options.debugOptions.doShowMostUsed ) {
+                    DatasheetBOW.most_used( project );
                 } else if ( options.debugOptions.doShowWordIds ) {
                     var db = project.getDB();
                     var repo = db.getRepository( Sentence.class );
@@ -202,7 +202,13 @@ public class OptionHandler {
                         // do serialize
                         if (s.getType() == Sentence.Type.NONCOMMENT) {
                             var tokens = s.getTokens().stream()
-                                    .map(t -> Serializer.mergeWords(allMappings.getSerializer().deserialize(t.getStream())))
+                                    .map(t -> {
+                                        if(t.getType() == TokenInstance.Type.ACCESS) {
+                                            return t.toString();
+                                        } else {
+                                            return Serializer.mergeWords(allMappings.getSerializer().deserialize(t.getStream()));
+                                        }
+                                    })
                                     .collect(Collectors.toList());
                             logger.info("{}\n->\n{}", s.getText(), tokens);
                         }
@@ -215,6 +221,10 @@ public class OptionHandler {
                             logger.info("{} -> {}", acronym.getAcronym(), acronym.getExpanded());
                         }
                     }
+                } else if (options.debugOptions.doShowFrameSearchTree) {
+                    System.out.println(allMappings.getFrameFinder().getFrameSearchTree().toString());
+                } else if (options.debugOptions.doShowTokenSearchTree) {
+                    System.out.println(allMappings.getTokenizer().getTokenSearchTree().toString());
                 }
             }
         }

@@ -1,34 +1,29 @@
-package edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree;
+package edu.vt.datasheet_text_processor.semantic_expressions.frames.SearchTree;
 
 import edu.vt.datasheet_text_processor.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 
-public class SearchTreeLeafNode extends SearchTreeNode{
-    private Integer tokenId;
+public class FrameSearchTreeLeafNode extends FrameSearchTreeNode {
+    private Integer frameId;
 
-    public Integer getTokenId() {
-        return tokenId;
-    }
-
-    public void setTokenId(Integer tokenId) {
-        this.tokenId = tokenId;
-    }
-
-    public SearchTreeLeafNode(Integer tokenId) {
+    public FrameSearchTreeLeafNode(Integer frameId) {
         super(Constants.SEARCH_TREE_LEAF_NODE_ID);
-        this.tokenId = tokenId;
+        this.frameId = frameId;
     }
 
+    public Integer getFrameId() {
+        return frameId;
+    }
     @Override
     public String getString(int index) {
         var str = new StringBuilder();
         // add spaces
         str.append(StringUtils.repeat('.', index ));
         // add self
-        str.append(getWordId());
+        str.append(getTokenId());
         str.append(" :: ");
         // add tokenid
-        str.append(tokenId);
+        str.append(frameId);
         // new line
         str.append('\n');
         return str.toString();

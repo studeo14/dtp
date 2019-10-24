@@ -3,6 +3,8 @@ package edu.vt.datasheet_text_processor.input;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
+import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameModel;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.RawTokenModel;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
 import edu.vt.datasheet_text_processor.wordid.Mapping;
@@ -16,19 +18,23 @@ import java.io.IOException;
  * across operations rather than tying them to a single operation.
  *
  */
-@JsonPropertyOrder({"wordIdMapping", "tokenMapping"})
+@JsonPropertyOrder({"wordIdMapping", "tokenMapping", "frameMapping"})
 public class AllMappingsRaw {
     // need a serializer, tokenizer
     private Mapping wordIdMapping;
     private RawTokenModel tokenMapping;
+    private FrameModel frameMapping;
+    // tools
     private Serializer serializer;
     private Tokenizer tokenizer;
+    private FrameFinder frameFinder;
 
     public AllMappingsRaw() {}
 
     public void init() {
         this.serializer = new Serializer(wordIdMapping);
         this.tokenizer = new Tokenizer(tokenMapping, serializer);
+        this.frameFinder = new FrameFinder(frameMapping);
     }
 
     public void export(File outputFile) throws IOException {
@@ -36,6 +42,7 @@ public class AllMappingsRaw {
         var allMappings = new AllMappings();
         allMappings.setWordIdMapping(wordIdMapping);
         allMappings.setTokenMapping(tokenizer.getTokenModel());
+        allMappings.setFrameMapping(frameMapping);
         new ObjectMapper().writeValue(outputFile, allMappings);
     }
 
@@ -59,6 +66,16 @@ public class AllMappingsRaw {
         this.tokenMapping = tokenMapping;
     }
 
+    @JsonProperty("frameMapping")
+    public FrameModel getFrameMapping() {
+        return frameMapping;
+    }
+
+    @JsonProperty("frameMapping")
+    public void setFrameMapping(FrameModel frameMapping) {
+        this.frameMapping = frameMapping;
+    }
+
     public Serializer getSerializer() {
         return serializer;
     }
@@ -73,5 +90,13 @@ public class AllMappingsRaw {
 
     public void setTokenizer(Tokenizer tokenizer) {
         this.tokenizer = tokenizer;
+    }
+
+    public FrameFinder getFrameFinder() {
+        return frameFinder;
+    }
+
+    public void setFrameFinder(FrameFinder frameFinder) {
+        this.frameFinder = frameFinder;
     }
 }

@@ -191,5 +191,50 @@
         "aliases": [],
         "id": 37,
         "stream": "disable"
+    },
+    "38": {
+        "aliases": [],
+        "id": 38,
+        "stream": "from"
+    },
+    "39": {
+        "aliases": [],
+        "id": 39,
+        "stream": "through"
+    },
+    "40": {
+        "aliases": [],
+        "id": 40,
+        "stream": "["
+    },
+    "41": {
+        "aliases": [],
+        "id": 41,
+        "stream": "]"
+    },
+    "42": {
+        "aliases": [],
+        "id": 42,
+        "stream": ":"
+    },
+    "43": {
+        "aliases": [],
+        "id": 43,
+        "stream": "is assert"
+    },
+    "44": {
+        "aliases": [],
+        "id": 44,
+        "stream": "is deassert"
+    },
+    "45": {
+        "aliases": [],
+        "id": 45,
+        "stream": "is reassert"
+    },
+    "46": {
+        "aliases": [],
+        "id": 46,
+        "stream": "is high"
     }
 }

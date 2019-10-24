@@ -6,7 +6,8 @@ import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.SearchTreeLe
 import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.SearchTreeNode;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.TokenModel;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.TokenSearchTree;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance.TokenInstance;
+import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
+import edu.vt.datasheet_text_processor.util.Constants;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import edu.vt.datasheet_text_processor.wordid.WordIdUtils;
 import org.apache.logging.log4j.LogManager;
@@ -75,7 +76,7 @@ public class Tokenizer {
 
     private TokenInstance getNextToken(ListIterator<Integer> iter) throws TokenizerException {
         var current = new TokenInstance(TokenInstance.Type.NA);
-        SearchTreeNode currentSearchTreeNode = new SearchTreeNode(-1);
+        SearchTreeNode currentSearchTreeNode = new SearchTreeNode();
         ProcessState state = ProcessState.BEGIN;
         while(iter.hasNext()) {
             switch (state) {
@@ -92,6 +93,7 @@ public class Tokenizer {
                         currentSearchTreeNode = tokenSearchTree.getRootNode().getChildren().get(currentWord);
                     } else {
                         current.setType(TokenInstance.Type.LITERAL);
+                        current.setId(Constants.LITERAL_TOKEN_ID);
                         state = ProcessState.LITERAL;
                         logger.debug("Start literal: {}", currentWord);
                     }
@@ -111,8 +113,8 @@ public class Tokenizer {
                     if (currentSearchTreeNode.getChildren().contains(currentWord)) {
                         current.getStream().add(currentWord);
                         currentSearchTreeNode = currentSearchTreeNode.getChildren().get(currentWord);
-                    } else if (currentSearchTreeNode.getChildren().containsKey(-1)){
-                        current.setId(((SearchTreeLeafNode)currentSearchTreeNode.getChildren().get(-1)).getTokenId());
+                    } else if (currentSearchTreeNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)){
+                        current.setId(((SearchTreeLeafNode)currentSearchTreeNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getTokenId());
                         state = ProcessState.END;
                         iter.previous();
                     } else {

@@ -64,6 +64,8 @@ public class Application {
         public boolean doPercentage;
         @Option(names = {"--show-matches"}, description = "print out the matches for each sentences")
         public boolean doShowMatches;
+        @Option(names = {"--show-most-used"}, description = "print out the matches sorted by most commonly matched")
+        public boolean doShowMostUsed;
         @Option(names = {"--show-comments"}, description = "print out only the comments")
         public boolean doShowComments;
         @Option(names = {"--show-non-comments"}, description = "print out only the non-comments")
@@ -76,6 +78,10 @@ public class Application {
         public boolean doShowTokenText;
         @Option(names = {"--show-acronyms"}, description = "print out the generated acronyms")
         public boolean doShowAcronyms;
+        @Option(names = {"--show-fst"}, description = "print out the frame search tree")
+        public boolean doShowFrameSearchTree;
+        @Option(names = {"--show-tst"}, description = "print out the token search tree")
+        public boolean doShowTokenSearchTree;
     }
 
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")

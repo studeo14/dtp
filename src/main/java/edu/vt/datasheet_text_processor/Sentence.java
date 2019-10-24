@@ -1,7 +1,7 @@
 package edu.vt.datasheet_text_processor;
 
 
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance.TokenInstance;
+import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import org.dizitart.no2.IndexType;
 import org.dizitart.no2.NitriteId;
 import org.dizitart.no2.objects.Id;

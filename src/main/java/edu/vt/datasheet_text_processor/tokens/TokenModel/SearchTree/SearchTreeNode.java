@@ -1,5 +1,6 @@
 package edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree;
 
+import edu.vt.datasheet_text_processor.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -24,6 +25,11 @@ public class SearchTreeNode {
 
     public void setChildren(SearchTreeNodeChildren children) {
         this.children = children;
+    }
+
+    public SearchTreeNode() {
+        this.wordId = Constants.DEFAULT_WORD_ID;
+        this.children = new SearchTreeNodeChildren();
     }
 
     public SearchTreeNode(Integer wordId) {

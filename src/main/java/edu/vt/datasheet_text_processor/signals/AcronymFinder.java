@@ -2,7 +2,7 @@ package edu.vt.datasheet_text_processor.signals;
 
 import edu.vt.datasheet_text_processor.Project;
 import edu.vt.datasheet_text_processor.Sentence;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance.TokenInstance;
+import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import edu.vt.datasheet_text_processor.wordid.StopAddNewException;
 import org.apache.commons.lang3.tuple.Pair;

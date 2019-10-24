@@ -3,7 +3,7 @@ package edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization;
 import edu.vt.datasheet_text_processor.Project;
 import edu.vt.datasheet_text_processor.Sentence;
 import edu.vt.datasheet_text_processor.signals.Acronym;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance.TokenInstance;
+import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.apache.logging.log4j.LogManager;

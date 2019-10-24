@@ -1749,6 +1749,96 @@
             "aliases": [],
             "id": 37,
             "stream": "disable"
+        },
+        "38": {
+            "aliases": [],
+            "id": 38,
+            "stream": "from"
+        },
+        "39": {
+            "aliases": [],
+            "id": 39,
+            "stream": "through"
+        },
+        "40": {
+            "aliases": [],
+            "id": 40,
+            "stream": "["
+        },
+        "41": {
+            "aliases": [],
+            "id": 41,
+            "stream": "]"
+        },
+        "42": {
+            "aliases": [],
+            "id": 42,
+            "stream": ":"
+        },
+        "43": {
+            "aliases": [],
+            "id": 43,
+            "stream": "is assert"
+        },
+        "44": {
+            "aliases": [],
+            "id": 44,
+            "stream": "is deassert"
+        },
+        "45": {
+            "aliases": [],
+            "id": 45,
+            "stream": "is reassert"
+        },
+        "46": {
+            "aliases": [],
+            "id": 46,
+            "stream": "is high"
+        }
+    },
+    "frameMapping": {
+        "0": {
+            "id": 0,
+            "template": [10, -21, 11, -21],
+            "aliases": [
+                [-21, 10, 11, -21]
+            ]
+        },
+        "1": {
+            "id": 1,
+            "template": [-21, 40, -21, 41],
+            "aliases": [ ]
+        },
+        "2": {
+            "id": 2,
+            "template": [-21, 40, -21, 42, -21, 41],
+            "aliases": [ ]
+        },
+        "3": {
+            "id": 3,
+            "template": [38, 10, -21, 13, -21, 11, -21],
+            "aliases": [
+                [38, -21, 10, 13, -21, 11, -21],
+                [10, -21, 39, -21, 11, -21]
+            ]
+        },
+        "4": {
+            "id": 4,
+            "template": [-21, 12],
+            "aliases": [
+                [-21, 43],
+                [-21, 44],
+                [-21, 45]
+            ]
+        },
+        "5": {
+            "id": 5,
+            "template": [9, -21, 12],
+            "aliases": [
+                [9, -21, 43],
+                [9, -21, 44],
+                [9, -21, 45]
+            ]
         }
     }
 }

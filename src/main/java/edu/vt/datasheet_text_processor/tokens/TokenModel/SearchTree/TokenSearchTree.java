@@ -1,6 +1,7 @@
 package edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree;
 
 import edu.vt.datasheet_text_processor.tokens.TokenModel.TokenModel;
+import edu.vt.datasheet_text_processor.util.Constants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +17,7 @@ public class TokenSearchTree {
     }
 
     public TokenSearchTree(TokenModel model) {
-        this.rootNode = new SearchTreeNode(0);
+        this.rootNode = new SearchTreeNode();
         // go through and each token stream and add to tree
         for ( var token: model.values() ) {
             var stream = token.getStream();
@@ -31,7 +32,7 @@ public class TokenSearchTree {
     }
 
     private void addStreamToTree(ListIterator<Integer> listIterator, SearchTreeNode currentNode, Integer tokenId) {
-        // base case
+        // recursive case
         if (listIterator.hasNext()) {
             var wordId = listIterator.next();
             // add
@@ -46,12 +47,13 @@ public class TokenSearchTree {
             }
             // if there is a leaf node
             if (!listIterator.hasNext()) {
-                var leaf = new SearchTreeLeafNode(-1, tokenId);
+                var leaf = new SearchTreeLeafNode(tokenId);
                 newNode.getChildren().put(leaf.getWordId(), leaf);
             }
             // recurse
             addStreamToTree(listIterator, newNode, tokenId);
         }
+        // base case
         // else just return (break recursive loop)
     }
 

@@ -1,9 +1,6 @@
 package edu.vt.datasheet_text_processor.signals;
 
-import edu.vt.datasheet_text_processor.tokens.TokenModel.Token;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenInstance.TokenInstance;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
+import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +11,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.IOException;
 
 public class AcronymFinderTest {
     private final static Logger logger = LogManager.getLogger(AcronymFinderTest.class);
