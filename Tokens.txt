@@ -22,6 +22,10 @@ at this time
 above
 at
 can't be::can‘t be||can’t be
+can be
+cannot::can't||can‘t||can’t
+does
+does not::doesn't||doesn’t||doesn‘t
 accessed
 
 when
@@ -60,3 +64,31 @@ is assert
 is deassert
 is reassert
 is high
+
+port
+is a::is an
+has a::has an
+width of
+is
+is enabled
+if
+is defined
+
+then
+
+,
+and
+or
+both
+
+read
+
+can be
+cleared
+ignored
+writing
+a::an
+clears
+reset
+
+but

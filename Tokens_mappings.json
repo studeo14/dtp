@@ -93,148 +93,282 @@
         "stream": "can't be"
     },
     "18": {
-        "aliases": [],
+        "aliases": [
+            "can't",
+            "can\u2018t",
+            "can\u2019t"
+        ],
         "id": 18,
-        "stream": "using"
+        "stream": "cannot"
     },
     "19": {
         "aliases": [],
         "id": 19,
-        "stream": "additional"
+        "stream": "does"
     },
     "20": {
-        "aliases": [],
+        "aliases": [
+            "doesn't",
+            "doesn\u2019t",
+            "doesn\u2018t"
+        ],
         "id": 20,
-        "stream": "are"
+        "stream": "does not"
     },
     "21": {
         "aliases": [],
         "id": 21,
-        "stream": "available"
+        "stream": "using"
     },
     "22": {
         "aliases": [],
         "id": 22,
-        "stream": "for"
+        "stream": "additional"
     },
     "23": {
         "aliases": [],
         "id": 23,
-        "stream": "reset value"
+        "stream": "are"
     },
     "24": {
         "aliases": [],
         "id": 24,
-        "stream": "enables"
+        "stream": "available"
     },
     "25": {
         "aliases": [],
         "id": 25,
-        "stream": "to retrieve"
+        "stream": "for"
     },
     "26": {
         "aliases": [],
         "id": 26,
-        "stream": "what is"
+        "stream": "reset value"
     },
     "27": {
         "aliases": [],
         "id": 27,
-        "stream": "current"
+        "stream": "enables"
     },
     "28": {
         "aliases": [],
         "id": 28,
-        "stream": "following"
+        "stream": "to retrieve"
     },
     "29": {
         "aliases": [],
         "id": 29,
-        "stream": "displays"
+        "stream": "what is"
     },
     "30": {
         "aliases": [],
         "id": 30,
-        "stream": "list of"
+        "stream": "current"
     },
     "31": {
         "aliases": [],
         "id": 31,
-        "stream": "along with"
+        "stream": "following"
     },
     "32": {
         "aliases": [],
         "id": 32,
-        "stream": "they"
+        "stream": "displays"
     },
     "33": {
         "aliases": [],
         "id": 33,
-        "stream": "enable"
+        "stream": "list of"
     },
     "34": {
         "aliases": [],
         "id": 34,
-        "stream": "priority"
+        "stream": "along with"
     },
     "35": {
         "aliases": [],
         "id": 35,
-        "stream": "their"
+        "stream": "they"
     },
     "36": {
         "aliases": [],
         "id": 36,
-        "stream": "set"
+        "stream": "enable"
     },
     "37": {
         "aliases": [],
         "id": 37,
-        "stream": "disable"
+        "stream": "priority"
     },
     "38": {
         "aliases": [],
         "id": 38,
-        "stream": "from"
+        "stream": "their"
     },
     "39": {
         "aliases": [],
         "id": 39,
-        "stream": "through"
+        "stream": "set"
     },
     "40": {
         "aliases": [],
         "id": 40,
-        "stream": "["
+        "stream": "disable"
     },
     "41": {
         "aliases": [],
         "id": 41,
-        "stream": "]"
+        "stream": "from"
     },
     "42": {
         "aliases": [],
         "id": 42,
-        "stream": ":"
+        "stream": "through"
     },
     "43": {
         "aliases": [],
         "id": 43,
-        "stream": "is assert"
+        "stream": "["
     },
     "44": {
         "aliases": [],
         "id": 44,
-        "stream": "is deassert"
+        "stream": "]"
     },
     "45": {
         "aliases": [],
         "id": 45,
-        "stream": "is reassert"
+        "stream": ":"
     },
     "46": {
         "aliases": [],
         "id": 46,
+        "stream": "is assert"
+    },
+    "47": {
+        "aliases": [],
+        "id": 47,
+        "stream": "is deassert"
+    },
+    "48": {
+        "aliases": [],
+        "id": 48,
+        "stream": "is reassert"
+    },
+    "49": {
+        "aliases": [],
+        "id": 49,
         "stream": "is high"
+    },
+    "50": {
+        "aliases": [],
+        "id": 50,
+        "stream": "port"
+    },
+    "51": {
+        "aliases": [
+            "is an"
+        ],
+        "id": 51,
+        "stream": "is a"
+    },
+    "52": {
+        "aliases": [
+            "has an"
+        ],
+        "id": 52,
+        "stream": "has a"
+    },
+    "53": {
+        "aliases": [],
+        "id": 53,
+        "stream": "width of"
+    },
+    "54": {
+        "aliases": [],
+        "id": 54,
+        "stream": "is"
+    },
+    "55": {
+        "aliases": [],
+        "id": 55,
+        "stream": "is enabled"
+    },
+    "56": {
+        "aliases": [],
+        "id": 56,
+        "stream": "if"
+    },
+    "57": {
+        "aliases": [],
+        "id": 57,
+        "stream": "is defined"
+    },
+    "58": {
+        "aliases": [],
+        "id": 58,
+        "stream": "then"
+    },
+    "59": {
+        "aliases": [],
+        "id": 59,
+        "stream": ","
+    },
+    "60": {
+        "aliases": [],
+        "id": 60,
+        "stream": "and"
+    },
+    "61": {
+        "aliases": [],
+        "id": 61,
+        "stream": "or"
+    },
+    "62": {
+        "aliases": [],
+        "id": 62,
+        "stream": "both"
+    },
+    "63": {
+        "aliases": [],
+        "id": 63,
+        "stream": "read"
+    },
+    "64": {
+        "aliases": [],
+        "id": 64,
+        "stream": "cleared"
+    },
+    "65": {
+        "aliases": [],
+        "id": 65,
+        "stream": "ignored"
+    },
+    "66": {
+        "aliases": [],
+        "id": 66,
+        "stream": "writing"
+    },
+    "67": {
+        "aliases": [
+            "an"
+        ],
+        "id": 67,
+        "stream": "a"
+    },
+    "68": {
+        "aliases": [],
+        "id": 68,
+        "stream": "clears"
+    },
+    "69": {
+        "aliases": [],
+        "id": 69,
+        "stream": "reset"
+    },
+    "70": {
+        "aliases": [],
+        "id": 70,
+        "stream": "but"
     }
 }

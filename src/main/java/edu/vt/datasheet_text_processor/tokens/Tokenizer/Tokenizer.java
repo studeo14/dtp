@@ -78,6 +78,7 @@ public class Tokenizer {
         var current = new TokenInstance(TokenInstance.Type.NA);
         SearchTreeNode currentSearchTreeNode = new SearchTreeNode();
         ProcessState state = ProcessState.BEGIN;
+        var originalIter = iter;
         while(iter.hasNext()) {
             switch (state) {
                 case BEGIN:
@@ -118,11 +119,7 @@ public class Tokenizer {
                         state = ProcessState.END;
                         iter.previous();
                     } else {
-                        current.setId(-1);
-                        state = ProcessState.END;
-                        iter.previous();
-                        logger.info("Unknown token found at word {}. Defaulting to invalid token.", currentWord);
-//                        throw new TokenizerException(String.format("Unknown token found at word %s", currentWord));
+                        throw new TokenizerException(String.format("Unknown token found at word %s", currentWord), currentWord);
                     }
                     break;
                 }

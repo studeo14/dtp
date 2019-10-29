@@ -2,6 +2,7 @@ package edu.vt.datasheet_text_processor.wordid;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.util.Constants;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
 import org.apache.logging.log4j.LogManager;
@@ -165,8 +166,8 @@ public class Serializer {
 
     public Integer convert ( String input, boolean addNew ) throws StopAddNewException {
         // get base convertion
-        var base = mapping.getBaseMapping().getOrDefault( input, 0 );
-        if ( base == 0 ) {
+        var base = mapping.getBaseMapping().getOrDefault( input, Constants.DEFAULT_WORD_ID );
+        if (base.equals(Constants.DEFAULT_WORD_ID)) {
             if (addNew) {
                 base = addNewMapping( input );
             } else {

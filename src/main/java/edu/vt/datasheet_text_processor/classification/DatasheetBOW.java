@@ -6,9 +6,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +20,9 @@ public class DatasheetBOW {
     // regexes sorted by most used
     private static final Pattern[] patterns = {
             Pattern.compile("writing .+? to .+?"),
+            Pattern.compile("(^| )the (port|bit) .+? is "),
+            Pattern.compile(" has a width of"),
+            Pattern.compile(String.format("(^| )%s .*?%s .*?is ", conditions, signals)),
             Pattern.compile("reset value"),
             Pattern.compile(String.format("(occur|occurs).+?%s", conditions)),
             Pattern.compile("(^| )(are|must be) (sampled|captured)"),
@@ -67,7 +67,7 @@ public class DatasheetBOW {
             Pattern.compile("possible values"),
             Pattern.compile(".+? defaults to .+?"),
             Pattern.compile("(during|while|before|after) .+? (transfers|interactions|exchanges|transactions)"),
-            Pattern.compile("(^| )(at|when|after|before|if) .+? (zero|one|0|1|high|low|enabled|disabled|asserted|deasserted)"),
+            Pattern.compile("(^| )(at|when|after|before|if) .+? (is|is set to|equals) (zero|one|0|1|high|low|enabled|disabled|asserted|deasserted)( |$|\\.)"),
             Pattern.compile("(^| )(bit|signal|register|bus|value) .+? (asserts|deasserts|enables|disables|activates|sends|starts|stops)"),
             Pattern.compile("padding .+? (bits|bus|register|value)"),
             Pattern.compile("(^| |-)(asserts|reassert|reasserts|assert|deassert|deasserts)"),
@@ -95,9 +95,7 @@ public class DatasheetBOW {
                 .filter(s -> s.getType() == Sentence.Type.NONCOMMENT)
                 .forEach(s -> {
                     var match = is_questionable_debug(s.getText());
-                    if (match.getLeft()) {
-                        matchCount.put(match.getRight(), matchCount.get(match.getRight()) + 1);
-                    }
+                    match.ifPresent(patternListPair -> matchCount.put(patternListPair.getLeft(), matchCount.get(patternListPair.getLeft()) + 1));
                 });
         // sort and print
         matchCount.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getValue))
@@ -121,20 +119,33 @@ public class DatasheetBOW {
     }
 
     /**
+     * Helper fuction to extract the pattern and group matches from a matcher object
+     * @param matcher
+     * @return
+     */
+    public static Pair<Pattern, List<String>> extractMatches(Matcher matcher) {
+        var groups = new ArrayList<String>();
+        for (var i = 1; i <= matcher.groupCount(); i++) {
+            groups.add(matcher.group(i));
+        }
+        return Pair.of(matcher.pattern(), groups);
+    }
+
+    /**
      * Finds if a sentence matches any of the patterns and gives the first pattern matched.
      *
      * @param sentence
-     * @return Pair of (match?, pattern)
+     * @return Optional of the matched pattern, empty if no matches found
      */
-    public static Pair<Boolean, Pattern> is_questionable_debug(String sentence) {
+    public static Optional<Pair<Pattern, List<String>>> is_questionable_debug(String sentence) {
         // return first pattern matched as a pair
         for (Pattern p : patterns) {
             Matcher tempMatcher = p.matcher(sentence);
             if (tempMatcher.find()) {
-                return Pair.of(true, p);
+                return Optional.of(extractMatches(tempMatcher));
             }
         }
-        return Pair.of(false, null);
+        return Optional.empty();
     }
 
     /**
@@ -143,18 +154,17 @@ public class DatasheetBOW {
      * @param sentence
      * @return Pair of (match?, patterns)
      */
-    public static Pair<Boolean, List<Pattern>> is_questionable_matches(String sentence) {
+    public static Optional<List<Pattern>> is_questionable_matches(String sentence) {
         boolean retBool = false;
         List<Pattern> retList = new ArrayList<>();
         // add to list of patterns that match and set bool if matched at all
         for (Pattern p : patterns) {
             Matcher tempMatcher = p.matcher(sentence);
             if (tempMatcher.find()) {
-                retBool = true;
                 retList.add(p);
             }
         }
-        return Pair.of(retBool, retList);
+        return Optional.empty();
     }
 
     // TODO: update for current flow
@@ -177,8 +187,9 @@ public class DatasheetBOW {
         project.getSentences()
                 .toList().stream()
                 .filter(s -> s.getType() == Sentence.Type.NONCOMMENT)
-                .map(s -> Pair.of(s.getText(), is_questionable_debug(s.getText()).getRight()))
-                .forEach(p -> System.out.printf("%s :: %s\n", p.getLeft(), p.getRight().pattern()));
+                .map(s -> Pair.of(s.getText(), is_questionable_debug(s.getText())))
+                .filter(s -> s.getRight().isPresent())
+                .forEach(p -> System.out.printf("%s :: %s\n", p.getLeft(), p.getRight().get()));
     }
 
     // TODO: update for current flow
@@ -193,8 +204,9 @@ public class DatasheetBOW {
         project.getSentences()
                 .toList().stream()
                 .filter(s -> s.getType() == Sentence.Type.NONCOMMENT)
-                .map(s -> Pair.of(s.getText(), is_questionable_matches(s.getText()).getRight()))
-                .forEach(p -> logger.info("{} :: {}", p.getLeft(), p.getRight()));
+                .map(s -> Pair.of(s.getText(), is_questionable_matches(s.getText())))
+                .filter(s -> s.getRight().isPresent())
+                .forEach(p -> logger.info("{} :: {}", p.getLeft(), p.getRight().get()));
     }
 
 }

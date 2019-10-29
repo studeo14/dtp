@@ -125,9 +125,13 @@ public class OptionHandler {
                     for ( Sentence s : documents ) {
                         // do serialize
                         if ( s.getType() == Sentence.Type.NONCOMMENT ) {
-                            List<TokenInstance> tokens = allMappings.getTokenizer().tokenize(s.getWordIds());
-                            s.setTokens( tokens );
-                            repo.update( s );
+                            try {
+                                List<TokenInstance> tokens = allMappings.getTokenizer().tokenize(s.getWordIds());
+                                s.setTokens( tokens );
+                                repo.update( s );
+                            } catch (TokenizerException te) {
+                                logger.error("Unable to tokenize \"{}\" at **{}**", s.getText(),allMappings.getSerializer().unconvert(te.getCurrentWord()));
+                            }
                         }
                     }
                     if (options.tokenOptions.normalize) {
@@ -164,8 +168,18 @@ public class OptionHandler {
                     double percentage = results.getRight().doubleValue() / ( results.getLeft().doubleValue() );
                     System.out.printf( "%%Q: %.2f%%\n", percentage * 100 );
                 } else if ( options.debugOptions.doShowComments ) {
-                    DatasheetBOW.debug_file_comments( project );
-                } else if ( options.debugOptions.doShowNonComments ) {
+                    DatasheetBOW.debug_file_comments(project);
+                } else if (options.debugOptions.doShowNonComments) {
+                    var db = project.getDB();
+                    var repo = db.getRepository( Sentence.class );
+                    var documents = repo.find( FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
+                    for ( Sentence s : documents ) {
+                        // do serializee
+                        if ( s.getType() == Sentence.Type.NONCOMMENT ) {
+                            logger.info( "{}", s.getText());
+                        }
+                    }
+                } else if ( options.debugOptions.doShowNonCommentsMatches ) {
                     DatasheetBOW.debug_file_questionable( project );
                 } else if ( options.debugOptions.doShowMatches ) {
                     DatasheetBOW.debug_file_matches( project );

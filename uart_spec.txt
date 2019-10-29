@@ -1,158 +1,400 @@
 0::N::The UART (Universal Asynchronous Receiver/Transmitter) core provides serial communication capabilities, which allow communication with modem or other external devices, like another computer using a serial cable and RS232 protocol.
 231::N::This core is designed to be maximally compatible with the industry standard National Semiconductors’ 16550A device.
 347::N::Features:
-0::M::Table Start: "null"
-0::M::Table End: "null"
+0::M::Table Start: "Revision History"
+0::M::Table End: "Revision History"
 357::M::List Start
-357::N::WISHBONE interface in 32-bit or 8-bit data bus modes (selectable)
-423::N::FIFO only operation
-443::N::Register level and functionality compatibility with NS16550A (but not 16450).
-521::N::Debug Interface in 32-bit data bus mode.
-561::M::List End
-562::N::Clocks table:
-562::M::Table Start: "null"
-562::M::Table End: "null"
-562::M::Table Start: "null"
-562::M::Table End: "null"
-562::M::Table Start: "null"
-562::M::Table End: "null"
-576::N::In addition, there are 2 Clock Divisor registers that together form one 16-bit.
-656::N::The registers can be accessed when the 7th (DLAB) bit of the Line Control Register is set to ‘1’.
-754::N::At this time the above registers at addresses 0-1 can’t be accessed.
-576::M::Table Start: "null"
-576::M::Table End: "null"
-576::M::Table Start: "null"
-576::M::Table End: "null"
-823::N::When using 32-bit data bus interface, additional read-only registers are available for debug purposes:
-823::M::Table Start: "null"
-823::M::Table End: "null"
-926::N::This register allows enabling and disabling interrupt generation by the UART.
-926::M::Table Start: "null"
-926::M::Table End: "null"
-1004::N::Reset Value: 00h
-1004::M::Table Start: "null"
-1004::M::Table End: "null"
-1021::N::The IIR enables the programmer to retrieve what is the current highest priority pending interrupt.
-1120::N::Bit 0 indicates that an interrupt is pending when it’s logic ‘0’.
-1186::N::When it’s ‘1’ – no interrupt is pending.
-1227::N::The following table displays the list of possible interrupts along with the bits they enable, priority, and their source and reset control.
-1367::N::Bits 4 and 5: Logic ‘0’.
-1392::N::Bits 6 and 7: Logic ‘1’ for compatibility reason.
-1442::N::Reset Value: C1h
-1367::M::Table Start: "null"
-1367::M::Table End: "null"
-1459::N::The FCR allows selection of the FIFO trigger level (the number of bytes in FIFO required to enable the Received Data Available interrupt).
-1598::N::In addition, the FIFOs can be cleared using this register.
-1657::N::Reset Value : 11000000b
-1657::M::Table Start: "null"
-1657::M::Table End: "null"
-1681::N::The line control register allows the specification of the format of the asynchronous data communication used.
-1791::N::A bit in the register also allows access to the Divisor Latches, which define the baud rate.
-1884::N::A bit in the register also allows access to the Divisor Latches, which define the baud rate.
-1977::N::Reading from the register is allowed to check the current settings of the communication.
-2066::N::Reading from the register is allowed to check the current settings of the communication.
-1681::M::Table Start: "null"
-1681::M::Table End: "null"
-2155::N::Reset Value: 00000011b
-2178::N::The modem control register allows transferring control signals to a modem connected to the UART.
-2275::N::Reset Value: 0
-2275::M::Table Start: "null"
-2275::M::Table End: "null"
-2290::N::The register displays the current state of the modem control lines.
-2358::N::Also, four bits also provide an indication in the state of one of the modem status lines.
-2448::N::These bits are set to ‘1’ when a change in corresponding line has been detected and they are reset when the register is being read.
-2290::M::Table Start: "null"
-2290::M::Table End: "null"
-2290::M::Table Start: "null"
-2290::M::Table End: "null"
-2580::N::The divisor latches can be accessed by setting the 7th bit of LCR to ‘1’.
-2654::N::You should restore this bit to ‘0’ after setting the divisor latches in order to restore access to the other registers that occupy the same addresses.
-2805::N::The 2 bytes form one 16-bit register, which is internally accessed as a single number.
-2892::N::You should therefore set all 2 bytes of the register to ensure normal operation.
-2973::N::The register is set to the default value of 0 on reset, which disables all serial I/O operations in order to ensure explicit setup of the register in the software.
-3137::N::The value set should be equal to (system clock speed) / (16 x desired baud rate).
-3219::N::The internal counter starts to work when the LSB of DL is written, so when setting the divisor, write the MSB first and the LSB last.
-2580::M::Table Start: "null"
-2580::M::Table End: "null"
-3353::N::This register is only available when the core has 32-bit data bus and 5-bit address bus.
-3442::N::It is read only and is provided for debugging purposes of chip testing as it is not part of the original UART16550 device specifications.
-3580::N::Reading from the does not influence core’s bahaviour.
-3634::N::This register is only available when the core has 32-bit data bus and 5-bit address bus.
-3723::N::It is read only and is provided for debugging purposes of chip testing as it is not part of the original UART16550 device specifications.
-3861::N::Reading from the does not influence core’s bahaviour.
-3634::M::Table Start: "null"
-3634::M::Table End: "null"
-3915::N::This UART core is very similar in operation to the standard 16550 UART chip with the main exception being that only the FIFO mode is supported.
-4059::N::The scratch register is removed, as it serves no purpose.
-4117::N::This core can operate in 8-bit data bus mode or in 32-bit bus mode, which is now the default mode.
-4216::N::The 32-bit mode is fully WISHBONE compatible and it uses the WISHBONE [SEL_I] signal to properly receive and return 8-bit data on 32-bit data bus.
-4363::N::The 8-bit version might have problems in various WISHBONE implementations because a 32-bit master reading from 8-bit bus can expect data on different bytes of the 4-byte word, depending on the register address.
-4574::N::Also, in 32-bit data bus mode, the [ADR_I] is 5 and not 3 bits wide.
-4643::N::In addition, in the 32-bit data bus mode a debug interface is present in the system.
-4728::N::This interface has 2 32-bit registers that can be read to provide non-intrusive look into the core’s registers and other internal values of importance.
-4880::N::The selection between 32- and 8-bits data bus modes is performed by defining DATA_BUS_WIDTH_8 in uart_defines.v, uart_top.v or on the compiler/synthesizer tool command line.
-3915::M::Table Start: "null"
-3915::M::Table End: "null"
-5054::N::Upon reset the core performs the following tasks:
-5104::M::List Start
-5104::N::The receiver and transmitter FIFOs are cleared.
-5152::N::The receiver and transmitter shift registers are cleared
-5209::N::The Divisor Latch register is set to 0.
-5249::N::The Line Control Register is set to communication of 8 bits of data, no parity, 1 stop bit.
-5341::N::All interrupts are disabled in the Interrupt Enable Register.
-5402::M::List End
-5403::N::For proper operation, perform the following:
-5448::M::List Start
-5448::N::Set the Line Control Register to the desired line control parameters.
-5518::N::Set bit 7 to ‘1’ to allow access to the Divisor Latches.
-5574::M::List End
-5575::M::List Start
-5575::N::Set the Divisor Latches, MSB first, LSB next.
-5621::N::Set bit 7 of LCR to ‘0’ to disable access to Divisor Latches.
-5683::N::At this time the transmission engine starts working and data can be sent and received.
-5770::N::Set the FIFO trigger level.
-5798::N::Generally, higher trigger level values produce less interrupt to the system, so setting it to 14 bytes is recommended if the system responds fast enough.
-5952::N::Enable desired interrupts by setting appropriate bits in the Interrupt Enable register.
-6039::M::List End
-6040::N::Remember that (Input Clock Speed)/(Divisor Latch value) = 16 x the communication baud rate.
-6132::N::Since the protocol is asynchronous and the sampling of the bits is performed in the perceived middle of the bit time, it is highly immune to small differences in the clocks of the sending and receiving sides, yet no such assumption should be made when calculating the Divisor Latch values.
-6422::N::The core implements the WISNBONE SoC bus interface for communication with the system.
-6508::N::It has an 8-bit data bus for compatibility reason.
-6559::N::The core requires one interrupt.
-6592::N::It requires 2 pads in the chip (serial in and serial out) and, optionally, another six modem control signals, which can otherwise be implemented using general purpose I/Os on the chip.
-6777::N::The block diagram of the core is on the following page.
+357::N::WISHBONE interface in 32-bit or 8-bit data bus modes (selectable) 
+423::N::FIFO only operation 
+443::N::Register level and functionality compatibility with NS16550A (but not 16450). 
+521::N::Debug Interface in 32-bit data bus mode. 
+562::M::List End
+562::M::Table Start: "Introduction"
+562::N::The Port CLK is an Input.
+588::N::The Port CLK has a width of 1.
+619::N::The Port CLK is Block’s clock input.
+656::N::The Port WB_RST_I is an Input.
+687::N::The Port WB_RST_I has a width of 1.
+723::N::The Port WB_RST_I is Asynchronous Reset.
+764::N::The Port WB_ADDR_I is an Input.
+796::N::The Port WB_ADDR_I has a width of 5 or 3.
+838::N::The Port WB_ADDR_I is Used for register selection.
+889::N::The Port WB_SEL_I is an Input.
+920::N::The Port WB_SEL_I has a width of 4.
+956::N::The Port WB_SEL_I is Select signal.
+992::N::The Port WB_DAT_I is an Input.
+1023::N::The Port WB_DAT_I has a width of 32 or 8.
+1065::N::The Port WB_DAT_I is Data input.
+1098::N::The Port WB_DAT_O is an Output.
+1130::N::The Port WB_DAT_O has a width of 32 or 8.
+1172::N::The Port WB_DAT_O is Data output.
+1206::N::The Port WB_WE_I is an Input.
+1236::N::The Port WB_WE_I has a width of 1.
+1271::N::The Port WB_WE_I is Write or read cycle selection.
+1322::N::The Port WB_STB_I is an Input.
+1353::N::The Port WB_STB_I has a width of 1.
+1389::N::The Port WB_STB_I is Specifies transfer cycle.
+1436::N::The Port WB_CYC_I is an Input.
+1467::N::The Port WB_CYC_I has a width of 1.
+1503::N::The Port WB_CYC_I is A bus cycle is in progress.
+1552::N::The Port OpenCores UART16550 core specifications 8/11/2002 www.opencores.org Rev 0.6 2 of 16 2 IO ports 2.1 WISHBONE interface signals Port Width Direction Description CLK 1 Input Block’s clock input WB_RST_I 1 Input Asynchronous Reset WB_ADDR_I 5 or 3 Input Used for register selection WB_SEL_I 4 Input Select signal WB_DAT_I 32 or 8 Input Data input WB_DAT_O 32 or 8 Output Data output WB_WE_I 1 Input Write or read cycle selection WB_STB_I 1 Input Specifies transfer cycle WB_CYC_I 1 Input A bus cycle is in progress WB_ACK_O is an Output.
+2095::N::The Port OpenCores UART16550 core specifications 8/11/2002 www.opencores.org Rev 0.6 2 of 16 2 IO ports 2.1 WISHBONE interface signals Port Width Direction Description CLK 1 Input Block’s clock input WB_RST_I 1 Input Asynchronous Reset WB_ADDR_I 5 or 3 Input Used for register selection WB_SEL_I 4 Input Select signal WB_DAT_I 32 or 8 Input Data input WB_DAT_O 32 or 8 Output Data output WB_WE_I 1 Input Write or read cycle selection WB_STB_I 1 Input Specifies transfer cycle WB_CYC_I 1 Input A bus cycle is in progress WB_ACK_O has a width of 1.
+2642::N::The Port OpenCores UART16550 core specifications 8/11/2002 www.opencores.org Rev 0.6 2 of 16 2 IO ports 2.1 WISHBONE interface signals Port Width Direction Description CLK 1 Input Block’s clock input WB_RST_I 1 Input Asynchronous Reset WB_ADDR_I 5 or 3 Input Used for register selection WB_SEL_I 4 Input Select signal WB_DAT_I 32 or 8 Input Data input WB_DAT_O 32 or 8 Output Data output WB_WE_I 1 Input Write or read cycle selection WB_STB_I 1 Input Specifies transfer cycle WB_CYC_I 1 Input A bus cycle is in progress WB_ACK_O is Acknowledge of a transfer.
+3201::M::Table End: "Introduction"
+3201::M::Table Start: "2.2 Other internal signals"
+3201::N::The Port INT_O is an Output.
+3230::N::The Port INT_O has a width of 1.
+3263::N::The Port INT_O is Interrupt output.
+3299::N::The Port BAUD_O is an Output.
+3329::N::The Port BAUD_O has a width of 1.
+3363::N::Optional baud rate output signal.
+3397::N::The signal here is the 16 x actual baud rate.
+3443::N::It is enabled if UART_HAS_BAUDRATE_OUTPUT is defined
+3496::M::Table End: "2.2 Other internal signals"
+3496::M::Table Start: "2.3 External (off-chip) connections"
+3496::N::The Port STX_PAD_O is an Output.
+3529::N::The Port STX_PAD_O has a width of 1.
+3566::N::The Port STX_PAD_O is The serial output signal.
+3614::N::The Port SRX_PAD_I is an Input.
+3646::N::The Port SRX_PAD_I has a width of 1.
+3683::N::The Port SRX_PAD_I is The serial input signal.
+3730::N::The Port RTS_PAD_O is an Output.
+3763::N::The Port RTS_PAD_O has a width of 1.
+3800::N::The Port RTS_PAD_O is Request To Send.
+3839::N::The Port DTR_PAD_O is an Output.
+3872::N::The Port DTR_PAD_O has a width of 1.
+3909::N::The Port DTR_PAD_O is Data Terminal Ready.
+3952::N::The Port CTS_PAD_I is an Input.
+3984::N::The Port CTS_PAD_I has a width of 1.
+4021::N::The Port CTS_PAD_I is Clear To Send.
+4058::N::The Port DSR_PAD_I is an Input.
+4090::N::The Port DSR_PAD_I has a width of 1.
+4127::N::The Port DSR_PAD_I is Data Set Ready.
+4165::N::The Port RI_PAD_I is an Input.
+4196::N::The Port RI_PAD_I has a width of 1.
+4232::N::The Port RI_PAD_I is Ring Indicator.
+4269::N::The Port DCD_PAD_I is an Input.
+4301::N::The Port DCD_PAD_I has a width of 1.
+4338::N::The Port DCD_PAD_I is Data Carrier Detect.
+4381::M::Table End: "2.3 External (off-chip) connections"
+4381::N::Clocks table:
+4395::M::Table Start: "Clocks"
+4395::N::When Name is , then Rates (MHz) is Max.
+4435::N::The Name is Min.
+4452::N::When Name is clk, then Source is WISHBONE bus, Rates (MHz) is 1258Mhz for 1200 bps.
+4536::N::The Name clk is 3.6864 for 115200 bps.
+4575::M::Table End: "Clocks"
+4575::M::Table Start: "4.1 Registers list"
+4575::N::When Name is Receiver Buffer, then Address is 0, Width is 8, Access is R.
+4649::N::The Name Receiver Buffer is Receiver FIFO output.
+4699::N::When Name is Transmitter Holding Register (THR), then Address is 0, Width is 8, Access is W.
+4792::N::The Name Transmitter Holding Register (THR) is Transmit FIFO input.
+4860::N::When Name is Interrupt Enable, then Address is 1, Width is 8, Access is RW.
+4936::N::The Name Interrupt Enable is Enable/Mask interrupts generated by the UART.
+5011::N::When Name is Interrupt Identification, then Address is 2, Width is 8, Access is R.
+5094::N::The Name Interrupt Identification is Get interrupt information.
+5158::N::When Name is FIFO Control, then Address is 2, Width is 8, Access is W.
+5229::N::The Name FIFO Control is Control FIFO options.
+5276::N::When Name is Line Control Register, then Address is 3, Width is 8, Access is RW.
+5357::N::The Name Line Control Register is Control connection.
+5411::N::When Name is Modem Control, then Address is 4, Width is 8, Access is W.
+5483::N::The Name Modem Control is Controls modem.
+5525::N::When Name is Line Status, then Address is 5, Width is 8, Access is R.
+5595::N::The Name Line Status is Status information.
+5639::N::When Name is Modem Status, then Address is 6, Width is 8, Access is R.
+5710::N::The Name Modem Status is Modem Status.
+5749::M::Table End: "4.1 Registers list"
+5749::N::In addition, there are 2 Clock Divisor registers that together form one 16-bit.
+5829::N::The registers can be accessed when the 7th (DLAB) bit of the Line Control Register is set to ‘1’.
+5927::N::At this time the above registers at addresses 0-1 can’t be accessed.
+5996::M::Table Start: "4.1 Registers list"
+5996::N::When Name is Divisor Latch Byte 1 (LSB), then Address is 0, Width is 8, Access is RW.
+6082::N::The Name Divisor Latch Byte 1 (LSB) is The LSB of the divisor latch.
+6151::N::When Name is Divisor Latch Byte 2, then Address is 1, Width is 8, Access is RW.
+6231::N::The Name Divisor Latch Byte 2 is The MSB of the divisor latch.
+6294::M::Table End: "4.1 Registers list"
+6294::N::When using 32-bit data bus interface, additional read-only registers are available for debug purposes:
+6397::M::Table Start: "4.1 Registers list"
+6397::N::When Name is Debug 1, then Address is 8, Width is 32, Access is R.
+6464::N::The Name Debug 1 is First debug register.
+6506::N::When Name is Debug 2, then Address is 12, Width is 32, Access is R.
+6574::N::The Name Debug 2 is Second debug register.
+6617::M::Table End: "4.1 Registers list"
+6617::N::This register allows enabling and disabling interrupt generation by the UART.
+6695::M::Table Start: "4.2 Interrupt Enable Register (IER)"
+6695::N::When Bit # is 0, then Access is RW.
+6731::N::The Bit # 0 is Received Data available interrupt  ‘0’ – disabled  ‘1’ – enabled.
+6812::N::When Bit # is 1, then Access is RW.
+6848::N::The Bit # 1 is Transmitter Holding Register empty interrupt  ‘0’ – disabled  ‘1’ – enabled.
+6940::N::When Bit # is 2, then Access is RW.
+6976::N::The Bit # 2 is Receiver Line Status Interrupt  ‘0’ – disabled  ‘1’ – enabled.
+7054::N::When Bit # is 3, then Access is RW.
+7090::N::The Bit # 3 is Modem Status Interrupt  ‘0’ – disabled  ‘1’ – enabled.
+7160::N::When Bit # is 7-4, then Access is RW.
+7198::N::Reserved.
+7208::N::Should be logic ‘0’.
+7229::M::Table End: "4.2 Interrupt Enable Register (IER)"
+7229::N::Reset Value: 00h
+7246::N::The IIR enables the programmer to retrieve what is the current highest priority pending interrupt.
+7345::N::Bit 0 indicates that an interrupt is pending when it’s logic ‘0’.
+7411::N::When it’s ‘1’ – no interrupt is pending.
+7452::N::The following table displays the list of possible interrupts along with the bits they enable, priority, and their source and reset control.
+7592::M::Table Start: "4.3 Interrupt Identification Register (IIR)"
+7592::N::When Bit 3 is 0, then Bit 2 is 1, Bit 1 is 1, Priority is 1st, Interrupt Type is Receiver Line Status, Interrupt Source is Parity, Overrun or Framing errors or Break Interrupt, Interrupt Reset Control is Reading the Line Status Register.
+7830::N::When Bit 3 is 0, then Bit 2 is 1, Bit 1 is 0, Priority is 2nd, Interrupt Type is Receiver Data available, Interrupt Source is FIFO trigger level reached, Interrupt Reset Control is FIFO drops below trigger level.
+8043::N::When Bit 3 is 1, then Bit 2 is 1, Bit 1 is 0, Priority is 2nd, Interrupt Type is Timeout Indication, Interrupt Source is There’s at least 1 character in the FIFO but no character has been input to the FIFO or read from it for the last 4 Char times., Interrupt Reset Control is Reading from the FIFO (Receiver Buffer Register).
+8370::N::When Bit 3 is 0, then Bit 2 is 0, Bit 1 is 1, Priority is 3rd, Interrupt Type is Transmitter Holding Register empty, Interrupt Source is Transmitter Holding Register Empty, Interrupt Reset Control is Writing to the Transmitter Holding Register or reading IIR.
+8630::N::When Bit 3 is 0, then Bit 2 is 0, Bit 1 is 0, Priority is 4th, Interrupt Type is Modem Status, Interrupt Source is CTS, DSR, RI or DCD., Interrupt Reset Control is Reading the Modem status register.
+8829::M::Table End: "4.3 Interrupt Identification Register (IIR)"
+8829::N::Bits 4 and 5: Logic ‘0’.
+8854::N::Bits 6 and 7: Logic ‘1’ for compatibility reason.
+8904::N::Reset Value: C1h
+8921::N::The FCR allows selection of the FIFO trigger level (the number of bytes in FIFO required to enable the Received Data Available interrupt).
+9060::N::In addition, the FIFOs can be cleared using this register.
+9119::M::Table Start: "4.4 FIFO Control Register (FCR)"
+9119::N::When Bit # is 0, then Access is W.
+9154::N::Ignored (Used to enable FIFOs in NS16550D).
+9198::N::Since this UART only supports FIFO mode, this bit is ignored.
+9260::N::When Bit # is 1, then Access is W.
+9295::N::Writing a ‘1’ to bit 1 clears the Receiver FIFO and resets its logic.
+9365::N::But it doesn’t clear the shift register, i.e. receiving of the current character continues.
+9457::N::When Bit # is 2, then Access is W.
+9492::N::Writing a ‘1’ to bit 2 clears the Transmitter FIFO and resets its logic.
+9565::N::The shift register is not cleared, i.e. transmitting of the current character continues.
+9654::N::When Bit # is 5-3, then Access is W.
+9691::N::The Bit # 5-3 is Ignored.
+9717::N::When Bit # is 7-6, then Access is W.
+9754::N::The Bit # 7-6 is Define the Receiver FIFO Interrupt trigger level  ‘00’ – 1 byte  ‘01’ – 4 bytes  ‘10’ – 8 bytes  ‘11’ – 14 bytes.
+9885::M::Table End: "4.4 FIFO Control Register (FCR)"
+9885::N::Reset Value : 11000000b
+9909::M::Table Start: "4.4 FIFO Control Register (FCR)"
+9909::N::When Bit # is 1-0, then Access is RW.
+9947::N::The Bit # 1-0 is Select number of bits in each character  ‘00’ – 5 bits  ‘01’ – 6 bits  ‘10’ – 7 bits  ‘11’ – 8 bits.
+10065::N::When Bit # is 2, then Access is RW.
+10101::N::The Bit # 2 is Specify the number of generated stop bits  ‘0’ – 1 stop bit  ‘1’ – 1.5 stop bits when 5-bit character length selected and  2 bits otherwise Note that the receiver always checks the first stop bit only.
+10318::N::When Bit # is 3, then Access is RW.
+10354::N::The Bit # 3 is Parity Enable  ‘0’ – No parity  ‘1’ – Parity bit is generated on each outgoing character and  is checked on each incoming one.
+10496::N::When Bit # is OpenCores UART16550 core specifications 8/11/2002 www.opencores.org Rev 0.6 8 of 16 4.5 Line Control Register (LCR) The line control register allows the specification of the format of the asynchronous data communication used. A bit in the register also allows access to the Divisor Latches, which define the baud rate. Reading from the register is allowed to check the current settings of the communication. Bit # Access Description 1-0 RW Select number of bits in each character  ‘00’ – 5 bits  ‘01’ – 6 bits  ‘10’ – 7 bits  ‘11’ – 8 bits 2 RW Specify the number of generated stop bits  ‘0’ – 1 stop bit  ‘1’ – 1.5 stop bits when 5-bit character length selected and  2 bits otherwise Note that the receiver always checks the first stop bit only. 3 RW Parity Enable  ‘0’ – No parity  ‘1’ – Parity bit is generated on each outgoing character and  is checked on each incoming one. 4, then Access is RW.
+11411::N::Even Parity select ‘0’ – Odd number of ‘1’ is transmitted and checked in each word (data and parity combined).
+11522::N::In other words, if the data has an even number of ‘1’ in it, then the parity bit is ‘1’.
+11611::N::‘1’ – Even number of ‘1’ is transmitted in each word.
+11665::N::When Bit # is 5, then Access is RW.
+11701::N::Stick Parity bit.
+11719::N::‘0’ – Stick Parity disabled ‘1’ - If bits 3 and 4 are logic ‘1’, the parity bit is transmitted and checked as logic ‘0’.
+11840::N::If bit 3 is ‘1’ and bit 4 is ‘0’ then the parity bit is transmitted and checked as ‘1’.
+11928::N::When Bit # is 6, then Access is RW.
+11964::N::Break Control bit ‘1’ – the serial out is forced into logic ‘0’ (break state).
+12043::N::‘0’ – break is disabled
+12067::N::When Bit # is 7, then Access is RW.
+12103::N::Divisor Latch Access bit.
+12129::N::‘1’ – The divisor latches can be accessed ‘0’ – The normal registers are accessed
+12211::M::Table End: "4.4 FIFO Control Register (FCR)"
+12211::N::The line control register allows the specification of the format of the asynchronous data communication used.
+12321::N::A bit in the register also allows access to the Divisor Latches, which define the baud rate.
+12414::N::A bit in the register also allows access to the Divisor Latches, which define the baud rate.
+12507::N::Reading from the register is allowed to check the current settings of the communication.
+12596::N::Reading from the register is allowed to check the current settings of the communication.
+12685::N::Reset Value: 00000011b
+12708::N::The modem control register allows transferring control signals to a modem connected to the UART.
+12805::M::Table Start: "4.6 Modem Control Register (MCR)"
+12805::N::When Bit # is 0, then Access is W.
+12840::N::The Bit # 0 is Data Terminal Ready (DTR) signal control  ‘0’ – DTR is ‘1’  ‘1’ – DTR is ‘0’.
+12933::N::When Bit # is 1, then Access is W.
+12968::N::The Bit # 1 is Request To Send (RTS) signal control  ‘0’ – RTS is ‘1’  ‘1’ – RTS is ‘0’.
+13057::N::When Bit # is 2, then Access is W.
+13092::N::Out1.
+13098::N::In loopback mode, connected Ring Indicator (RI) signal input
+13159::N::When Bit # is 3, then Access is W.
+13194::N::Out2.
+13200::N::In loopback mode, connected to Data Carrier Detect (DCD) input.
+13264::N::When Bit # is 4, then Access is W.
+13299::N::Loopback mode ‘0’ – normal operation ‘1’ – loopback mode.
+13357::N::When in loopback mode, the Serial Output Signal (STX_PAD_O) is set to logic ‘1’.
+13438::N::The signal of the transmitter shift register is internally connected to the input of the receiver shift register.
+13552::N::The following connections are made: DTR DSR RTS CTS Out1 RI Out2 DCD
+13621::N::When Bit # is 7-5, then Access is W.
+13658::N::The Bit # 7-5 is Ignored.
+13684::M::Table End: "4.6 Modem Control Register (MCR)"
+13684::N::Reset Value: 0
+13699::M::Table Start: "4.7 Line Status Register (LSR)"
+13699::N::When Bit # is 0, then Access is R.
+13734::N::Data Ready (DR) indicator.
+13761::N::‘0’ – No characters in the FIFO ‘1’ – At least one character has been received and is in the FIFO.
+13860::N::When Bit # is 1, then Access is R.
+13895::N::Overrun Error (OE) indicator ‘1’ – If the FIFO is full and another character has been received in the receiver shift register.
+14022::N::If another character is starting to arrive, it will overwrite the data in the shift register but the FIFO will remain intact.
+14148::N::The bit is cleared upon reading from the register.
+14199::N::Generates Receiver Line Status interrupt.
+14241::N::‘0’ – No overrun state
+14264::N::When Bit # is 2, then Access is R.
+14299::N::Parity Error (PE) indicator ‘1’ – The character that is currently at the top of the FIFO has been received with parity error.
+14425::N::The bit is cleared upon reading from the register.
+14476::N::Generates Receiver Line Status interrupt.
+14518::N::‘0’ – No parity error in the current character
+14565::N::When Bit # is 3, then Access is R.
+14600::N::Framing Error (FE) indicator ‘1’ – The received character at the top of the FIFO did not have a valid stop bit.
+14712::N::Of course, generally, it might be that all the following data is corrupt.
+14786::N::The bit is cleared upon reading from the register.
+14837::N::Generates Receiver Line Status interrupt.
+14879::N::‘0’ – No framing error in the current character
+14927::N::When Bit # is 4, then Access is R.
+14962::N::Break Interrupt (BI) indicator ‘1’ –A break condition has been reached in the current character.
+15059::N::The break occurs when the line is held in logic 0 for a time of one character (start bit + data + parity + stop bit).
+15177::N::In that case, one zero character enters the FIFO and the UART waits for a valid start bit to receive next character.
+15294::N::The bit is cleared upon reading from the register.
+15345::N::Generates Receiver Line Status interrupt.
+15387::N::‘0’ – No break condition in the current character
+15437::N::When Bit # is 5, then Access is R.
+15472::N::Transmit FIFO is empty.
+15496::N::‘1’ – The transmitter FIFO is empty.
+15533::N::Generates Transmitter Holding Register Empty interrupt.
+15589::N::The bit is cleared when data is being been written to the transmitter FIFO.
+15665::N::‘0’ – Otherwise
+15681::N::When Bit # is 6, then Access is R.
+15716::N::Transmitter Empty indicator.
+15745::N::‘1’ – Both the transmitter FIFO and transmitter shift register are empty.
+15819::N::The bit is cleared when data is being been written to the transmitter FIFO.
+15895::N::‘0’ – Otherwise
+15911::N::When Bit # is 7, then Access is R.
+15946::N::‘1’ – At least one parity error, framing error or break indications have been received and are inside the FIFO.
+16058::N::The bit is
+16069::M::Table End: "4.7 Line Status Register (LSR)"
+16069::M::Table Start: "4.7 Line Status Register (LSR)"
+16069::N::When Bit # is , then.
+16091::N::cleared upon reading from the register.
+16131::N::‘0’ – Otherwise.
+16148::M::Table End: "4.7 Line Status Register (LSR)"
+16148::N::The register displays the current state of the modem control lines.
+16216::N::Also, four bits also provide an indication in the state of one of the modem status lines.
+16306::N::These bits are set to ‘1’ when a change in corresponding line has been detected and they are reset when the register is being read.
+16438::M::Table Start: "4.8 Modem Status Register (MSR)"
+16438::N::When Bit # is 0, then Access is R.
+16473::N::The Bit # 0 is Delta Clear To Send (DCTS) indicator  ‘1’ – The CTS line has changed its state.
+16568::N::When Bit # is 1, then Access is R.
+16603::N::The Bit # 1 is Delta Data Set Ready (DDSR) indicator  ‘1’ – The DSR line has changed its state.
+16699::N::When Bit # is 2, then Access is R.
+16734::N::Trailing Edge of Ring Indicator (TERI) detector.
+16783::N::The RI line has changed its state from low to high state.
+16841::N::When Bit # is 3, then Access is R.
+16876::N::The Bit # 3 is Delta Data Carrier Detect (DDCD) indicator  ‘1’ – The DCD line has changed its state.
+16977::N::When Bit # is 4, then Access is R.
+17012::N::The Bit # 4 is Complement of the CTS input or equals to RTS in loopback mode.
+17090::N::When Bit # is 5, then Access is R.
+17125::N::The Bit # 5 is Complement of the DSR input or equals to DTR in loopback mode.
+17203::N::When Bit # is 6, then Access is R.
+17238::N::The Bit # 6 is Complement of the RI input or equals to Out1 in loopback mode.
+17316::N::When Bit # is 7, then Access is R.
+17351::N::The Bit # 7 is Complement of the DCD input or equals to Out2 in loopback mode.
+17430::M::Table End: "4.8 Modem Status Register (MSR)"
+17430::N::The divisor latches can be accessed by setting the 7th bit of LCR to ‘1’.
+17504::N::You should restore this bit to ‘0’ after setting the divisor latches in order to restore access to the other registers that occupy the same addresses.
+17655::N::The 2 bytes form one 16-bit register, which is internally accessed as a single number.
+17742::N::You should therefore set all 2 bytes of the register to ensure normal operation.
+17823::N::The register is set to the default value of 0 on reset, which disables all serial I/O operations in order to ensure explicit setup of the register in the software.
+17987::N::The value set should be equal to (system clock speed) / (16 x desired baud rate).
+18069::N::The internal counter starts to work when the LSB of DL is written, so when setting the divisor, write the MSB first and the LSB last.
+18203::N::This register is only available when the core has 32-bit data bus and 5-bit address bus.
+18292::N::It is read only and is provided for debugging purposes of chip testing as it is not part of the original UART16550 device specifications.
+18430::N::Reading from the does not influence core’s bahaviour.
+18484::M::Table Start: "4.10 Debug 1"
+18484::N::When Bit # is 7-0, then Access is R.
+18521::N::The Bit # 7-0 is Line Status Register value.
+18566::N::When Bit # is 11-8, then Access is R.
+18604::N::The Bit # 11-8 is Interrupt Enable Register value (bits 3-0).
+18666::N::When Bit # is 15-12, then Access is R.
+18705::N::The Bit # 15-12 is Interrupt Identifier Register value (bits 3-0).
+18772::N::When Bit # is 23-16, then Access is R.
+18811::N::The Bit # 23-16 is Line Control Register value.
+18859::N::When Bit # is 31-24, then Access is R.
+18898::N::The Bit # 31-24 is Modem Status Register value.
+18946::M::Table End: "4.10 Debug 1"
+18946::N::This register is only available when the core has 32-bit data bus and 5-bit address bus.
+19035::N::It is read only and is provided for debugging purposes of chip testing as it is not part of the original UART16550 device specifications.
+19173::N::Reading from the does not influence core’s bahaviour.
+19227::M::Table Start: "4.11 Debug 2"
+19227::N::When Bit # is 2-0, then Access is R.
+19264::N::The Bit # 2-0 is Transmitter FSM state.
+19304::N::When Bit # is 7-3, then Access is R.
+19341::N::The Bit # 7-3 is Number of characters in Transmitter FIFO (tf_count).
+19411::N::When Bit # is 11-8, then Access is R.
+19449::N::The Bit # 11-8 is Receiver FSM state.
+19487::N::When Bit # is 16-12, then Access is R.
+19526::N::The Bit # 16-12 is Number of characters in Receiver FIFO (rf_count).
+19595::N::When Bit # is 18-17, then Access is R.
+19634::N::The Bit # 18-17 is Modem Control Register value (bits 4-0).
+19694::N::When Bit # is 23-19, then Access is R.
+19733::N::The Bit # 23-19 is FIFO Control Register value (bits 7-6).
+19792::N::When Bit # is 31-24, then Access is R.
+19831::N::Reserved.
+19841::N::Returned value is 0.
+19862::M::Table End: "4.11 Debug 2"
+19862::N::This UART core is very similar in operation to the standard 16550 UART chip with the main exception being that only the FIFO mode is supported.
+20006::N::The scratch register is removed, as it serves no purpose.
+20064::N::This core can operate in 8-bit data bus mode or in 32-bit bus mode, which is now the default mode.
+20163::N::The 32-bit mode is fully WISHBONE compatible and it uses the WISHBONE [SEL_I] signal to properly receive and return 8-bit data on 32-bit data bus.
+20310::N::The 8-bit version might have problems in various WISHBONE implementations because a 32-bit master reading from 8-bit bus can expect data on different bytes of the 4-byte word, depending on the register address.
+20521::N::Also, in 32-bit data bus mode, the [ADR_I] is 5 and not 3 bits wide.
+20590::N::In addition, in the 32-bit data bus mode a debug interface is present in the system.
+20675::N::This interface has 2 32-bit registers that can be read to provide non-intrusive look into the core’s registers and other internal values of importance.
+20827::N::The selection between 32- and 8-bits data bus modes is performed by defining DATA_BUS_WIDTH_8 in uart_defines.v, uart_top.v or on the compiler/synthesizer tool command line.
+21001::N::Upon reset the core performs the following tasks:
+21051::M::List Start
+21051::N::The receiver and transmitter FIFOs are cleared. 
+21099::N::The receiver and transmitter shift registers are cleared 
+21156::N::The Divisor Latch register is set to 0. 
+21196::N::The Line Control Register is set to communication of 8 bits of data, no parity, 1 stop bit. 
+21288::N::All interrupts are disabled in the Interrupt Enable Register. 
+21350::M::List End
+21350::N::For proper operation, perform the following:
+21395::M::List Start
+21395::N::Set the Line Control Register to the desired line control parameters. Set bit 7 to ‘1’ to allow access to the Divisor Latches. 
+21522::M::List End
+21522::M::List Start
+21522::N::Set the Divisor Latches, MSB first, LSB next. 
+21568::N::Set bit 7 of LCR to ‘0’ to disable access to Divisor Latches. At this time the transmission engine starts working and data can be sent and received. 
+21717::N::Set the FIFO trigger level. Generally, higher trigger level values produce less interrupt to the system, so setting it to 14 bytes is recommended if the system responds fast enough. 
+21899::N::Enable desired interrupts by setting appropriate bits in the Interrupt Enable register. 
+21987::M::List End
+21987::N::Remember that (Input Clock Speed)/(Divisor Latch value) = 16 x the communication baud rate.
+22079::N::Since the protocol is asynchronous and the sampling of the bits is performed in the perceived middle of the bit time, it is highly immune to small differences in the clocks of the sending and receiving sides, yet no such assumption should be made when calculating the Divisor Latch values.
+22369::N::The core implements the WISNBONE SoC bus interface for communication with the system.
+22455::N::It has an 8-bit data bus for compatibility reason.
+22506::N::The core requires one interrupt.
+22539::N::It requires 2 pads in the chip (serial in and serial out) and, optionally, another six modem control signals, which can otherwise be implemented using general purpose I/Os on the chip.
+22724::N::The block diagram of the core is on the following page.
 0::M::Section start: "Introduction"
-562::M::Section End: "Introduction"
+3201::M::Section End: "Introduction"
 0::M::Section start: "Revision History"
 0::M::Section End: "Revision History"
-562::M::Section start: "Clocks"
-576::M::Section End: "Clocks"
-562::M::Section start: "2.2 Other internal signals"
-562::M::Section End: "2.2 Other internal signals"
-562::M::Section start: "2.3 External (off-chip) connections"
-562::M::Section End: "2.3 External (off-chip) connections"
-576::M::Section start: "4.1 Registers list"
-926::M::Section End: "4.1 Registers list"
-926::M::Section start: "4.2 Interrupt Enable Register (IER)"
-1021::M::Section End: "4.2 Interrupt Enable Register (IER)"
-1021::M::Section start: "4.3 Interrupt Identification Register (IIR)"
-1459::M::Section End: "4.3 Interrupt Identification Register (IIR)"
-1459::M::Section start: "4.4 FIFO Control Register (FCR)"
-2178::M::Section End: "4.4 FIFO Control Register (FCR)"
-2178::M::Section start: "4.6 Modem Control Register (MCR)"
-2290::M::Section End: "4.6 Modem Control Register (MCR)"
-2290::M::Section start: "4.8 Modem Status Register (MSR)"
-2580::M::Section End: "4.8 Modem Status Register (MSR)"
-2290::M::Section start: "4.7 Line Status Register (LSR)"
-2290::M::Section End: "4.7 Line Status Register (LSR)"
-2580::M::Section start: "4.9 Divisor Latches"
-3353::M::Section End: "4.9 Divisor Latches"
-3353::M::Section start: "4.10 Debug 1"
-3634::M::Section End: "4.10 Debug 1"
-3634::M::Section start: "4.11 Debug 2"
-3915::M::Section End: "4.11 Debug 2"
-3915::M::Section start: "Operation"
-5054::M::Section End: "Operation"
-5054::M::Section start: "5.1 Initialization"
-6422::M::Section End: "5.1 Initialization"
-6422::M::Section start: "Architecture"
+3201::M::Section start: "2.2 Other internal signals"
+3496::M::Section End: "2.2 Other internal signals"
+3496::M::Section start: "2.3 External (off-chip) connections"
+4381::M::Section End: "2.3 External (off-chip) connections"
+4381::M::Section start: "Clocks"
+4575::M::Section End: "Clocks"
+4575::M::Section start: "4.1 Registers list"
+6617::M::Section End: "4.1 Registers list"
+6617::M::Section start: "4.2 Interrupt Enable Register (IER)"
+7246::M::Section End: "4.2 Interrupt Enable Register (IER)"
+7246::M::Section start: "4.3 Interrupt Identification Register (IIR)"
+8921::M::Section End: "4.3 Interrupt Identification Register (IIR)"
+8921::M::Section start: "4.4 FIFO Control Register (FCR)"
+12708::M::Section End: "4.4 FIFO Control Register (FCR)"
+12708::M::Section start: "4.6 Modem Control Register (MCR)"
+13699::M::Section End: "4.6 Modem Control Register (MCR)"
+13699::M::Section start: "4.7 Line Status Register (LSR)"
+16148::M::Section End: "4.7 Line Status Register (LSR)"
+16148::M::Section start: "4.8 Modem Status Register (MSR)"
+17430::M::Section End: "4.8 Modem Status Register (MSR)"
+17430::M::Section start: "4.9 Divisor Latches"
+18203::M::Section End: "4.9 Divisor Latches"
+18203::M::Section start: "4.10 Debug 1"
+18946::M::Section End: "4.10 Debug 1"
+18946::M::Section start: "4.11 Debug 2"
+19862::M::Section End: "4.11 Debug 2"
+19862::M::Section start: "Operation"
+21001::M::Section End: "Operation"
+21001::M::Section start: "5.1 Initialization"
+22369::M::Section End: "5.1 Initialization"
+22369::M::Section start: "Architecture"
+22780::M::Section End: "Architecture"

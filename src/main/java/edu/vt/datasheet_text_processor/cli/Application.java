@@ -70,6 +70,8 @@ public class Application {
         public boolean doShowComments;
         @Option(names = {"--show-non-comments"}, description = "print out only the non-comments")
         public boolean doShowNonComments;
+        @Option(names = {"--show-non-comments-matches"}, description = "print out only the non-comments with their pattern matches")
+        public boolean doShowNonCommentsMatches;
         @Option(names = {"--show-wordids"}, description = "print out the word id streams")
         public boolean doShowWordIds;
         @Option(names = {"--show-tokens"}, description = "print out the token streams")
