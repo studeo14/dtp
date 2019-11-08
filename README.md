@@ -43,36 +43,49 @@ Groups wordids into tokens. The result is a token stream. This step assumes seri
 ### -h (Help message)
 From `./run.sh -h`:
 ```text
-Usage: ./run.sh [-w -m=MAPPINGFILE [--add-new]] [[-t] -q=MAPPINGFILE
-           [--compile-tokens]] [[-p] | [--show-percentage] | [--show-matches] |
-           [--show-comments] | [--show-non-comments] | [--show-wordids] |
-           [--show-tokens]] [-chn] [--text] -f=INPUTFILE [-s=SIGNALFILE]
+Usage: dtp [-n | -m=MAPPINGFILE] [-w [--add-new]] [[-t] [-N]] [[-p] |
+           [--show-percentage] | [--show-matches] | [--show-most-used] |
+           [--show-comments] | [--show-non-comments] |
+           [--show-non-comments-matches] | [--show-wordids] | [--show-tokens] |
+           [--show-token-text] | [--show-acronyms] | [--show-fst] |
+           [--show-tst]] [-ch] [--compile-tokens] [--text] -f=INPUTFILE
+           [-s=SIGNALFILE]
   -c, --classify            classify the sentences
+      --compile-tokens      indicates that the mapping file is a raw string
+                              token and needs to be compiled
   -f, --file=INPUTFILE      the input cas/project/text file
   -h, --help                display this help message
-  -n, --new-project         create a new project
   -s, --signal-names=SIGNALFILE
                             a list of the signal names in the document
       --text                input file only has raw text, use implied sentence
                               ids
+In Point options
+  -m, --mappings=MAPPINGFILE
+                            mapping file (JSON)
+  -n, --new-project         create a new project
 Word id serialization options
       --add-new             add new mappings from unmapped words
-  -m, --word-id-mappings=MAPPINGFILE
-                            mapping file (JSON)
   -w, --word-id             translate to word ids
-Tokenizer options      --compile-tokens      input token mapping file contains raw text rather
-                              than wordid streams
-  -q, --token-mappings=MAPPINGFILE
-                            mapping file (JSON)
+Tokenizer options
+  -N, --normalize           normalize the tokens
   -t, --tokenize            tokenize sentences
 Debugging options for classification
   -p, --print               print the sentences from a project
+      --show-acronyms       print out the generated acronyms
       --show-comments       print out only the comments
+      --show-fst            print out the frame search tree
       --show-matches        print out the matches for each sentences
+      --show-most-used      print out the matches sorted by most commonly
+                              matched
       --show-non-comments   print out only the non-comments
+      --show-non-comments-matches
+                            print out only the non-comments with their pattern
+                              matches
       --show-percentage     print out the percentage of the file that is
                               non-comments
+      --show-token-text     print out the tokenized sentence in text form
       --show-tokens         print out the token streams
+      --show-tst            print out the token search tree
       --show-wordids        print out the word id streams
 ```
 ### Top Level Options
@@ -80,8 +93,6 @@ Debugging options for classification
 Tells the code to classify the sentences.
 #### -f, --file
 The input project or text file.
-#### -n, --new-project
-Tell the code to interpret the input file as a text file to be turned into a new project. The new project file will be `INPUTFILE.project`.
 #### -s, --signal-names
 This tells the code to add the signal names in `SIGNALFILE` to the project. This input file follows the following line-delimited format:
 
@@ -90,70 +101,91 @@ This tells the code to add the signal names in `SIGNALFILE` to the project. This
 ```
 #### --text
 Tells the new project code to interpret the input text file as a line-delimited version (not from cas2text)
+#### --compile-tokens
+Tells the code that the token mapping file uses plain text sentences to represent the tokens. Tells the code to also serialize the token mappings and use them instead.
+
+This operation is mutually exclusive to any other operation (the program will compile the input mapping file and exit. It will not do anything else).
+
+Exports the serialized token mappings to `MAPPINGFILE_compiled.json`
+### In Point Options
+These options tell the program whether it is creating a new project or processing one. These are mutually exclusive options.
+#### -n, --new-project
+Tell the code to interpret the input file as a text file to be turned into a new project. The new project file will be `INPUTFILE.project`.
+#### -m, --mappings
+Mapping json file that specifies verb aliases and base mappings. Additionally, contains mappings for tokens, frames, and semantic expressions.
 ### Word Id Options
 #### --add-new
 When a word is found that has no existing mapping the code will interactively ask the user to classify the word.
 The categories are given to the user to input. If a verb is chosen then the stem and alias will be asked of the user.
 The new mappings are exported to the given mapping file from the `-m` option.
-#### -m, --word-id-mappings
-Mapping json file that specifies verb aliases and base mappings.
 #### -w, --word-id
 Tell the code to serialize the sentences
 ### Tokenizser Options
+#### -N, --normalize
+Normalizes ambiguous sentences. This includes finding and replacing acronyms and signals names and simplifying bit accesses.
 #### -t, --tokenize
 Tell the code to tokenize the word id streams. When this option is given, the `-w` and `-m` options are needed as well in order to interpret the wordids.
-#### -q, --token-mappings
-Mappings file for the token and token aliases. (JSON)
-#### --compile-tokens
-Tells the code that the token mapping file uses plain text sentences to represent the tokens. Tells the code to also serialize the token mappings and use them instead.
-
-Exports the serialized token mappings to `MAPPINGFILE_compiled.json`
 ### Debugging options
 #### -p, --print
 Prints out the current state of the project
+#### --show-acronyms
+Prints out the found acronyms in the project
 #### --show-comments
 Prints out only the comments from the project. This assumes that the project has been classified.
+#### --show-fst
+Prints out the frame search tree
 #### --show-matches
 Shows what patterns were matched during classification
+#### --show-most-used
+Shows the classification patterns that were most matched in the current project.
 #### --show-non-comments
 Prints out only the non-comments
+#### --show-non-comments-matches
+Prints out only the non-comments with their pattern matches
 #### --show-percentage
 Prints out the percentage of the project of non-comments:comments
-#### --show-wordids
-Shows the wordid streams of the sentences
+#### --show-token-text
+Prints out the tokenized sentence in text form. Includes the normalized results if normalization has been run.
 #### --show-tokens
 Shown the token streams.
+#### --show-tst
+Prints out the token search tree
+#### --show-wordids
+Shows the wordid streams of the sentences
 
 ## Examples
 Input file from cas2text: `uart_spec.txt`.
 
+Input mapping file (uncompiled): `Mappings.json`.
+
 ### Creating the project
-Command: `./run.sh -nf uart_spec.txt`
+Command: `./run.sh -nf uart_spec.txt`.
 
 #### Raw text input
-Command: `./run.sh -nf uart_spec.txt --text`
+Command: `./run.sh -nf uart_spec.txt --text`.
 
-A file `uart_spec.project` is creates.
+A file `uart_spec.project` is created.
+### Compiling the mappings
+Command: `./run.sh -f uart_spec.project -m Mappings.json --compile-tokens`
+
+A file `Mappings_compile.json` is created. This file should be used for the remainder of the processing commands.
 ### Classification
-Command: `./run.sh -f uart_spec.project -c`
+Command: `./run.sh -f uart_spec.project -m Mappings_compiled.json -c`
 
 ### Word Id Serialization
-Mappings File: `Mappings.json`
-
-Command: `./run.sh -f uart_spec.project -wm Mappings.json`
+Command: `./run.sh -f uart_spec.project -m Mappings_compiled.json -w`
 #### Adding new mappings
-Command: `./run.sh -f uart_spec.project -wm Mappings.json --add-new`
+Command: `./run.sh -f uart_spec.project -m Mappings_compiled.json -w --add-new`
+
+The new mappings will be exported to the `<MAPPINGFILE>` that was given in the command.
 
 ### Tokenization
-Mappings File (Raw Sentences): `Tokens_mappings.json`
-Mappings File (Compiled): `Tokens_mappings_compiled.json`
+Command: `./run.sh -f uart_spec.project -m Mappings_compiled.json -t`
 
-Command: `./run.sh -f uart_spec.project -wm Mappings.json -tq Tokens_mappings_compiled.json`
+#### Normalization
+Command: `./run.sh -f uart_spec.project -m Mappings_compiled.json -tN`
 
-#### Compiling token mappings
-Command: `./run.sh -f uart_spec.project -wm Mappings.json -tq Tokens_mappings.json --compile-tokens`
-
-### Combining options
+### Combining processing options
 This command does everything at once (in the proper order internally)
 
-Command: `./run.sh -nf uart_spec.txt -cwm Mappings.json -tw Tokens_mappings_compiled.json`
+Command: `./run.sh -f uart_spec.project -cwtNm Mappings_compiled.json`

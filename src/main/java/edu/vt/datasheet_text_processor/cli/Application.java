@@ -11,16 +11,23 @@ public class Application {
     @Option(names = {"-f", "--file"}, required = true, paramLabel = "INPUTFILE", description = "the input cas/project/text file")
     public File inputFile;
 
+    @ArgGroup(exclusive = true, heading="In Point options%n")
+    public InPointOptions inPointOptions;
+
+    // options that tell the program if it is creating a project or processing one
+    public static class InPointOptions {
+        @Option(names = {"-n", "--new-project"}, description = "create a new project", required = true)
+        public boolean newProject;
+        @Option(names = {"-m", "--mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
+        public File mappingFile;
+    }
+
     // new project flags
-    @Option(names = {"-n", "--new-project"}, description = "create a new project")
-    public boolean newProject;
     @Option(names = {"--text"}, description = "input file only has raw text, use implied sentence ids")
     public boolean text;
 
     @Option(names = {"-s", "--signal-names"}, description = "a list of the signal names in the document", paramLabel = "SIGNALFILE")
     public File signalNames;
-    @Option(names = {"-m", "--mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
-    public File mappingFile;
     @Option(names = {"--compile-tokens"}, description = "indicates that the mapping file is a raw string token and needs to be compiled", required = false)
     public boolean compileTokens;
 
@@ -43,7 +50,7 @@ public class Application {
         public boolean addNew;
     }
 
-    @ArgGroup(exclusive = false, heading = "Tokenizer options")
+    @ArgGroup(exclusive = false, heading = "Tokenizer options%n")
     public TokenOptions tokenOptions;
     public static class TokenOptions {
         @Option(names = {"-t", "--tokenize"}, description = "tokenize sentences")

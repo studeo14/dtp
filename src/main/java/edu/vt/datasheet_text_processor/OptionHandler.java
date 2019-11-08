@@ -34,15 +34,15 @@ public class OptionHandler {
 
     public static void handle ( Project project, Application options ) throws IOException, TokenizerException {
         if (options.compileTokens) {
-            var rawMappings = new ObjectMapper().readValue(options.mappingFile, AllMappingsRaw.class);
+            var rawMappings = new ObjectMapper().readValue(options.inPointOptions.mappingFile, AllMappingsRaw.class);
             rawMappings.init();
-            var exportFileBase = FilenameUtils.removeExtension(options.mappingFile.getName());
+            var exportFileBase = FilenameUtils.removeExtension(options.inPointOptions.mappingFile.getName());
             var exportFile = new File(exportFileBase + "_compiled.json");
             rawMappings.export(exportFile);
             logger.info("Exported compiled tokens to {}", exportFile.getName());
             logger.info("exiting.");
         } else {
-            var allMappings = new ObjectMapper().readValue(options.mappingFile, AllMappings.class);
+            var allMappings = new ObjectMapper().readValue(options.inPointOptions.mappingFile, AllMappings.class);
             allMappings.init();
             if (options.signalNames != null ) {
                 // add signal names to the project
@@ -111,7 +111,7 @@ public class OptionHandler {
                         }
                     }
                     if ( options.wordIDOptions.addNew ) {
-                        allMappings.export(options.mappingFile);
+                        allMappings.export(options.inPointOptions.mappingFile);
                     }
                 }
             }
@@ -142,7 +142,7 @@ public class OptionHandler {
                         AcronymFinder.findAcronyms(project, allMappings.getSerializer());
                         var added = AcronymFinder.addAcronymsToMapping(project, allMappings.getSerializer());
                         if (added) {
-                            allMappings.export(options.mappingFile);
+                            allMappings.export(options.inPointOptions.mappingFile);
                         }
                         // normalize acronyms
                         logger.info("Normalizing Acronyms.");
