@@ -21,14 +21,14 @@ RI_PAD_O
 DCD_PAD_I
 Receiver Buffer::RB
 Transmitter Holding Register::THR
-Interrupt Enable::IER
-Interrupt Identification::IIR
-FIFO Control::FCR
-Line Control Register::LCR
-Modem Control::MCR
-Line Status Register::LSR
-Modem Status Register::MSR
-Divisor Latch::DLR
+Interrupt Enable/Interrupt Enable Register::IER
+Interrupt Identification/Interrupt Identification Register::IIR
+FIFO Control/FIFO Control Register::FCR
+Line Control Register/Line Control::LCR
+Modem Control/Modem Control Register::MCR
+Line Status Register/Line Status::LSR
+Modem Status Register/Modem Status::MSR
+Divisor Latch/Divisor Latch Register::DLR
 Debug 1::D1R
 Debug 2::D2R
 WISHBONE

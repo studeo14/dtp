@@ -1,13 +1,12 @@
 in addition
 there are
+there's::there‘s||there’s
 #2
 #clock divisor
 #registers
 that
 together
 form
-one
-16-bit
 
 #register
 can be
@@ -68,11 +67,14 @@ is high
 port
 is a::is an
 has a::has an
-width of
+has been
+has changed
 is
 is enabled
 if
 is defined
+in progress
+in
 
 then
 
