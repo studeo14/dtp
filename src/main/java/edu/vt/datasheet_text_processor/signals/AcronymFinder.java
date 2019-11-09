@@ -8,6 +8,7 @@ import edu.vt.datasheet_text_processor.wordid.StopAddNewException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dizitart.no2.exceptions.InvalidIdException;
 import org.dizitart.no2.exceptions.UniqueConstraintException;
 import org.dizitart.no2.objects.filters.ObjectFilters;
 
@@ -79,7 +80,13 @@ public class AcronymFinder {
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .map(pair -> new Acronym(pair.getLeft(), pair.getRight()))
-                        .forEach(acronym -> acronyms.insert(acronym));
+                        .forEach(acronym -> {
+                            try {
+                                acronyms.insert(acronym);
+                            } catch (UniqueConstraintException | InvalidIdException r) {
+                                logger.debug("Skipping {}. Already exists.", acronym.getAcronym());
+                            }
+                        });
 
             }
         }
@@ -100,7 +107,7 @@ public class AcronymFinder {
                 serializer.addWordToMapping(acronym.getAcronym(), Serializer.WordIDClass.OBJECT);
                 retVal = true;
                 try {
-                    logger.debug("{} -> {}", acronym.getAcronym(), serializer.convert(acronym.getAcronym(), false));
+                    logger.debug("{} -> {}", acronym.getAcronym(), serializer.convert(acronym.getAcronym(), "", false));
                 } catch (StopAddNewException e) {
                     // ignore
                 }

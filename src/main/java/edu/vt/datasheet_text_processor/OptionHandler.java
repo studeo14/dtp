@@ -61,9 +61,19 @@ public class OptionHandler {
                             var acronyms = Arrays.stream(split[1].split(","))
                                     .map(String::toLowerCase)
                                     .collect(Collectors.toList());
-                            collection.insert(new Signal(split[0].toLowerCase(), acronyms));
+                            var aliases = Arrays.stream(split[0].split("/"))
+                                    .map(String::toLowerCase)
+                                    .collect(Collectors.toList());
+                            for (var alias: aliases) {
+                                collection.insert(new Signal(alias, acronyms));
+                            }
                         } else {
-                            collection.insert(new Signal(split[0].toLowerCase()));
+                            var aliases = Arrays.stream(split[0].split("/"))
+                                    .map(String::toLowerCase)
+                                    .collect(Collectors.toList());
+                            for (var alias: aliases) {
+                                collection.insert(new Signal(alias));
+                            }
                         }
                         logger.info("Signal added: {}", split[0]);
                     } catch (UniqueConstraintException | InvalidIdException r) {
@@ -130,7 +140,7 @@ public class OptionHandler {
                                 s.setTokens( tokens );
                                 repo.update( s );
                             } catch (TokenizerException te) {
-                                logger.error("Unable to tokenize \"{}\" at **{}**", s.getText(),allMappings.getSerializer().unconvert(te.getCurrentWord()));
+                                logger.error("Unable to tokenize \"{}\" at **{}({})**", s.getText(),allMappings.getSerializer().unconvert(te.getCurrentWord()), te.getWordIndex());
                             }
                         }
                     }

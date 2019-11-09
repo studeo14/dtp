@@ -9,8 +9,8 @@ import org.dizitart.no2.objects.Indices;
 import java.io.Serializable;
 
 @Indices({
-        @Index(value = "acronym", type = IndexType.Unique),
-        @Index(value = "expanded", type = IndexType.Fulltext)
+        @Index(value = "acronym", type = IndexType.NonUnique),
+        @Index(value = "expanded", type = IndexType.Unique)
 })
 public class Acronym implements Serializable {
 
