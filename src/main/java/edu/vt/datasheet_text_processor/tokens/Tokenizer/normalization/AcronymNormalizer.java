@@ -10,8 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.objects.filters.ObjectFilters;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AcronymNormalizer {
@@ -57,6 +56,7 @@ public class AcronymNormalizer {
         // search through acronyms for match
         if (db.hasRepository(Acronym.class)) {
             var acronyms = db.getRepository(Acronym.class).find();
+            var returnCandidates = new ArrayList<List<Integer>>();
             for (var acronym: acronyms) {
                 if (text.contains(acronym.getExpanded())) {
                     logger.debug("Found.");
@@ -64,8 +64,13 @@ public class AcronymNormalizer {
                     logger.debug("New Text: {}", newText);
                     var newStream = serializer.serialize(newText, new AddNewWrapper(false));
                     logger.debug(newStream);
-                    return Optional.of(newStream);
+                    returnCandidates.add(newStream);
                 }
+            }
+            // sort by acronym length and choose the largest match
+            if (!returnCandidates.isEmpty()) {
+                returnCandidates.sort(Comparator.comparingInt(List::size));
+                return Optional.of(returnCandidates.get(0));
             }
         }
         return Optional.empty();

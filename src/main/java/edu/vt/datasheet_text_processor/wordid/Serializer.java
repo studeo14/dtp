@@ -5,15 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.vt.datasheet_text_processor.util.Constants;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.TokenizerME;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.vt.datasheet_text_processor.wordid.WordIdUtils.*;
@@ -42,7 +40,6 @@ public class Serializer {
     private Mapping mapping;
     private InverseMapping inverseMapping;
     private Map< WordIDClass, Integer > currentNumber;
-    private static final Tokenizer tokenizer = SimpleTokenizer.INSTANCE;
 
     public Serializer( Mapping mapping) {
         this.mapping = mapping;
@@ -80,11 +77,11 @@ public class Serializer {
     public List< Integer > serialize (String sentence, AddNewWrapper addNew ) {
 
         // convert to list of base words (stemming)
-        return Arrays.stream( tokenizer.tokenize( sentence ) )
+        return WordTokenizer.tokenize( sentence ).stream()
                 .map( this::stem )
                 .map( s -> {
                     try {
-                        return convert( s, addNew.isValue() );
+                        return convert( s, sentence, addNew.isValue() );
                     } catch (StopAddNewException e) {
                         addNew.setValue(false);
                         return 0;
@@ -129,14 +126,15 @@ public class Serializer {
         mapping.getBaseMapping().put( baseWord, mappingInteger );
         // need to add to inverse mapping
         inverseMapping.getMapping().put(mappingInteger, baseWord);
+        logger.debug("Adding to mappings: {} -> {}", baseWord, mappingInteger);
         //
         return mappingInteger;
     }
 
-    private Integer addNewMapping ( String input ) throws StopAddNewException {
+    private Integer addNewMapping ( String input, String sentenceRef ) throws StopAddNewException {
         Integer cat;
         do {
-            var res = System.console().readLine( "%s is unmapped. Enter category to add to mapping (0/1/2/3/4/5/6/7) 'q' to stop adding new (this may result in unmapped words!): ", input );
+            var res = System.console().readLine( "'%s' is unmapped in \"%s\".\n Enter category to add to mapping (0/1/2/3/4/5/6/7) 'q' to stop adding new (this may result in unmapped words!): ", input, sentenceRef );
             if (res.toLowerCase().equals("q")) {
                 throw new StopAddNewException();
             }
@@ -164,14 +162,14 @@ public class Serializer {
         return addWordToMapping(stem, catClass);
     }
 
-    public Integer convert ( String input, boolean addNew ) throws StopAddNewException {
-        // get base convertion
+    public Integer convert ( String input, String sentenceRef, boolean addNew ) throws StopAddNewException {
+        // get base conversion
         var base = mapping.getBaseMapping().getOrDefault( input, Constants.DEFAULT_WORD_ID );
         if (base.equals(Constants.DEFAULT_WORD_ID)) {
             if (addNew) {
-                base = addNewMapping( input );
+                base = addNewMapping( input, sentenceRef );
             } else {
-                logger.info("No existing mapping found for {}", input);
+                logger.info("No existing mapping found for '{}' in \"{}\"", input, sentenceRef);
             }
         }
         var baseClass = getWordIdClass( base );
