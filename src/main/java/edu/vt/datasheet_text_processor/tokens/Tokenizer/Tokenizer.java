@@ -68,6 +68,7 @@ public class Tokenizer {
 
     private List<TokenInstance> processWordIdStream(ListIterator<Integer> iter) throws TokenizerException {
         ArrayList<TokenInstance> retVal = new ArrayList<>();
+        logger.debug("Start new sentence tokenization");
         while(iter.hasNext()) {
             retVal.add(getNextToken(iter));
         }
@@ -119,7 +120,7 @@ public class Tokenizer {
                         state = ProcessState.END;
                         iter.previous();
                     } else {
-                        throw new TokenizerException(String.format("Unknown token found at word %s", currentWord), currentWord);
+                        throw new TokenizerException(String.format("Unknown token found at word %s", currentWord), currentWord, iter.nextIndex());
                     }
                     break;
                 }
@@ -139,6 +140,7 @@ public class Tokenizer {
                 case END:
                 {
                     // wrap up
+                    logger.debug("Token end");
                     return current;
                 }
             }
