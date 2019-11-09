@@ -114,6 +114,7 @@ public class WordTokenizer {
             logger.debug("New State: {}", state);
         }
         // add whatever is left
+        // this was a bug that made the last word in a token be discarded during compilation.
         if (!sb.toString().isBlank()) {
             retList.add(sb.toString());
         }
