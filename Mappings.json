@@ -1607,7 +1607,8 @@
       "out1": 15140,
       "out2": 15150,
       "tf_count": 15160,
-      "rf_count": 15170
+      "rf_count": 15170,
+      "unset": 21760
     }
   },
   "tokenMapping": {
@@ -1662,103 +1663,103 @@
     "9": {
       "aliases": [],
       "id": 9,
-      "stream": "bit"
+      "stream": "upon"
     },
     "10": {
       "aliases": [],
       "id": 10,
-      "stream": "of"
+      "stream": "bit"
     },
     "11": {
       "aliases": [],
       "id": 11,
-      "stream": "is set"
+      "stream": "of"
     },
     "12": {
       "aliases": [],
       "id": 12,
-      "stream": "to"
+      "stream": "is set"
     },
     "13": {
       "aliases": [],
       "id": 13,
-      "stream": "at this time"
+      "stream": "to"
     },
     "14": {
       "aliases": [],
       "id": 14,
-      "stream": "above"
+      "stream": "at this time"
     },
     "15": {
       "aliases": [],
       "id": 15,
-      "stream": "at"
+      "stream": "above"
     },
     "16": {
+      "aliases": [],
+      "id": 16,
+      "stream": "at"
+    },
+    "17": {
       "aliases": [
         "can\u2018t be",
         "can\u2019t be"
       ],
-      "id": 16,
+      "id": 17,
       "stream": "can't be"
     },
-    "17": {
+    "18": {
       "aliases": [
         "can't",
         "can\u2018t",
         "can\u2019t"
       ],
-      "id": 17,
+      "id": 18,
       "stream": "cannot"
     },
-    "18": {
+    "19": {
       "aliases": [],
-      "id": 18,
+      "id": 19,
       "stream": "does"
     },
-    "19": {
+    "20": {
       "aliases": [
         "doesn't",
         "doesn\u2019t",
         "doesn\u2018t"
       ],
-      "id": 19,
-      "stream": "does not"
-    },
-    "20": {
-      "aliases": [],
       "id": 20,
-      "stream": "using"
+      "stream": "does not"
     },
     "21": {
       "aliases": [],
       "id": 21,
-      "stream": "additional"
+      "stream": "using"
     },
     "22": {
       "aliases": [],
       "id": 22,
-      "stream": "are"
+      "stream": "additional"
     },
     "23": {
       "aliases": [],
       "id": 23,
-      "stream": "available"
+      "stream": "are"
     },
     "24": {
       "aliases": [],
       "id": 24,
-      "stream": "for"
+      "stream": "available"
     },
     "25": {
       "aliases": [],
       "id": 25,
-      "stream": "reset value"
+      "stream": "for"
     },
     "26": {
       "aliases": [],
       "id": 26,
-      "stream": "enables"
+      "stream": "reset value"
     },
     "27": {
       "aliases": [],
@@ -1873,118 +1874,121 @@
     "49": {
       "aliases": [],
       "id": 49,
-      "stream": "port"
+      "stream": "is low"
     },
     "50": {
-      "aliases": [
-        "is an"
-      ],
+      "aliases": [],
       "id": 50,
-      "stream": "is a"
+      "stream": "is unset"
     },
     "51": {
       "aliases": [
-        "has an"
+        "is equal to",
+        "is set equal to"
       ],
       "id": 51,
-      "stream": "has a"
+      "stream": "is set to"
     },
     "52": {
       "aliases": [],
       "id": 52,
-      "stream": "has been"
+      "stream": "port"
     },
     "53": {
-      "aliases": [],
+      "aliases": [
+        "is an"
+      ],
       "id": 53,
-      "stream": "has changed"
+      "stream": "is a"
     },
     "54": {
-      "aliases": [],
+      "aliases": [
+        "has an"
+      ],
       "id": 54,
-      "stream": "is"
+      "stream": "has a"
     },
     "55": {
       "aliases": [],
       "id": 55,
-      "stream": "is enabled"
+      "stream": "has been"
     },
     "56": {
       "aliases": [],
       "id": 56,
-      "stream": "if"
+      "stream": "has changed"
     },
     "57": {
       "aliases": [],
       "id": 57,
-      "stream": "is defined"
+      "stream": "is"
     },
     "58": {
       "aliases": [],
       "id": 58,
-      "stream": "in progress"
+      "stream": "is enabled"
     },
     "59": {
       "aliases": [],
       "id": 59,
-      "stream": "in"
+      "stream": "if"
     },
     "60": {
       "aliases": [],
       "id": 60,
-      "stream": "then"
+      "stream": "is defined"
     },
     "61": {
       "aliases": [],
       "id": 61,
-      "stream": ","
+      "stream": "in progress"
     },
     "62": {
       "aliases": [],
       "id": 62,
-      "stream": "and"
+      "stream": "in"
     },
     "63": {
       "aliases": [],
       "id": 63,
-      "stream": "or"
+      "stream": "then"
     },
     "64": {
       "aliases": [],
       "id": 64,
-      "stream": "both"
+      "stream": ","
     },
     "65": {
       "aliases": [],
       "id": 65,
-      "stream": "read"
+      "stream": "both"
     },
     "66": {
       "aliases": [],
       "id": 66,
-      "stream": "cleared"
+      "stream": "read"
     },
     "67": {
       "aliases": [],
       "id": 67,
-      "stream": "ignored"
+      "stream": "cleared"
     },
     "68": {
       "aliases": [],
       "id": 68,
-      "stream": "writing"
+      "stream": "ignored"
     },
     "69": {
+      "aliases": [],
+      "id": 69,
+      "stream": "writing"
+    },
+    "70": {
       "aliases": [
         "an"
       ],
-      "id": 69,
-      "stream": "a"
-    },
-    "70": {
-      "aliases": [],
       "id": 70,
-      "stream": "clears"
+      "stream": "a"
     },
     "71": {
       "aliases": [],
@@ -2113,6 +2117,63 @@
           45
         ]
       ]
+    },
+    "6": {
+      "id": 6,
+      "template": [9, -21],
+      "aliases": []
+    },
+    "7": {
+      "id": 7,
+      "template": [8, -21, 12],
+      "aliases": [
+        [8, -21, 45],
+        [8, -21, 47],
+        [8, -21, 48]
+      ]
+    },
+    "8": {
+      "id": 8,
+      "template": [8, -21, 50],
+      "aliases": [
+        [8, -21, 49],
+        [8, -21, 46]
+      ]
+    },
+    "9": {
+      "id": 9,
+      "template": [8, -21, 51, -21],
+      "aliases": [
+        [8, -21, 57, -21]
+      ]
+    },
+    "10": {
+      "id": 10,
+      "template": [-21, 12],
+      "aliases": [
+        [-21, 45],
+        [-21, 47],
+        [-21, 48]
+      ]
+    },
+    "11": {
+      "id": 11,
+      "template": [-21, 50],
+      "aliases": [
+        [-21, 49],
+        [-21, 46]
+      ]
+    },
+    "12": {
+      "id": 12,
+      "template": [-21, 51, -21],
+      "aliases": [
+        [-21, 57, -21]
+      ]
     }
+  },
+  "semanticModel": {
+    "antecedents": [6, 7, 8, 9],
+    "consequents": [10, 11, 12]
   }
 }

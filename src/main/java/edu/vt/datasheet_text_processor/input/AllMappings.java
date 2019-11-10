@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameModel;
+import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticModel;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.TokenModel;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
 import edu.vt.datasheet_text_processor.wordid.Mapping;
@@ -19,13 +20,14 @@ import java.io.IOException;
  * across operations rather than tying them to a single operation.
  *
  */
-@JsonPropertyOrder({"wordIdMapping", "tokenMapping", "frameMapping"})
+@JsonPropertyOrder({"wordIdMapping", "tokenMapping", "frameMapping", "semanticModel"})
 @JsonIgnoreProperties({"serializer", "tokenizer", "frameFinder"})
 public class AllMappings {
     // need a serializer, tokenizer
     private Mapping wordIdMapping;
     private TokenModel tokenMapping;
     private FrameModel frameMapping;
+    private SemanticModel semanticModel;
     // tools
     private Serializer serializer;
     private Tokenizer tokenizer;
@@ -71,6 +73,16 @@ public class AllMappings {
     @JsonProperty("frameMapping")
     public void setFrameMapping(FrameModel frameMapping) {
         this.frameMapping = frameMapping;
+    }
+
+    @JsonProperty("semanticModel")
+    public SemanticModel getSemanticModel() {
+        return semanticModel;
+    }
+
+    @JsonProperty("semanticModel")
+    public void setSemanticModel(SemanticModel semanticModel) {
+        this.semanticModel = semanticModel;
     }
 
     public Serializer getSerializer() {

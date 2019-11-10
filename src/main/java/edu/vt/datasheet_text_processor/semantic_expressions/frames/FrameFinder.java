@@ -12,7 +12,7 @@ import java.util.ListIterator;
 import java.util.Optional;
 
 public class FrameFinder {
-    private static final Logger loggger = LogManager.getLogger(FrameFinder.class);
+    private static final Logger logger = LogManager.getLogger(FrameFinder.class);
 
     private enum State {BEGIN, INSIDE, FAIL, END};
 

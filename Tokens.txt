@@ -12,6 +12,7 @@ form
 can be
 accessed
 when
+upon
 bit
 of
 is set
@@ -35,7 +36,6 @@ available
 for
 reset value
 
-enables
 to retrieve
 what is
 current
@@ -64,6 +64,13 @@ is deassert
 is reassert
 is high
 
+is deassert
+is low
+is unset
+
+is set to::is equal to||is set equal to
+
+
 port
 is a::is an
 has a::has an
@@ -79,8 +86,8 @@ in
 then
 
 ,
-and
-or
+#and
+#or
 both
 
 read
@@ -90,7 +97,6 @@ cleared
 ignored
 writing
 a::an
-clears
 reset
 
 but
