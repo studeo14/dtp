@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TokenInstance {
-    public enum Type {NA, TOKEN, LITERAL, ACCESS};
+    public enum Type {NA, TOKEN, LITERAL, ACCESS, COMPOUND};
 
     private Type type;
     private Integer id;
     private List<Integer> stream;
     private BitAccessToken bitAccessToken;
+    private CompoundToken compoundToken;
 
     public TokenInstance () {
         this.stream = new ArrayList<>();
@@ -66,6 +67,14 @@ public class TokenInstance {
 
     public void setBitAccessToken(BitAccessToken bitAccessToken) {
         this.bitAccessToken = bitAccessToken;
+    }
+
+    public CompoundToken getCompoundToken() {
+        return compoundToken;
+    }
+
+    public void setCompoundToken(CompoundToken compoundToken) {
+        this.compoundToken = compoundToken;
     }
 
     @Override

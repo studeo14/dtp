@@ -29,13 +29,18 @@ public class FrameInstance {
         this.id = id;
         this.tokens = tokens;
         this.literals = tokens.stream()
-                .filter(t -> t.getType() == TokenInstance.Type.LITERAL)
+                .filter(t -> t.getType() == TokenInstance.Type.LITERAL || t.getType() == TokenInstance.Type.COMPOUND)
                 .map(TokenInstance::getStream)
                 .collect(Collectors.toList());
     }
 
     public FrameInstance(Integer id) {
         this.id = id;
+        this.tokens = new ArrayList<>();
+        this.literals = new ArrayList<>();
+    }
+
+    public FrameInstance() {
         this.tokens = new ArrayList<>();
         this.literals = new ArrayList<>();
     }
@@ -58,6 +63,14 @@ public class FrameInstance {
 
     public void setTokens(List<TokenInstance> tokens) {
         this.tokens = tokens;
+    }
+
+    public void setTokensAndLiterals(List<TokenInstance> tokens) {
+        this.tokens = tokens;
+        this.literals = tokens.stream()
+                .filter(t -> t.getType() == TokenInstance.Type.LITERAL || t.getType() == TokenInstance.Type.COMPOUND)
+                .map(TokenInstance::getStream)
+                .collect(Collectors.toList());
     }
 
     public List<List<Integer>> getLiterals() {

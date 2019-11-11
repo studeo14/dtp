@@ -1,6 +1,7 @@
 package edu.vt.datasheet_text_processor.semantic_expressions.frames.SearchTree;
 
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameModel;
+import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameTemplateModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +15,7 @@ public class FrameSearchTree {
     public FrameSearchTree(FrameModel frameModel) {
         this.rootNode = new FrameSearchTreeNode();
         // add frame templates
-        for (var frameTemplate: frameModel.values()) {
+        for (var frameTemplate: frameModel.getGeneric().values()) {
             var frameId = frameTemplate.getId();
             // add base
             addTemplate(frameTemplate.getTemplate().listIterator(), rootNode, frameId);
@@ -43,12 +44,17 @@ public class FrameSearchTree {
             if (!listIterator.hasNext()) {
                 var leaf = new FrameSearchTreeLeafNode(frameId);
                 newNode.getChildren().put(leaf.getTokenId(), leaf);
+            } else {
+                // recurse
+                addTemplate(listIterator, newNode, frameId);
             }
-            // recurse
-            addTemplate(listIterator, newNode, frameId);
         }
         // base case
         // else just return (break recursive loop)
+    }
+
+    public FrameSearchTreeNode getRootNode() {
+        return rootNode;
     }
 
     public String toString() {

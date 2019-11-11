@@ -59,6 +59,13 @@ public class Application {
         public boolean normalize;
     }
 
+    @ArgGroup(exclusive = false, heading = "Semantic Expression Options%n")
+    public SemanticExpressionOptions semanticExpressionOptions;
+    public static class SemanticExpressionOptions {
+        @Option(names={"-e", "--semantic-expressions"}, description = "find the semantic expressions in the token streams")
+        public boolean doSemanticExpression;
+    }
+
 
     // debugging options
     @ArgGroup(exclusive = true, heading = "Debugging options for classification%n")
@@ -91,6 +98,8 @@ public class Application {
         public boolean doShowFrameSearchTree;
         @Option(names = {"--show-tst"}, description = "print out the token search tree")
         public boolean doShowTokenSearchTree;
+        @Option(names = {"--show-semexpr"}, description = "print out the semantic expressions")
+        public boolean doShowSemanticExpressions;
     }
 
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")

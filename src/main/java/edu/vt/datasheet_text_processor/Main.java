@@ -1,6 +1,7 @@
 package edu.vt.datasheet_text_processor;
 
 import edu.vt.datasheet_text_processor.cli.Application;
+import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,10 +19,9 @@ class Main {
         try {
             cli.parseArgs(args);
             handleCli(cli, options);
-        } catch (IOException e) {
+        } catch (IOException | TokenizerException | FrameException e) {
             logger.error(e.getMessage());
-        } catch (TokenizerException e) {
-            e.printStackTrace();
+            logger.error(e);
         } catch (CommandLine.ParameterException e) {
             logger.error(e.getMessage());
             cli.usage(System.out);
@@ -32,7 +32,7 @@ class Main {
         }
     }
 
-    private static void handleCli(CommandLine cli, Application options) throws IOException, TokenizerException {
+    private static void handleCli(CommandLine cli, Application options) throws IOException, TokenizerException, FrameException {
         if (cli.isUsageHelpRequested()) {
             cli.usage(System.out);
         } else {

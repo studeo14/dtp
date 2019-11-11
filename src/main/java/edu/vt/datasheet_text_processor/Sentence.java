@@ -1,6 +1,7 @@
 package edu.vt.datasheet_text_processor;
 
 
+import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import org.dizitart.no2.IndexType;
 import org.dizitart.no2.NitriteId;
@@ -29,6 +30,7 @@ public class Sentence implements Serializable {
     private Type type;
     private List<Integer> wordIds;
     private List<TokenInstance> tokens;
+    private SemanticExpression semanticExpression;
 
     public Sentence() {
 
@@ -88,5 +90,13 @@ public class Sentence implements Serializable {
 
     public void setTokens(List<TokenInstance> tokens) {
         this.tokens = tokens;
+    }
+
+    public SemanticExpression getSemanticExpression() {
+        return semanticExpression;
+    }
+
+    public void setSemanticExpression(SemanticExpression semanticExpression) {
+        this.semanticExpression = semanticExpression;
     }
 }

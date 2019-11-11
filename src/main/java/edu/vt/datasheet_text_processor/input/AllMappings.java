@@ -112,4 +112,12 @@ public class AllMappings {
     public void setFrameFinder(FrameFinder frameFinder) {
         this.frameFinder = frameFinder;
     }
+
+    public SemanticParser getSemanticParser() {
+        return semanticParser;
+    }
+
+    public void setSemanticParser(SemanticParser semanticParser) {
+        this.semanticParser = semanticParser;
+    }
 }

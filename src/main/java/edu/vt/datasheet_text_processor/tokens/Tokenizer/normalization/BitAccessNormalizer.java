@@ -59,10 +59,13 @@ public class BitAccessNormalizer {
                         throw new TokenizerException("Unable to replace sublist of tokens, not found");
                     }
                     // else
+                    // clear original tokens from token list
                     var window = tokens.subList(sublistIndex, sublistIndex + bat.getOriginalTokens().size());
                     window.clear();
+                    // create new token replacement
                     var newToken = new TokenInstance(TokenInstance.Type.ACCESS, null, Constants.LITERAL_TOKEN_ID);
                     newToken.setBitAccessToken(bat);
+                    // add in place of old tokens
                     window.add(newToken);
                     sentences.update(sentence);
                 }

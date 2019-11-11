@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameModel;
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticModel;
+import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticParser;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.RawTokenModel;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
 import edu.vt.datasheet_text_processor.wordid.Mapping;
@@ -30,6 +31,7 @@ public class AllMappingsRaw {
     private Serializer serializer;
     private Tokenizer tokenizer;
     private FrameFinder frameFinder;
+    private SemanticParser semanticParser;
 
     public AllMappingsRaw() {}
 
@@ -37,6 +39,7 @@ public class AllMappingsRaw {
         this.serializer = new Serializer(wordIdMapping);
         this.tokenizer = new Tokenizer(tokenMapping, serializer);
         this.frameFinder = new FrameFinder(frameMapping);
+        this.semanticParser = new SemanticParser(semanticModel);
     }
 
     public void export(File outputFile) throws IOException {
@@ -111,5 +114,13 @@ public class AllMappingsRaw {
 
     public void setFrameFinder(FrameFinder frameFinder) {
         this.frameFinder = frameFinder;
+    }
+
+    public SemanticParser getSemanticParser() {
+        return semanticParser;
+    }
+
+    public void setSemanticParser(SemanticParser semanticParser) {
+        this.semanticParser = semanticParser;
     }
 }

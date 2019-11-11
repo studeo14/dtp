@@ -5,6 +5,8 @@ import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
 import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.input.AllMappingsRaw;
+import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
+import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
 import edu.vt.datasheet_text_processor.signals.Acronym;
 import edu.vt.datasheet_text_processor.signals.AcronymFinder;
 import edu.vt.datasheet_text_processor.signals.Signal;
@@ -21,6 +23,7 @@ import org.dizitart.no2.FindOptions;
 import org.dizitart.no2.SortOrder;
 import org.dizitart.no2.exceptions.InvalidIdException;
 import org.dizitart.no2.exceptions.UniqueConstraintException;
+import org.dizitart.no2.objects.filters.ObjectFilters;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +35,7 @@ import java.util.stream.Collectors;
 public class OptionHandler {
     private static final Logger logger = LogManager.getLogger( OptionHandler.class );
 
-    public static void handle ( Project project, Application options ) throws IOException, TokenizerException {
+    public static void handle ( Project project, Application options ) throws IOException, TokenizerException, FrameException {
         if (options.compileTokens) {
             var rawMappings = new ObjectMapper().readValue(options.inPointOptions.mappingFile, AllMappingsRaw.class);
             rawMappings.init();
@@ -163,6 +166,27 @@ public class OptionHandler {
                     }
                 }
             }
+            if (options.semanticExpressionOptions != null) {
+                if (options.semanticExpressionOptions.doSemanticExpression) {
+                    logger.info("Finding Semantic Expressions");
+                    var db = project.getDB();
+                    var repo = db.getRepository(Sentence.class);
+                    var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
+                    for ( Sentence s : documents ) {
+                        try {
+                            var semexpr = allMappings.getSemanticParser().findSemanticExpression(s.getTokens(), allMappings.getFrameFinder());
+                            if (semexpr.isPresent()) {
+                                var se = semexpr.get();
+                                s.setSemanticExpression(se);
+                                repo.update(s);
+                            }
+                        } catch (FrameException e) {
+                            logger.warn("For The Sentence: {}", s.getText());
+                            logger.warn(e.getMessage());
+                        }
+                    }
+                }
+            }
             if ( options.debugOptions != null ) {
                 if ( options.debugOptions.doPrint ) {
                     // print all from database
@@ -229,6 +253,16 @@ public class OptionHandler {
                                     .map(t -> {
                                         if(t.getType() == TokenInstance.Type.ACCESS) {
                                             return t.toString();
+                                        } else if (t.getType() == TokenInstance.Type.COMPOUND) {
+                                            return t.getCompoundToken().getOriginalTokens().stream()
+                                                    .map(ti -> {
+                                                        if(ti.getType() == TokenInstance.Type.ACCESS) {
+                                                            return ti.toString();
+                                                        } else {
+                                                            return Serializer.mergeWords(allMappings.getSerializer().deserialize(ti.getStream()));
+                                                        }
+                                                    })
+                                                    .collect(Collectors.joining(" "));
                                         } else {
                                             return Serializer.mergeWords(allMappings.getSerializer().deserialize(t.getStream()));
                                         }
@@ -249,6 +283,41 @@ public class OptionHandler {
                     System.out.println(allMappings.getFrameFinder().getFrameSearchTree().toString());
                 } else if (options.debugOptions.doShowTokenSearchTree) {
                     System.out.println(allMappings.getTokenizer().getTokenSearchTree().toString());
+                } else if (options.debugOptions.doShowSemanticExpressions) {
+                    var db = project.getDB();
+                    var repo = db.getRepository(Sentence.class);
+                    var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
+                    for (var s: documents) {
+                        var se = s.getSemanticExpression();
+                        if (se != null) {
+                            var tokens = se.getAllFrames().stream()
+                                    .map(FrameInstance::getTokens)
+                                    .map(tlist -> tlist.stream()
+                                            .map(t -> {
+                                                if (t.getType() == TokenInstance.Type.ACCESS) {
+                                                    return t.toString();
+                                                } else if (t.getType() == TokenInstance.Type.COMPOUND) {
+                                                    return t.getCompoundToken().getOriginalTokens().stream()
+                                                            .map(ti -> {
+                                                                if (ti.getType() == TokenInstance.Type.ACCESS) {
+                                                                    return ti.toString();
+                                                                } else {
+                                                                    return Serializer.mergeWords(allMappings.getSerializer().deserialize(ti.getStream()));
+                                                                }
+                                                            })
+                                                            .collect(Collectors.joining(" "));
+                                                } else {
+                                                    return Serializer.mergeWords(allMappings.getSerializer().deserialize(t.getStream()));
+                                                }
+                                            })
+                                            .collect(Collectors.toList())
+                                    )
+                                    .collect(Collectors.toList());
+                            logger.info("{} -> {} ({})", s.getText(), se, tokens);
+                        } else {
+                            logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
+                        }
+                    }
                 }
             }
         }
