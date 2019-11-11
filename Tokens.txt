@@ -86,8 +86,6 @@ in
 then
 
 ,
-#and
-#or
 both
 
 read
@@ -100,3 +98,8 @@ a::an
 reset
 
 but
+bit #
+and
+or
+
+.

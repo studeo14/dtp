@@ -386,5 +386,25 @@
         "aliases": [],
         "id": 72,
         "stream": "but"
+    },
+    "73": {
+        "aliases": [],
+        "id": 73,
+        "stream": "bit #"
+    },
+    "74": {
+        "aliases": [],
+        "id": 74,
+        "stream": "and"
+    },
+    "75": {
+        "aliases": [],
+        "id": 75,
+        "stream": "or"
+    },
+    "76": {
+        "aliases": [],
+        "id": 76,
+        "stream": "."
     }
 }

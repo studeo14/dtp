@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameModel;
+import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameTemplateModel;
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticModel;
+import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticParser;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.TokenModel;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.Tokenizer;
 import edu.vt.datasheet_text_processor.wordid.Mapping;
@@ -21,7 +23,7 @@ import java.io.IOException;
  *
  */
 @JsonPropertyOrder({"wordIdMapping", "tokenMapping", "frameMapping", "semanticModel"})
-@JsonIgnoreProperties({"serializer", "tokenizer", "frameFinder"})
+@JsonIgnoreProperties({"serializer", "tokenizer", "frameFinder", "semanticParser"})
 public class AllMappings {
     // need a serializer, tokenizer
     private Mapping wordIdMapping;
@@ -32,6 +34,7 @@ public class AllMappings {
     private Serializer serializer;
     private Tokenizer tokenizer;
     private FrameFinder frameFinder;
+    private SemanticParser semanticParser;
 
     public AllMappings() {}
 
@@ -39,6 +42,7 @@ public class AllMappings {
         this.serializer = new Serializer(wordIdMapping);
         this.tokenizer = new Tokenizer(tokenMapping);
         this.frameFinder = new FrameFinder(frameMapping);
+        this.semanticParser = new SemanticParser(semanticModel);
     }
 
     public void export(File outputFile) throws IOException {
