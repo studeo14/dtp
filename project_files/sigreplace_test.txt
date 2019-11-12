@@ -1,0 +1,5 @@
+The Modem Control Register is a good test.
+The Modem Control Register is a Modem Control Register test
+Take the Divisor Latch Register and give it to the Modem Control Register.
+The Line Control is in the Line Control Register.
+The Line Control Register is in the Modem Control Register.
