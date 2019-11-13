@@ -61,11 +61,27 @@ public class FrameFinder {
                     if (frameSearchTree.getRootNode().getChildren().containsKey(currentToken.getId())) {
                         // check for literal starts
                         if (currentToken.getId().equals(Constants.LITERAL_TOKEN_ID)) {
-                            var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
-                            cToken.setCompoundToken(new CompoundToken(literalList));
-                            tokenList.add(cToken);
-                            tokenList.add(currentToken);
-                            logger.debug("Starting Frame at {} from literal token start", currentToken.getId());
+                            // if there is not a next token then this cannot be a valid start token
+                            if (iter.hasNext()) {
+                                // need to peek to next token to see if this is a valid starting literal
+                                var next = iter.next();
+                                // reset
+                                iter.previous();
+                                // check
+                                if (!frameSearchTree.getRootNode().getChildren().get(Constants.LITERAL_TOKEN_ID).getChildren().containsKey(next.getId())) {
+                                    logger.debug("No Frame. Adding literal to start.");
+                                    literalList.add(currentToken);
+                                    break;
+                                }
+                                // if there is a valid next token
+                                var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
+                                cToken.setCompoundToken(new CompoundToken(literalList));
+                                tokenList.add(cToken);
+                                tokenList.add(currentToken);
+                                logger.debug("Starting Frame at {} from literal token start", currentToken.getId());
+                            } else {
+                                break;
+                            }
                         } else { // regular starts
                             tokenList.add(currentToken);
                             logger.debug("Starting Frame at {}({})", currentToken.getId(), currentToken.getStream());
@@ -112,7 +128,8 @@ public class FrameFinder {
                             state = FindState.END;
                         }
                     } else { // this means that no frame can be found here.
-                        //iter.previous();
+                        iter.previous();
+                        logger.debug("No valid child found. Returning empty frame.");
                         return Optional.empty();
                     }
                     break;

@@ -7,6 +7,7 @@ import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.input.AllMappingsRaw;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
+import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
 import edu.vt.datasheet_text_processor.signals.Acronym;
 import edu.vt.datasheet_text_processor.signals.AcronymFinder;
 import edu.vt.datasheet_text_processor.signals.Signal;
@@ -17,6 +18,7 @@ import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.BitAccessN
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.FindOptions;
@@ -178,6 +180,9 @@ public class OptionHandler {
                             if (semexpr.isPresent()) {
                                 var se = semexpr.get();
                                 s.setSemanticExpression(se);
+                                if (logger.getLevel().equals(Level.DEBUG)) {
+                                    printSemanticExpression(s, allMappings);
+                                }
                                 repo.update(s);
                             }
                         } catch (FrameException e) {
@@ -288,38 +293,42 @@ public class OptionHandler {
                     var repo = db.getRepository(Sentence.class);
                     var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
                     for (var s: documents) {
-                        var se = s.getSemanticExpression();
-                        if (se != null) {
-                            var tokens = se.getAllFrames().stream()
-                                    .map(FrameInstance::getTokens)
-                                    .map(tlist -> tlist.stream()
-                                            .map(t -> {
-                                                if (t.getType() == TokenInstance.Type.ACCESS) {
-                                                    return t.toString();
-                                                } else if (t.getType() == TokenInstance.Type.COMPOUND) {
-                                                    return t.getCompoundToken().getOriginalTokens().stream()
-                                                            .map(ti -> {
-                                                                if (ti.getType() == TokenInstance.Type.ACCESS) {
-                                                                    return ti.toString();
-                                                                } else {
-                                                                    return Serializer.mergeWords(allMappings.getSerializer().deserialize(ti.getStream()));
-                                                                }
-                                                            })
-                                                            .collect(Collectors.joining(" "));
-                                                } else {
-                                                    return Serializer.mergeWords(allMappings.getSerializer().deserialize(t.getStream()));
-                                                }
-                                            })
-                                            .collect(Collectors.toList())
-                                    )
-                                    .collect(Collectors.toList());
-                            logger.info("{} -> {} ({})", s.getText(), se, tokens);
-                        } else {
-                            logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
-                        }
+                        printSemanticExpression(s, allMappings);
                     }
                 }
             }
+        }
+    }
+
+    public static void printSemanticExpression(Sentence s, AllMappings allMappings) {
+        var se = s.getSemanticExpression();
+        if (se != null) {
+            var tokens = se.getAllFrames().stream()
+                    .map(FrameInstance::getTokens)
+                    .map(tlist -> tlist.stream()
+                            .map(t -> {
+                                if (t.getType() == TokenInstance.Type.ACCESS) {
+                                    return t.toString();
+                                } else if (t.getType() == TokenInstance.Type.COMPOUND) {
+                                    return t.getCompoundToken().getOriginalTokens().stream()
+                                            .map(ti -> {
+                                                if (ti.getType() == TokenInstance.Type.ACCESS) {
+                                                    return ti.toString();
+                                                } else {
+                                                    return Serializer.mergeWords(allMappings.getSerializer().deserialize(ti.getStream()));
+                                                }
+                                            })
+                                            .collect(Collectors.joining(" "));
+                                } else {
+                                    return Serializer.mergeWords(allMappings.getSerializer().deserialize(t.getStream()));
+                                }
+                            })
+                            .collect(Collectors.toList())
+                    )
+                    .collect(Collectors.toList());
+            logger.info("{} -> {} ({})", s.getText(), se, tokens);
+        } else {
+            logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
         }
     }
 }
