@@ -48,7 +48,7 @@ public class ProjectUtils {
     }
 
     public static Project openProject(File inputFile) {
-        var projectName = FilenameUtils.removeExtension(inputFile.getName());
+        var projectName = FilenameUtils.removeExtension(inputFile.getAbsolutePath());
         var project = new Project(projectName);
         var db = Nitrite.builder()
                 .compressed()

@@ -15,7 +15,7 @@ public class DatasheetBOW {
     private static final String actions = "(assert|asserts|reassert|deassert|set|clear|start|stop|enabled|disable|reset|activate|generate)";
     private static final String conditions = "(when|before|after|during|when|at|upon|on|while|if)";
     private static final String values = "(zero|one|0|1|high|low|enabled|disabled|asserted|deasserted)";
-    private static final String signals = "(input|output|register|signal|bit|bus|value)";
+    private static final String signals = "(input|output|register|signal|bit|bus|value|fifo|latch|name)";
 
     // regexes sorted by most used
     private static final Pattern[] patterns = {
@@ -77,6 +77,7 @@ public class DatasheetBOW {
             Pattern.compile("(hardwired|tied-off|tie-off|constant) to"),
             Pattern.compile("active (low|high)"),
             Pattern.compile("active-(low|high)"),
+            Pattern.compile(String.format("(^| )%s .+? is ", signals)),
     };
 
     public enum Action {
