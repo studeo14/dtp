@@ -101,5 +101,7 @@ but
 bit #
 and
 or
+if
+then
 
 .
