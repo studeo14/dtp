@@ -32,14 +32,20 @@ public class FrameFinder {
 
     public List<FrameInstance> findAllFrames(List<TokenInstance> tokens) throws FrameException {
         ArrayList<FrameInstance> retVal = new ArrayList<>();
-        logger.debug("Start new sentence tokenization");
+        logger.debug("Start new sentence frame finding.");
         logger.debug("Tokens: {}", tokens.stream().map(TokenInstance::getId).collect(Collectors.toList()));
         var iter = tokens.listIterator();
         while(iter.hasNext()) {
             var frame = getNextFrame(iter);
             if (frame.isPresent()) {
-                retVal.add(frame.get());
-                logger.debug("Frame Added: {}", frame.get().getId());
+                var numLit = frame.get().getLiterals().size();
+                var expected = frameModel.getGeneric().numLiterals(frame.get().getId());
+                if (numLit == expected) {
+                    retVal.add(frame.get());
+                    logger.debug("Frame Added: {}", frame.get().getId());
+                } else {
+                    throw new FrameException(String.format("Invalid number of literals. Id: %d, Expected: %d, Actual: %d", frame.get().getId(), expected, numLit));
+                }
             }
         }
         return retVal;
@@ -75,9 +81,9 @@ public class FrameFinder {
                                 }
                                 // if there is a valid next token
                                 var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
+                                literalList.add(currentToken);
                                 cToken.setCompoundToken(new CompoundToken(literalList));
                                 tokenList.add(cToken);
-                                tokenList.add(currentToken);
                                 logger.debug("Starting Frame at {} from literal token start", currentToken.getId());
                             } else {
                                 break;
@@ -115,7 +121,11 @@ public class FrameFinder {
                         currentNode = currentNode.getChildren().get(currentToken.getId());
                     } else if (currentNode.getChildren().containsKey(Constants.LITERAL_TOKEN_ID)) { // if has a "placeholder" child
                         logger.debug("Placeholder Child");
-                        tokenList.add(currentToken);
+                        literalList = new ArrayList<>();
+                        literalList.add(currentToken);
+                        var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
+                        cToken.setCompoundToken(new CompoundToken(literalList));
+                        tokenList.add(cToken);
                         currentNode = currentNode.getChildren().get(Constants.LITERAL_TOKEN_ID);
                     } else if (currentNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)) { // if has no more children
                         logger.debug("Leaf Child");
@@ -123,6 +133,9 @@ public class FrameFinder {
                         current.setId(((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId());
                         // check if ending on a "placeholder" token
                         if (currentNode.getTokenId().equals(Constants.LITERAL_TOKEN_ID)) {
+                            // remove earlier literal
+                            tokenList.remove(tokenList.size() - 1);
+                            iter.previous();
                             state = FindState.END_ON_LITERAL;
                         } else { // if not
                             state = FindState.END;
@@ -141,22 +154,32 @@ public class FrameFinder {
                 }
                 case END_ON_LITERAL: {
                     logger.debug("End On Literal");
+                    literalList = new ArrayList<>();
                     while(iter.hasNext()) {
                         var currentToken = iter.next();
                         if (!currentToken.getId().equals(Constants.LITERAL_TOKEN_ID) && frameSearchTree.getRootNode().getChildren().containsKey(currentToken.getId())) {
                             logger.debug("End Literal on New Frame Found");
                             iter.previous();
+                            var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
+                            cToken.setCompoundToken(new CompoundToken(literalList));
+                            tokenList.add(cToken);
                             current.setTokensAndLiterals(tokenList);
                             return Optional.of(current);
-                        } else if (currentToken.getId().equals(64)) {
+                        } else if (punctuationToken(currentToken)) {
                             logger.debug("End Literal on Punctuation Found");
+                            var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
+                            cToken.setCompoundToken(new CompoundToken(literalList));
+                            tokenList.add(cToken);
                             current.setTokensAndLiterals(tokenList);
                             return Optional.of(current);
                         }
-                        tokenList.add(currentToken);
+                        logger.debug("Adding literal '{}' to end.", currentToken.getId());
+                        literalList.add(currentToken);
                     }
                     logger.debug("End Literal on Iter End");
-                    iter.previous();
+                    var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
+                    cToken.setCompoundToken(new CompoundToken(literalList));
+                    tokenList.add(cToken);
                     current.setTokensAndLiterals(tokenList);
                     return Optional.of(current);
                 }
@@ -171,6 +194,17 @@ public class FrameFinder {
         } else {
             logger.debug("No leaf.");
             return Optional.empty();
+        }
+    }
+
+    private boolean punctuationToken(TokenInstance currentToken) {
+        switch (currentToken.getId()) {
+            case 64:
+            case 73:
+            case -20:
+                return true;
+            default:
+                return false;
         }
     }
 

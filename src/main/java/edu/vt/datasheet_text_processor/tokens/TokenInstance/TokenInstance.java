@@ -1,9 +1,13 @@
 package edu.vt.datasheet_text_processor.tokens.TokenInstance;
 
 import edu.vt.datasheet_text_processor.util.Constants;
+import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
+import edu.vt.datasheet_text_processor.wordid.Serializer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TokenInstance {
     public enum Type {NA, TOKEN, LITERAL, ACCESS, COMPOUND};
@@ -46,7 +50,14 @@ public class TokenInstance {
     }
 
     public List<Integer> getStream() {
-        return stream;
+        if (type == Type.COMPOUND) {
+            return compoundToken.getOriginalTokens().stream()
+                    .map(TokenInstance::getStream)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+        } else {
+            return stream;
+        }
     }
 
     public void setStream(List<Integer> stream) {
@@ -66,6 +77,12 @@ public class TokenInstance {
     }
 
     public void setBitAccessToken(BitAccessToken bitAccessToken) {
+        this.bitAccessToken = bitAccessToken;
+    }
+
+    public void setBitAccessToken(BitAccessToken bitAccessToken, Serializer serializer) {
+        var t = new AddNewWrapper(false);
+        this.stream = serializer.serialize(bitAccessToken.toString(), t);
         this.bitAccessToken = bitAccessToken;
     }
 

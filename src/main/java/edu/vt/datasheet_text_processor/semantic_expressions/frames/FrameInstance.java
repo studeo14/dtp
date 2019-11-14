@@ -1,6 +1,7 @@
 package edu.vt.datasheet_text_processor.semantic_expressions.frames;
 
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
+import edu.vt.datasheet_text_processor.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class FrameInstance {
         this.id = id;
         this.tokens = tokens;
         this.literals = tokens.stream()
-                .filter(t -> t.getType() == TokenInstance.Type.LITERAL || t.getType() == TokenInstance.Type.COMPOUND)
+                .filter(t -> t.getId().equals(Constants.LITERAL_TOKEN_ID))
                 .map(TokenInstance::getStream)
                 .collect(Collectors.toList());
     }

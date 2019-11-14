@@ -9,6 +9,7 @@ import edu.vt.datasheet_text_processor.tokens.TokenInstance.BitAccessToken;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
 import edu.vt.datasheet_text_processor.util.Constants;
+import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -64,7 +65,8 @@ public class BitAccessNormalizer {
                     window.clear();
                     // create new token replacement
                     var newToken = new TokenInstance(TokenInstance.Type.ACCESS, null, Constants.LITERAL_TOKEN_ID);
-                    newToken.setBitAccessToken(bat);
+                    // add bat and make sure that the stream is created
+                    newToken.setBitAccessToken(bat, serializer);
                     // add in place of old tokens
                     window.add(newToken);
                     sentences.update(sentence);

@@ -298,113 +298,98 @@
     "55": {
         "aliases": [],
         "id": 55,
-        "stream": "has been"
+        "stream": "has"
     },
     "56": {
         "aliases": [],
         "id": 56,
-        "stream": "has changed"
+        "stream": "is"
     },
     "57": {
         "aliases": [],
         "id": 57,
-        "stream": "is"
+        "stream": "if"
     },
     "58": {
         "aliases": [],
         "id": 58,
-        "stream": "is enabled"
+        "stream": "in progress"
     },
     "59": {
         "aliases": [],
         "id": 59,
-        "stream": "if"
+        "stream": "in"
     },
     "60": {
         "aliases": [],
         "id": 60,
-        "stream": "is defined"
+        "stream": "then"
     },
     "61": {
         "aliases": [],
         "id": 61,
-        "stream": "in progress"
+        "stream": ","
     },
     "62": {
         "aliases": [],
         "id": 62,
-        "stream": "in"
+        "stream": "both"
     },
     "63": {
         "aliases": [],
         "id": 63,
-        "stream": "then"
+        "stream": "read"
     },
     "64": {
         "aliases": [],
         "id": 64,
-        "stream": ","
+        "stream": "cleared"
     },
     "65": {
         "aliases": [],
         "id": 65,
-        "stream": "both"
+        "stream": "ignored"
     },
     "66": {
         "aliases": [],
         "id": 66,
-        "stream": "read"
+        "stream": "writing"
     },
     "67": {
-        "aliases": [],
+        "aliases": [
+            "an"
+        ],
         "id": 67,
-        "stream": "cleared"
+        "stream": "a"
     },
     "68": {
         "aliases": [],
         "id": 68,
-        "stream": "ignored"
+        "stream": "reset"
     },
     "69": {
         "aliases": [],
         "id": 69,
-        "stream": "writing"
+        "stream": "but"
     },
     "70": {
-        "aliases": [
-            "an"
-        ],
+        "aliases": [],
         "id": 70,
-        "stream": "a"
+        "stream": "bit #"
     },
     "71": {
         "aliases": [],
         "id": 71,
-        "stream": "reset"
+        "stream": "and"
     },
     "72": {
         "aliases": [],
         "id": 72,
-        "stream": "but"
+        "stream": "or"
     },
     "73": {
         "aliases": [],
         "id": 73,
-        "stream": "bit #"
-    },
-    "74": {
-        "aliases": [],
-        "id": 74,
-        "stream": "and"
-    },
-    "75": {
-        "aliases": [],
-        "id": 75,
-        "stream": "or"
-    },
-    "76": {
-        "aliases": [],
-        "id": 76,
         "stream": "."
     }
 }

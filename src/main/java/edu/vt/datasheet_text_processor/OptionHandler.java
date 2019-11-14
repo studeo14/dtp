@@ -5,6 +5,8 @@ import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
 import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.input.AllMappingsRaw;
+import edu.vt.datasheet_text_processor.intermediate_representation.IRException;
+import edu.vt.datasheet_text_processor.intermediate_representation.IRFinder;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
@@ -188,6 +190,30 @@ public class OptionHandler {
                         } catch (FrameException e) {
                             logger.warn("For The Sentence: {}", s.getText());
                             logger.warn(e.getMessage());
+                        }
+                    }
+                }
+            }
+            if (options.irOptions != null) {
+                if (options.irOptions.doGetIr) {
+                    logger.info("Finding Intermediate Representation");
+                    var db = project.getDB();
+                    var repo = db.getRepository(Sentence.class);
+                    var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
+                    for ( Sentence s : documents ) {
+                        var se = s.getSemanticExpression();
+                        if (se != null) {
+                            try {
+                                var ir = IRFinder.findIR(se, allMappings);
+                                s.setIr(ir);
+                                repo.update(s);
+                                logger.info("{} -> {}", s.getText(), ir);
+                            } catch (IRException e) {
+                                logger.warn("For sentence: {}", s.getText());
+                                logger.warn(e.getMessage());
+                            }
+                        } else {
+                            logger.info("No SE for sentence {}", s.getSentenceId());
                         }
                     }
                 }

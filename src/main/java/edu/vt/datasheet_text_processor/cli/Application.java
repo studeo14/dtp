@@ -66,6 +66,12 @@ public class Application {
         public boolean doSemanticExpression;
     }
 
+    @ArgGroup(exclusive = false, heading = "IR Options%n")
+    public IROptions irOptions;
+    public static class IROptions {
+        @Option(names={"-i", "--get-ir"}, description = "find the IR of the semantic expressiosn")
+        public boolean doGetIr;
+    }
 
     // debugging options
     @ArgGroup(exclusive = true, heading = "Debugging options for classification%n")
@@ -100,6 +106,8 @@ public class Application {
         public boolean doShowTokenSearchTree;
         @Option(names = {"--show-semexpr"}, description = "print out the semantic expressions")
         public boolean doShowSemanticExpressions;
+        @Option(names = {"--show-ir"}, description = "print out the ir")
+        public boolean doShowIR;
     }
 
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")

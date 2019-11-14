@@ -31,6 +31,7 @@ public class Sentence implements Serializable {
     private List<Integer> wordIds;
     private List<TokenInstance> tokens;
     private SemanticExpression semanticExpression;
+    private String ir;
 
     public Sentence() {
 
@@ -98,5 +99,13 @@ public class Sentence implements Serializable {
 
     public void setSemanticExpression(SemanticExpression semanticExpression) {
         this.semanticExpression = semanticExpression;
+    }
+
+    public String getIr() {
+        return ir;
+    }
+
+    public void setIr(String ir) {
+        this.ir = ir;
     }
 }
