@@ -194,7 +194,7 @@ public class OptionHandler {
                     var repo = db.getRepository( Sentence.class );
                     var documents = repo.find( FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
                     for ( Sentence s : documents ) {
-                        var o = String.format( "%d :: %s :: %s", s.getSentenceId(), s.getType(), s.getText() );
+                        var o = String.format( "%d(%d) :: %s :: %s", s.getSentenceId(), s.getPriority(), s.getType(), s.getText() );
                         System.out.println( o );
                     }
                 } else if ( options.debugOptions.doPercentage ) {

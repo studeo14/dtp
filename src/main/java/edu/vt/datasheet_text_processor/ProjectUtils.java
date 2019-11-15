@@ -29,14 +29,16 @@ public class ProjectUtils {
             for (String line : Files.readAllLines(inputFile.toPath())) {
                 line = line.toLowerCase();
                 if (textOnly) {
-                    var result = repo.insert(new Sentence(index, line));
+                    var result = repo.insert(new Sentence(index, 4, line));
                     index += 1;
                 } else {
-                    var splits = line.split("::");
+                    var splits = line.split(";");
                     var id = Integer.parseInt(splits[0]);
-                    var newSentence = new Sentence(id, splits[2].toLowerCase());
+                    var prio = Integer.parseInt(splits[1]);
+                    var tag = splits[2];
+                    var newSentence = new Sentence(id, prio, splits[3].toLowerCase());
                     // check for meta tag
-                    if (splits[1].equals("M") || splits[1].equals("m")) {
+                    if (tag.equals("M") || tag.equals("m")) {
                         newSentence.setType(Sentence.Type.META);
                     }
                     var result = repo.insert(newSentence);
