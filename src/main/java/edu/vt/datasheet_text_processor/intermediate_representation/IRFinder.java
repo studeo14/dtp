@@ -9,6 +9,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * Take in semantic expressions and determine type of IR to generate
@@ -33,8 +36,85 @@ public class IRFinder {
         }
     }
 
-    private static String processImplicative(SemanticExpression se, AllMappings allMappings) {
-        return "()";
+    private static String processImplicative(SemanticExpression se, AllMappings allMappings) throws IRException {
+        var sb = new StringBuilder();
+        // process antecedent
+        sb.append(processAntecedent(se, allMappings));
+        sb.append(" -> ");
+        // process consequent
+        sb.append(processDeclarative(se, allMappings));
+        return sb.toString();
+    }
+
+    private static String processAntecedent(SemanticExpression se, AllMappings allMappings) throws IRException {
+        var sb = new StringBuilder();
+        if (se.getAntecedents().size() > 1) {
+            throw new IRException("Cannot handle compound antecedents (1+).");
+        } else {
+            var flag = false;
+            for (var frame: se.getAntecedents()) {
+                var frameRes = processAntecedentFrame(frame, allMappings);
+                if (frameRes.isPresent()) {
+                    flag = true;
+                    sb.append('(');
+                    // process frame
+                    sb.append(frameRes.get());
+                    sb.append(')');
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    private static Optional<String> processAntecedentFrame(FrameInstance frame, AllMappings allMappings) throws IRException {
+        logger.debug("AF: {}, {}, {}", frame.getId(), frame.getTokens().size(), frame.getLiterals().size());
+        switch (frame.getId()) {
+            case 6: { // event
+                var name = frame.get(0);
+                var sb = new StringBuilder();
+                sb.append("STATE(");
+                sb.append(Serializer.mergeWords(allMappings.getSerializer().deserialize(name)));
+                sb.append(')');
+                return Optional.of(sb.toString());
+            }
+            case 7: { // when logic high
+                var name = frame.get(0);
+                var sb = new StringBuilder();
+                sb.append("STATE(");
+                sb.append(Serializer.mergeWords(allMappings.getSerializer().deserialize(name)));
+                sb.append(" == '1'");
+                sb.append(')');
+                return Optional.of(sb.toString());
+            }
+            case 8: { // when logic low
+                var name = frame.get(0);
+                var sb = new StringBuilder();
+                sb.append("(");
+                sb.append(Serializer.mergeWords(allMappings.getSerializer().deserialize(name)));
+                sb.append(" == '0'");
+                sb.append(')');
+                return Optional.of(sb.toString());
+            }
+            case 9: { // when specified value
+                var name = frame.get(0);
+                var value = frame.get(1);
+                return Optional.of(getPossibleAction(name, value, allMappings));
+            }
+            case 13:
+                return Optional.empty();
+            default:
+                throw new IRException(String.format("Unknown Antecedent frame %d.", frame.getId()));
+        }
+    }
+
+    private static String getPossibleAction(List<Integer> name, List<Integer> value, AllMappings allMappings) {
+        var nameS = Serializer.mergeWords(allMappings.getSerializer().deserialize(name));
+        var valueS = Serializer.mergeWords(allMappings.getSerializer().deserialize(value));
+        if (value.size() == 1 && WordIdUtils.getWordIdClass(value.get(0)) == Serializer.WordIDClass.VERB) { // possible action
+            return valueS.toUpperCase() + "(" + nameS + ")";
+        } else {
+            return "(" + nameS + " == " + valueS + ")";
+        }
     }
 
     private static String processDeclarative(SemanticExpression se, AllMappings allMappings) throws IRException {
@@ -44,16 +124,19 @@ public class IRFinder {
             if (flag) {
                 sb.append(" && ");
             }
-            flag = true;
-            sb.append('(');
-            // process frame
-            sb.append(processConsequentFrame(frame, allMappings));
-            sb.append(')');
+            var frameRes = processConsequentFrame(frame, allMappings);
+            if (frameRes.isPresent()) {
+                flag = true;
+                sb.append('(');
+                // process frame
+                sb.append(frameRes.get());
+                sb.append(')');
+            }
         }
         return sb.toString();
     }
 
-    private static String processConsequentFrame(FrameInstance frame, AllMappings allMappings) throws IRException {
+    private static Optional<String> processConsequentFrame(FrameInstance frame, AllMappings allMappings) throws IRException {
         logger.debug("CF: {}, {}, {}", frame.getId(), frame.getTokens().size(), frame.getLiterals().size());
         switch (frame.getId()) {
             case 12: {
@@ -63,26 +146,29 @@ public class IRFinder {
                 var desc = frame.get(1);
                 var sb = new StringBuilder();
                 sb.append("DESC(");
-                sb.append(Serializer.mergeWords(allMappings.getSerializer().deserialize(name)));
+                sb.append(normalizeSignalName(Serializer.mergeWords(allMappings.getSerializer().deserialize(name))));
                 sb.append(", ");
                 sb.append(Serializer.mergeWords(allMappings.getSerializer().deserialize(desc)));
                 sb.append(')');
-                return sb.toString();
+                return Optional.of(sb.toString());
             }
             case 14: {
                 // property type
                 // get first
                 var name = frame.get(0);
                 var prop = frame.get(1);
-                return getProperty(name, prop, allMappings);
+                return Optional.of(getProperty(name, prop, allMappings));
             }
+            case 13:
+                return Optional.empty();
             default:
-                throw new IRException(String.format("Unknown Consesquent frame %d.", frame.getId()));
+                throw new IRException(String.format("Unknown Consequent frame %d.", frame.getId()));
         }
     }
 
     private static String getProperty(List<Integer> name, List<Integer> prop, AllMappings allMappings) throws IRException {
         var nameS = Serializer.mergeWords(allMappings.getSerializer().deserialize(name));
+        nameS = normalizeSignalName(nameS);
         var propS = Serializer.mergeWords(allMappings.getSerializer().deserialize(prop));
         if (WordIdUtils.getWordIdClass(prop.get(0)) == Serializer.WordIDClass.VERB) {
             // TODO: handle "has <verb>" frames
@@ -99,5 +185,29 @@ public class IRFinder {
                 throw new IRException("Unknown 'has' expression.");
             }
         }
+    }
+
+    private final static Pattern[] signalNamePatterns = {
+            Pattern.compile("port (\\w+)"),
+            Pattern.compile("signal (\\w+)"),
+            Pattern.compile("register (\\w+)"),
+            Pattern.compile("name (\\w+)"),
+    };
+
+    /**
+     * Helper method to extract the actual signal name from a phrase like
+     *  "port x", "signal y", "register q"
+     * @param signalName
+     * @return
+     */
+    private static String normalizeSignalName(String signalName) {
+        // check patterns
+        for (var pattern: signalNamePatterns) {
+            var t = pattern.matcher(signalName);
+            if (t.find()) {
+                return t.group(1);
+            }
+        }
+        return signalName;
     }
 }

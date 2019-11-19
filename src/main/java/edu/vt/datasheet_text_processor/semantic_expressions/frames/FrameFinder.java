@@ -199,9 +199,9 @@ public class FrameFinder {
 
     private boolean punctuationToken(TokenInstance currentToken) {
         switch (currentToken.getId()) {
-            case 64:
-            case 73:
-            case -20:
+            case 61: // comma
+            case 73: // period
+            case -20:// literal
                 return true;
             default:
                 return false;
