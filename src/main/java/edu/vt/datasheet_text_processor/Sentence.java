@@ -26,6 +26,7 @@ public class Sentence implements Serializable {
     private NitriteId empId;
 
     private Integer sentenceId;
+    private Integer priority;
     private String text;
     private Type type;
     private List<Integer> wordIds;
@@ -37,12 +38,13 @@ public class Sentence implements Serializable {
 
     }
 
-    public Sentence(Integer sentenceId, String text) {
+    public Sentence(Integer sentenceId, Integer priority, String text) {
         this.sentenceId = sentenceId;
+        this.priority = priority;
         this.text = text;
         this.type = Type.NA;
         this.wordIds = new ArrayList<>();
-        this.tokens = new ArrayList<TokenInstance>();
+        this.tokens = new ArrayList<>();
     }
 
     public NitriteId getEmpId() {
@@ -59,6 +61,14 @@ public class Sentence implements Serializable {
 
     public void setSentenceId(Integer sentenceId) {
         this.sentenceId = sentenceId;
+    }
+
+    public Integer getPriority () {
+        return priority;
+    }
+
+    public void setPriority ( Integer priority ) {
+        this.priority = priority;
     }
 
     public String getText() {
