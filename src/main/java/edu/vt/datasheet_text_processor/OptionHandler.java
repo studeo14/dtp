@@ -207,7 +207,6 @@ public class OptionHandler {
                                 var ir = IRFinder.findIR(se, allMappings);
                                 s.setIr(ir);
                                 repo.update(s);
-                                logger.info("{} -> {}", s.getText(), ir);
                             } catch (IRException e) {
                                 logger.warn("For sentence: {}", s.getText());
                                 logger.warn(e.getMessage());
@@ -320,6 +319,13 @@ public class OptionHandler {
                     var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
                     for (var s: documents) {
                         printSemanticExpression(s, allMappings);
+                    }
+                } else if (options.debugOptions.doShowIR) {
+                    var db = project.getDB();
+                    var repo = db.getRepository(Sentence.class);
+                    var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
+                    for (var s: documents) {
+                        logger.info("{} -> {}", s.getText(), s.getIr());
                     }
                 }
             }
