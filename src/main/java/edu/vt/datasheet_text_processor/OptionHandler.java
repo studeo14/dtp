@@ -225,7 +225,7 @@ public class OptionHandler {
                     var documents = repo.find( FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
                     for ( Sentence s : documents ) {
                         var o = String.format( "%d(%d) :: %s :: %s", s.getSentenceId(), s.getPriority(), s.getType(), s.getText() );
-                        System.out.println( o );
+                        logger.info(o);
                     }
                 } else if ( options.debugOptions.doPercentage ) {
                     var results = DatasheetBOW.count_questionable( project );
