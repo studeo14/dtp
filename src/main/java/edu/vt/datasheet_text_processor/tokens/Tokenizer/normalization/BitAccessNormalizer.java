@@ -4,29 +4,25 @@ import edu.vt.datasheet_text_processor.Project;
 import edu.vt.datasheet_text_processor.Sentence;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
-import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameTemplate;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.BitAccessToken;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
 import edu.vt.datasheet_text_processor.util.Constants;
-import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.objects.filters.ObjectFilters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Takes in a LiteralToken and converts it to a standard BitAccessToken format
  */
 public class BitAccessNormalizer {
-    private static final Logger logger = LogManager.getLogger(BitAccessNormalizer.class);
+    private static final Logger logger = LoggerFactory.getLogger(BitAccessNormalizer.class);
 
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
     private static final Pattern[] NUMBER_WORD_PATTERNS = {

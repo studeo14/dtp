@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TokenInstance {
-    public enum Type {NA, TOKEN, LITERAL, ACCESS, COMPOUND};
+    public enum Type {NA, TOKEN, LITERAL, ACCESS, COMPOUND}
 
     private Type type;
     private Integer id;

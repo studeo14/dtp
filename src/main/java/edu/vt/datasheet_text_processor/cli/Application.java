@@ -11,6 +11,10 @@ public class Application {
     @Option(names = {"-f", "--file"}, required = true, paramLabel = "INPUTFILE", description = "the input cas/project/text file")
     public File inputFile;
 
+    // new project flags
+    @Option(names = {"-v","--verbose"}, description = "display debugging info")
+    public boolean verbose;
+
     @ArgGroup(exclusive = true, heading="In Point options%n")
     public InPointOptions inPointOptions;
 

@@ -6,11 +6,11 @@ import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import edu.vt.datasheet_text_processor.wordid.StopAddNewException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.exceptions.InvalidIdException;
 import org.dizitart.no2.exceptions.UniqueConstraintException;
 import org.dizitart.no2.objects.filters.ObjectFilters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  *  from the words that are present and seeing if there are any matches.
  */
 public class AcronymFinder {
-    private final static Logger logger = LogManager.getLogger(AcronymFinder.class);
+    private final static Logger logger = LoggerFactory.getLogger(AcronymFinder.class);
 
     /**
      * Initialize acronym collection with the signals collection

@@ -3,9 +3,6 @@ package edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree;
 import edu.vt.datasheet_text_processor.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class SearchTreeNode {
 
     private Integer wordId;

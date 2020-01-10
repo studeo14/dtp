@@ -4,18 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
-import edu.vt.datasheet_text_processor.wordid.Serializer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+import static org.junit.Assert.assertTrue;
+
 public class AcronymFinderTest {
-    private final static Logger logger = LogManager.getLogger(AcronymFinderTest.class);
+    private final static Logger logger = LoggerFactory.getLogger(AcronymFinderTest.class);
     private AllMappings allMappings;
 
     @Before
@@ -40,8 +40,8 @@ public class AcronymFinderTest {
         var wordIds = allMappings.getSerializer().serialize(test, new AddNewWrapper(false));
         TokenInstance token = new TokenInstance(TokenInstance.Type.LITERAL, wordIds);
         var acronymPair = AcronymFinder.getAcronym(token, allMappings.getSerializer());
-        logger.debug(acronymPair.isEmpty());
-        acronymPair.ifPresent(logger::debug);
+        logger.debug("{}", acronymPair.isEmpty());
+        acronymPair.ifPresent(b -> logger.debug("{}", b));
         assertTrue(acronymPair.isEmpty());
     }
 
@@ -52,8 +52,8 @@ public class AcronymFinderTest {
         var wordIds = allMappings.getSerializer().serialize(test, new AddNewWrapper(false));
         TokenInstance token = new TokenInstance(TokenInstance.Type.LITERAL, wordIds);
         var acronymPair = AcronymFinder.getAcronym(token, allMappings.getSerializer());
-        logger.debug(acronymPair.isEmpty());
-        acronymPair.ifPresent(logger::debug);
+        logger.debug("{}", acronymPair.isEmpty());
+        acronymPair.ifPresent(b -> logger.debug("{}", b));
         assertTrue(acronymPair.isPresent());
     }
 }

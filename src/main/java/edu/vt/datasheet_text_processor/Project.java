@@ -1,11 +1,11 @@
 package edu.vt.datasheet_text_processor;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.FindOptions;
 import org.dizitart.no2.Nitrite;
 import org.dizitart.no2.SortOrder;
 import org.dizitart.no2.objects.Cursor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Project {
     private Logger logger;
@@ -14,7 +14,7 @@ public class Project {
 
     public Project(String name) {
         this.name = name;
-        this.logger = LogManager.getLogger(String.format("%s:%s", Project.class, name));
+        this.logger = LoggerFactory.getLogger(String.format("%s:%s", Project.class, name));
     }
 
     public String getName() {

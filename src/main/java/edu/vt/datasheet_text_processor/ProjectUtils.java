@@ -1,16 +1,16 @@
 package edu.vt.datasheet_text_processor;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.Nitrite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
 public class ProjectUtils {
-    private static final Logger logger = LogManager.getLogger(ProjectUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProjectUtils.class);
 
     public static Project createEmptyProject(File inputFile) {
         var projectName = FilenameUtils.removeExtension(inputFile.getName());

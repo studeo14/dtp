@@ -1,14 +1,14 @@
 package edu.vt.datasheet_text_processor.wordid;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class WordTokenizer {
-    private final static Logger logger = LogManager.getLogger(WordTokenizer.class);
+    private final static Logger logger = LoggerFactory.getLogger(WordTokenizer.class);
     public final static Pattern WORD = Pattern.compile("\\w");
     public final static Pattern WHITESPACE = Pattern.compile("\\s");
     public final static Pattern PUNCTUATION = Pattern.compile("[.,;:!?]");

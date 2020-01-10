@@ -19,7 +19,7 @@ import java.util.List;
 })
 public class Sentence implements Serializable {
     public enum Type {
-        COMMENT, NONCOMMENT, META, NA;
+        COMMENT, NONCOMMENT, META, NA
     }
 
     @Id

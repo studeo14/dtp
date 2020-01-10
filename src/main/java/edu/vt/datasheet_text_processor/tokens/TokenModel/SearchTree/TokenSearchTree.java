@@ -1,14 +1,13 @@
 package edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree;
 
 import edu.vt.datasheet_text_processor.tokens.TokenModel.TokenModel;
-import edu.vt.datasheet_text_processor.util.Constants;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ListIterator;
 
 public class TokenSearchTree {
-    private final static Logger logger = LogManager.getLogger(TokenSearchTree.class);
+    private final static Logger logger = LoggerFactory.getLogger(TokenSearchTree.class);
 
     private SearchTreeNode rootNode;
 

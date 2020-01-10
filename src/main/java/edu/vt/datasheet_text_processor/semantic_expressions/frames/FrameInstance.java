@@ -5,7 +5,6 @@ import edu.vt.datasheet_text_processor.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**

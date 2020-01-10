@@ -3,14 +3,14 @@ package edu.vt.datasheet_text_processor.semantic_expressions.processor;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 
 public class SemanticParser {
-    private final static Logger logger = LogManager.getLogger(SemanticParser.class);
+    private final static Logger logger = LoggerFactory.getLogger(SemanticParser.class);
 
     private SemanticModel semanticModel;
 

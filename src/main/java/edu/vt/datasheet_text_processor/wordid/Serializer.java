@@ -3,15 +3,14 @@ package edu.vt.datasheet_text_processor.wordid;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.vt.datasheet_text_processor.util.Constants;
-import opennlp.tools.tokenize.SimpleTokenizer;
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.tokenize.TokenizerME;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static edu.vt.datasheet_text_processor.wordid.WordIdUtils.*;
@@ -21,7 +20,7 @@ import static edu.vt.datasheet_text_processor.wordid.WordIdUtils.*;
  * and returns a stream (List) of word ids (integers) instead
  */
 public class Serializer {
-    private final static Logger logger = LogManager.getLogger(Serializer.class);
+    private final static Logger logger = LoggerFactory.getLogger(Serializer.class);
     public enum WordIDClass {
         JUNK(0), OBJECT(1), VERB(2), NUMBER(3), MODIFIER(4), ADJECTIVE(5), PRONOUN(6), CONDITION(7);
         private Integer number;

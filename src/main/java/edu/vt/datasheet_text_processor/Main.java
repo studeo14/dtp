@@ -3,15 +3,16 @@ package edu.vt.datasheet_text_processor;
 import edu.vt.datasheet_text_processor.cli.Application;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 class Main {
-    private static final Logger logger = LogManager.getLogger(Main.class);
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String... args) {
         var options = new Application();
@@ -20,15 +21,12 @@ class Main {
             cli.parseArgs(args);
             handleCli(cli, options);
         } catch (IOException | TokenizerException | FrameException e) {
-            logger.error(e.getMessage());
-            logger.error(e);
+            logger.error(e.getMessage(), e);
         } catch (CommandLine.ParameterException e) {
             logger.error(e.getMessage());
             cli.usage(System.out);
         } catch (RuntimeException e) {
-            logger.fatal("Unknown runtime exception!: {}", e.getMessage());
-            logger.fatal(e.getCause());
-            e.printStackTrace();
+            logger.error("Unknown runtime exception!: {} :: {}", e.getMessage(), e.getCause(), e);
         }
     }
 
@@ -48,6 +46,10 @@ class Main {
                 return;
             }
             // else
+            // verbosity change (package only)
+            if (options.verbose) {
+                Configurator.setAllLevels("edu.vt", Level.DEBUG);
+            }
             // open and continue
             project = ProjectUtils.openProject(options.inputFile);
             if (project.getDB() == null) {

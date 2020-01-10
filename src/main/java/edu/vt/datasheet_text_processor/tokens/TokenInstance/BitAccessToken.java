@@ -1,8 +1,5 @@
 package edu.vt.datasheet_text_processor.tokens.TokenInstance;
 
-import edu.vt.datasheet_text_processor.util.Constants;
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.List;
 
 public class BitAccessToken {

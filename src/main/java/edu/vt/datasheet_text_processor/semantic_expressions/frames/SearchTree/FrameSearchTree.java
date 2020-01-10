@@ -1,14 +1,13 @@
 package edu.vt.datasheet_text_processor.semantic_expressions.frames.SearchTree;
 
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameModel;
-import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameTemplateModel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ListIterator;
 
 public class FrameSearchTree {
-    private final static Logger logger = LogManager.getLogger(FrameSearchTree.class);
+    private final static Logger logger = LoggerFactory.getLogger(FrameSearchTree.class);
 
     private FrameSearchTreeNode rootNode;
 

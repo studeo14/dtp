@@ -6,8 +6,8 @@ import edu.vt.datasheet_text_processor.semantic_expressions.frames.SearchTree.Fr
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.CompoundToken;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.util.Constants;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +16,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FrameFinder {
-    private static final Logger logger = LogManager.getLogger(FrameFinder.class);
+    private static final Logger logger = LoggerFactory.getLogger(FrameFinder.class);
 
-    private enum State {BEGIN, INSIDE, FAIL, END};
+    private enum State {BEGIN, INSIDE, FAIL, END}
 
     // used for finding frames in sentences
     private FrameSearchTree frameSearchTree;
@@ -51,7 +51,7 @@ public class FrameFinder {
         return retVal;
     }
 
-    private enum FindState {BEGIN, INSIDE, END, END_ON_LITERAL};
+    private enum FindState {BEGIN, INSIDE, END, END_ON_LITERAL}
 
     private Optional<FrameInstance> getNextFrame(ListIterator<TokenInstance> iter) throws FrameException {
         var current = new FrameInstance();

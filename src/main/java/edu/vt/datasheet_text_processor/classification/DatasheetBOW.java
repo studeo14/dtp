@@ -3,15 +3,15 @@ package edu.vt.datasheet_text_processor.classification;
 import edu.vt.datasheet_text_processor.Project;
 import edu.vt.datasheet_text_processor.Sentence;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DatasheetBOW {
-    private static final Logger logger = LogManager.getLogger(DatasheetBOW.class);
+    private static final Logger logger = LoggerFactory.getLogger(DatasheetBOW.class);
     private static final String actions = "(assert|asserts|reassert|deassert|set|clear|start|stop|enabled|disable|reset|activate|generate)";
     private static final String conditions = "(when|before|after|during|when|at|upon|on|while|if)";
     private static final String values = "(zero|one|0|1|high|low|enabled|disabled|asserted|deasserted)";

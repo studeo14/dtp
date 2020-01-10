@@ -5,13 +5,12 @@ import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import edu.vt.datasheet_text_processor.wordid.WordIdUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /**
  * Take in semantic expressions and determine type of IR to generate
@@ -19,7 +18,7 @@ import java.util.stream.Stream;
  * Then convert each frame or give an error/warning
  */
 public class IRFinder {
-    private final static Logger logger = LogManager.getLogger(IRFinder.class);
+    private final static Logger logger = LoggerFactory.getLogger(IRFinder.class);
 
     public static String findIR(SemanticExpression se, AllMappings allMappings) throws IRException {
         // first need to determine which type of se we are dealing with

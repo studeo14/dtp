@@ -1,17 +1,17 @@
 package edu.vt.datasheet_text_processor.tokens.Tokenizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.RawTokenModel;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.SearchTreeLeafNode;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.SearchTreeNode;
-import edu.vt.datasheet_text_processor.tokens.TokenModel.TokenModel;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.TokenSearchTree;
-import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
+import edu.vt.datasheet_text_processor.tokens.TokenModel.TokenModel;
 import edu.vt.datasheet_text_processor.util.Constants;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import edu.vt.datasheet_text_processor.wordid.WordIdUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class Tokenizer {
-    private final static Logger logger = LogManager.getLogger(Tokenizer.class);
+    private final static Logger logger = LoggerFactory.getLogger(Tokenizer.class);
 
     private TokenModel tokenModel;
     private TokenSearchTree tokenSearchTree;
@@ -64,7 +64,7 @@ public class Tokenizer {
         return processWordIdStream(iter);
     }
 
-    private enum ProcessState {BEGIN, INSIDE, LITERAL, END};
+    private enum ProcessState {BEGIN, INSIDE, LITERAL, END}
 
     private List<TokenInstance> processWordIdStream(ListIterator<Integer> iter) throws TokenizerException {
         ArrayList<TokenInstance> retVal = new ArrayList<>();

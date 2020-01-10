@@ -9,7 +9,6 @@ import edu.vt.datasheet_text_processor.intermediate_representation.IRException;
 import edu.vt.datasheet_text_processor.intermediate_representation.IRFinder;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
-import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
 import edu.vt.datasheet_text_processor.signals.Acronym;
 import edu.vt.datasheet_text_processor.signals.AcronymFinder;
 import edu.vt.datasheet_text_processor.signals.Signal;
@@ -20,14 +19,13 @@ import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.BitAccessN
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dizitart.no2.FindOptions;
 import org.dizitart.no2.SortOrder;
 import org.dizitart.no2.exceptions.InvalidIdException;
 import org.dizitart.no2.exceptions.UniqueConstraintException;
 import org.dizitart.no2.objects.filters.ObjectFilters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class OptionHandler {
-    private static final Logger logger = LogManager.getLogger( OptionHandler.class );
+    private static final Logger logger = LoggerFactory.getLogger( OptionHandler.class );
 
     public static void handle ( Project project, Application options ) throws IOException, TokenizerException, FrameException {
         if (options.compileTokens) {
@@ -182,7 +180,7 @@ public class OptionHandler {
                             if (semexpr.isPresent()) {
                                 var se = semexpr.get();
                                 s.setSemanticExpression(se);
-                                if (logger.getLevel().equals(Level.DEBUG)) {
+                                if (logger.isDebugEnabled()) {
                                     printSemanticExpression(s, allMappings);
                                 }
                                 repo.update(s);
@@ -358,7 +356,7 @@ public class OptionHandler {
                             .collect(Collectors.toList())
                     )
                     .collect(Collectors.toList());
-            logger.info("{} -> {} ({})", s.getText(), se, tokens);
+            logger.debug("{} -> {} ({})", s.getText(), se, tokens);
         } else {
             logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
         }
