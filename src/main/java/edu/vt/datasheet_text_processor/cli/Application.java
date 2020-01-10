@@ -20,15 +20,9 @@ public class Application {
 
     // options that tell the program if it is creating a project or processing one
     public static class InPointOptions {
-        @Option(names = {"-n", "--new-project"}, description = "create a new project", required = true)
-        public boolean newProject;
         @Option(names = {"-m", "--mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
         public File mappingFile;
     }
-
-    // new project flags
-    @Option(names = {"--text"}, description = "input file only has raw text, use implied sentence ids")
-    public boolean text;
 
     @Option(names = {"-s", "--signal-names"}, description = "a list of the signal names in the document", paramLabel = "SIGNALFILE")
     public File signalNames;
