@@ -47,6 +47,15 @@ public class Sentence implements Serializable {
         this.tokens = new ArrayList<>();
     }
 
+    public Sentence(Integer sentenceId, Integer priority, String text, Type type) {
+        this.sentenceId = sentenceId;
+        this.priority = priority;
+        this.text = text;
+        this.type = type;
+        this.wordIds = new ArrayList<>();
+        this.tokens = new ArrayList<>();
+    }
+
     public NitriteId getEmpId() {
         return empId;
     }

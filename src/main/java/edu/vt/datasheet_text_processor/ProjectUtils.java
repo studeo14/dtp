@@ -12,6 +12,24 @@ import java.nio.file.Files;
 public class ProjectUtils {
     private static final Logger logger = LogManager.getLogger(ProjectUtils.class);
 
+    public static Project createEmptyProject(File inputFile) {
+        var projectName = FilenameUtils.removeExtension(inputFile.getName());
+        var project = new Project(projectName);
+        var db = Nitrite.builder()
+                .compressed()
+                .filePath(projectName + ".project")
+                .openOrCreate();
+        project.setDB(db);
+        if (db.hasRepository(Sentence.class)) {
+            logger.info("Found existing project when trying to create a new one at {}.project", projectName);
+            return project;
+        } else {
+            var repo = db.getRepository(Sentence.class);
+            logger.info("Created new EMPTY project with SENTENCE repo at {}.project", projectName);
+        }
+        return project;
+    }
+
     public static Project createNewProject(File inputFile, boolean textOnly) throws IOException {
         var projectName = FilenameUtils.removeExtension(inputFile.getName());
         var project = new Project(projectName);
