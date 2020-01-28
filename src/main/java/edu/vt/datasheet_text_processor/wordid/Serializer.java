@@ -120,7 +120,7 @@ public class Serializer {
         var num = currentNumber.getOrDefault( catClass, 0 ) + 1;
         currentNumber.put( catClass, num );
         // realign integer
-        var mappingInteger = ( cat * 10000 ) + ( num * 10 );
+        var mappingInteger = ( cat * CLASS_NUM ) + ( num * OPTIONS );
         // add
         mapping.getBaseMapping().put( baseWord, mappingInteger );
         // need to add to inverse mapping
@@ -151,10 +151,15 @@ public class Serializer {
                 stem = System.console().readLine( "Enter Stem: " );
             }
             // get aliases
-            var aliases = System.console().readLine( "Enter aliases separated by commas: " ).split( "," );
+            var aliases = System.console().readLine( "Enter conjugations separated by commas (ed, ing, ect): " ).split( "," );
+            logger.debug("Aliases entered: '{}'", String.join("\"", aliases));
             // add aliases
             for ( var alias : aliases ) {
+                if (alias.isBlank() || alias.isEmpty()) {
+                    continue;
+                }
                 mapping.getAliases().put( alias, stem );
+                logger.debug("Adding alias: {} : {}", alias, stem);
             }
         }
         // add base mapping

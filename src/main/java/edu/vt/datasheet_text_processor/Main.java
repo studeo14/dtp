@@ -38,18 +38,8 @@ class Main {
             if (options.verbose) {
                 Configurator.setAllLevels("edu.vt", Level.DEBUG);
             }
+            OptionHandler.handle(options);
             // open and continue
-            Project project;
-            project = ProjectUtils.openProject(options.inputFile);
-            if (project.getDB() == null) {
-                logger.error("Unable to open project");
-            } else {
-                OptionHandler.handle(project, options);
-                if (project.getDB().hasUnsavedChanges()) {
-                    project.getDB().commit();
-                }
-                project.getDB().close();
-            }
         }
     }
 }

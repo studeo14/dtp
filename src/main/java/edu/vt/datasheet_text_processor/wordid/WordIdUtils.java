@@ -1,13 +1,17 @@
 package edu.vt.datasheet_text_processor.wordid;
 
 public class WordIdUtils {
+    public static final int CLASS_NUM = 1000000;
+    public static final int ID_NUMBER = CLASS_NUM/10;
+    public static final int OPTIONS = 10;
+
     public static Serializer.WordIDClass getWordIdClass (Integer wordId ) {
-        var classNum = ( wordId / 10000 );
+        var classNum = ( wordId / CLASS_NUM );
         return classNumToClass( classNum );
     }
 
     public static Integer getBase(Integer wordId) {
-        return (wordId / 10 ) * 10;
+        return wordId - (wordId%OPTIONS);
     }
 
     public static Serializer.WordIDClass classNumToClass (Integer classNum ) {
@@ -33,11 +37,11 @@ public class WordIdUtils {
     }
 
     public static Integer getWordIdNumber ( Integer wordId ) {
-        return ( wordId / 10 ) % 1000;
+        return ( wordId / OPTIONS ) % ID_NUMBER;
     }
 
     public static Integer getWordIdOption ( Integer wordId ) {
-        return ( wordId % 10 );
+        return ( wordId % OPTIONS );
     }
 
     public static Serializer.VerbEndings getVerbEnding (Integer wordId ) {
@@ -59,16 +63,12 @@ public class WordIdUtils {
         return Serializer.VerbEndings.NONE;
     }
 
-    public static Integer removeOptions(Integer in) {
-        return in - (in % 10);
-    }
-
     public static boolean equal(Integer a, Integer b) {
         // remove options for both
-        return removeOptions(a).equals(removeOptions(b));
+        return getBase(a).equals(getBase(b));
     }
 
     public static int compare(Integer a, Integer b) {
-        return removeOptions(a).compareTo(removeOptions(b));
+        return getBase(a).compareTo(getBase(b));
     }
 }

@@ -8,8 +8,8 @@ import java.io.File;
 
 @Command(name = "dtp")
 public class Application {
-    @Option(names = {"-f", "--file"}, required = true, paramLabel = "INPUTFILE", description = "the input cas/project/text file")
-    public File inputFile;
+    @Option(names = {"-m", "--mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
+    public File mappingFile;
 
     // new project flags
     @Option(names = {"-v","--verbose"}, description = "display debugging info")
@@ -20,14 +20,14 @@ public class Application {
 
     // options that tell the program if it is creating a project or processing one
     public static class InPointOptions {
-        @Option(names = {"-m", "--mappings"}, description = "mapping file (JSON)", required = true, paramLabel = "MAPPINGFILE")
-        public File mappingFile;
+        @Option(names = {"-f", "--file"}, required = true, paramLabel = "INPUTFILE", description = "the input cas/project/text file")
+        public File inputFile;
+        @Option(names = {"--compile-tokens"}, required = true, description = "indicates that the mapping file is a raw string token and needs to be compiled")
+        public boolean compileTokens;
     }
 
     @Option(names = {"-s", "--signal-names"}, description = "a list of the signal names in the document", paramLabel = "SIGNALFILE")
     public File signalNames;
-    @Option(names = {"--compile-tokens"}, description = "indicates that the mapping file is a raw string token and needs to be compiled", required = false)
-    public boolean compileTokens;
 
     // processing steps
     // print
