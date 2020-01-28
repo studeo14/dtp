@@ -27,6 +27,7 @@ public class Sentence implements Serializable {
 
     private Integer sentenceId;
     private Integer priority;
+    private String originalText;
     private String text;
     private Type type;
     private List<Integer> wordIds;
@@ -41,7 +42,8 @@ public class Sentence implements Serializable {
     public Sentence(Integer sentenceId, Integer priority, String text) {
         this.sentenceId = sentenceId;
         this.priority = priority;
-        this.text = text;
+        this.originalText = text;
+        this.text = text.toLowerCase();
         this.type = Type.NA;
         this.wordIds = new ArrayList<>();
         this.tokens = new ArrayList<>();
@@ -50,7 +52,8 @@ public class Sentence implements Serializable {
     public Sentence(Integer sentenceId, Integer priority, String text, Type type) {
         this.sentenceId = sentenceId;
         this.priority = priority;
-        this.text = text;
+        this.originalText = text;
+        this.text = text.toLowerCase();
         this.type = type;
         this.wordIds = new ArrayList<>();
         this.tokens = new ArrayList<>();
@@ -78,6 +81,14 @@ public class Sentence implements Serializable {
 
     public void setPriority ( Integer priority ) {
         this.priority = priority;
+    }
+
+    public String getOriginalText() {
+        return originalText;
+    }
+
+    public void setOriginalText(String originalText) {
+        this.originalText = originalText;
     }
 
     public String getText() {

@@ -32,6 +32,44 @@ public class BitAccessToken {
         this.registerName = registerName;
     }
 
+    private boolean checkBits(BitAccessToken other){
+        if (bits == null) {
+            return other.getBits() == null;
+        } else {
+            return bits.equals(other.getBits());
+        }
+    }
+
+    private boolean checkRegisterName(BitAccessToken other){
+        if (registerName == null) {
+            return other.getRegisterName() == null;
+        } else {
+            return registerName.equals(other.getRegisterName());
+        }
+    }
+
+    private boolean checkOriginalTokens(BitAccessToken other){
+        if (originalTokens == null) {
+            return other.getOriginalTokens() == null;
+        } else {
+            return originalTokens.equals(other.getOriginalTokens());
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BitAccessToken) {
+            var newO = (BitAccessToken)obj;
+            return
+                    checkBits(newO) &&
+                            checkRegisterName(newO) &&
+                            checkOriginalTokens(newO);
+
+        } else {
+            return false;
+        }
+    }
+
     public String getRegisterName() {
         return registerName;
     }

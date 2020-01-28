@@ -9,6 +9,7 @@ import edu.vt.datasheet_text_processor.intermediate_representation.IRException;
 import edu.vt.datasheet_text_processor.intermediate_representation.IRFinder;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
+import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
 import edu.vt.datasheet_text_processor.signals.Acronym;
 import edu.vt.datasheet_text_processor.signals.AcronymFinder;
 import edu.vt.datasheet_text_processor.signals.Signal;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class OptionHandler {
@@ -179,9 +181,19 @@ public class OptionHandler {
                             var semexpr = allMappings.getSemanticParser().findSemanticExpression(s.getTokens(), allMappings.getFrameFinder());
                             if (semexpr.isPresent()) {
                                 var se = semexpr.get();
+                                var seTTo = getSemanticExpressionTokenText(se, allMappings);
+                                List<List<String>> seTT = null;
+                                if (seTTo.isPresent()) {
+                                    seTT = seTTo.get();
+                                    se.setTokenText(seTT);
+                                }
                                 s.setSemanticExpression(se);
                                 if (logger.isDebugEnabled()) {
-                                    printSemanticExpression(s, allMappings);
+                                    if (seTT == null) {
+                                        logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
+                                    } else {
+                                        logger.debug("{} -> {} ({})", s.getText(), s.getSemanticExpression(), seTT);
+                                    }
                                 }
                                 repo.update(s);
                             }
@@ -316,7 +328,13 @@ public class OptionHandler {
                     var repo = db.getRepository(Sentence.class);
                     var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
                     for (var s: documents) {
-                        printSemanticExpression(s, allMappings);
+                        var se = s.getSemanticExpression();
+                        if (se == null) {
+                            logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
+                        } else {
+                            var seTT = s.getSemanticExpression().getTokenText();
+                            logger.debug("{} -> {} ({})", s.getText(), s.getSemanticExpression(), seTT);
+                        }
                     }
                 } else if (options.debugOptions.doShowIR) {
                     var db = project.getDB();
@@ -330,8 +348,7 @@ public class OptionHandler {
         }
     }
 
-    public static void printSemanticExpression(Sentence s, AllMappings allMappings) {
-        var se = s.getSemanticExpression();
+    public static Optional<List<List<String>>> getSemanticExpressionTokenText(SemanticExpression se, AllMappings allMappings) {
         if (se != null) {
             var tokens = se.getAllFrames().stream()
                     .map(FrameInstance::getTokens)
@@ -356,9 +373,9 @@ public class OptionHandler {
                             .collect(Collectors.toList())
                     )
                     .collect(Collectors.toList());
-            logger.debug("{} -> {} ({})", s.getText(), se, tokens);
+            return Optional.of(tokens);
         } else {
-            logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
+            return Optional.empty();
         }
     }
 }

@@ -14,6 +14,24 @@ public class CompoundToken {
         this.originalTokens = originalTokens;
     }
 
+    private boolean checkOriginalTokens(CompoundToken other){
+        if (originalTokens == null) {
+            return other.getOriginalTokens() == null;
+        } else {
+            return originalTokens.equals(other.getOriginalTokens());
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CompoundToken) {
+            var newO = (CompoundToken) obj;
+            return checkOriginalTokens(newO);
+        } else {
+            return false;
+        }
+    }
+
     public List<TokenInstance> getOriginalTokens() {
         return originalTokens;
     }

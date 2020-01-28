@@ -41,6 +41,61 @@ public class TokenInstance {
         this.id = id;
     }
 
+    private boolean checkType(TokenInstance other) {
+        if (type == null) {
+            return other.getType() == null;
+        } else {
+            return type.equals(other.getType());
+        }
+    }
+
+    private boolean checkId(TokenInstance other) {
+        if (id == null) {
+            return other.getId() == null;
+        } else {
+            return id.equals(other.getId());
+        }
+    }
+
+    private boolean checkStream(TokenInstance other) {
+        if (getStream() == null) {
+            return other.getStream() == null;
+        } else {
+            return getStream().equals(other.getStream());
+        }
+    }
+
+    private boolean checkBitAccessToken(TokenInstance other) {
+        if (bitAccessToken == null) {
+            return other.getBitAccessToken() == null;
+        } else {
+            return bitAccessToken.equals(other.getBitAccessToken());
+        }
+    }
+
+    private boolean checkCompoundToken(TokenInstance other) {
+        if (compoundToken == null) {
+            return other.getCompoundToken() == null;
+        } else {
+            return compoundToken.equals(other.getCompoundToken());
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TokenInstance) {
+            var other = (TokenInstance) obj;
+            return
+                    checkType(other) &&
+                            checkId(other) &&
+                            checkStream(other) &&
+                            checkBitAccessToken(other) &&
+                            checkCompoundToken(other);
+        } else {
+            return false;
+        }
+    }
+
     public Type getType() {
         return type;
     }

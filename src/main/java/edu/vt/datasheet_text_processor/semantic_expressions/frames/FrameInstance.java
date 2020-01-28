@@ -45,6 +45,43 @@ public class FrameInstance {
         this.literals = new ArrayList<>();
     }
 
+    private boolean checkId(FrameInstance other) {
+        if (id == null) {
+            return other.getId() == null;
+        } else {
+            return id.equals(other.getId());
+        }
+    }
+
+    private boolean checkTokens(FrameInstance other) {
+        if (tokens == null) {
+            return other.getTokens() == null;
+        } else {
+            return tokens.equals(other.getTokens());
+        }
+    }
+
+    private boolean checkLiterals(FrameInstance other) {
+        if (literals == null) {
+            return other.getLiterals() == null;
+        } else {
+            return literals.equals(other.getLiterals());
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof FrameInstance) {
+            var newO = (FrameInstance) obj;
+            return
+                    checkId(newO) &&
+                            checkTokens(newO) &&
+                            checkLiterals(newO);
+        } else {
+            return false;
+        }
+    }
+
     public List<Integer> get(Integer i) {
         return literals.get(i);
     }

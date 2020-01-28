@@ -1,0 +1,41 @@
+Paralledl video data
+Pixel clock
+Vsync
+Hsync
+Vbank
+Hblank
+Data Enable::DE
+Video Timing Controller::VTC
+tready
+frame buffer/frame buffer register/frame buffer fifo::fbr
+vid_out_clk
+aclk
+Faclk
+fmax
+Fvclk
+thblank
+thactive
+s_axis_video_tdata
+s_axis_video_tvalid
+s_axis_video_tready
+s_axis_video_tlast/tlast::eof
+s_axis_video_tuser/tuser0::sof
+aclken
+aresetn
+vtg_act_vid
+vtg_vsync
+vtg_hsync
+vtg_vblank
+vtg_ce
+vtg_fsync
+rst
+video_out_clk
+video_data
+video_dr
+video_vsync
+video_hsync
+video_vblank
+video_hblank
+locked
+wr_error
+empty
