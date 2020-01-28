@@ -333,7 +333,7 @@ public class OptionHandler {
                             logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
                         } else {
                             var seTT = s.getSemanticExpression().getTokenText();
-                            logger.debug("{} -> {} ({})", s.getText(), s.getSemanticExpression(), seTT);
+                            logger.info("{} -> {} ({})", s.getText(), s.getSemanticExpression(), seTT);
                         }
                     }
                 } else if (options.debugOptions.doShowIR) {
