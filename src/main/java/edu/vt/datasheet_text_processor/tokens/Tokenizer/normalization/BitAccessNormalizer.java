@@ -6,7 +6,7 @@ import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.BitAccessToken;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
+import edu.vt.datasheet_text_processor.Errors.TokenizerException;
 import edu.vt.datasheet_text_processor.util.Constants;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.dizitart.no2.objects.filters.ObjectFilters;

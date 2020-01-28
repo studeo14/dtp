@@ -1,6 +1,8 @@
 package edu.vt.datasheet_text_processor.tokens.Tokenizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.Errors.Context.TokenizerContext;
+import edu.vt.datasheet_text_processor.Errors.TokenizerException;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.RawTokenModel;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.SearchTree.SearchTreeLeafNode;
@@ -120,7 +122,8 @@ public class Tokenizer {
                         state = ProcessState.END;
                         iter.previous();
                     } else {
-                        throw new TokenizerException(String.format("Unknown token found at word %s", currentWord), currentWord, iter.nextIndex());
+                        var message = String.format("Unknown token found at word %s", currentWord);
+                        throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex()));
                     }
                     break;
                 }

@@ -1,5 +1,6 @@
 package edu.vt.datasheet_text_processor.intermediate_representation;
 
+import edu.vt.datasheet_text_processor.Errors.IRException;
 import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;

@@ -1,8 +1,8 @@
 package edu.vt.datasheet_text_processor;
 
 import edu.vt.datasheet_text_processor.cli.Application;
-import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
+import edu.vt.datasheet_text_processor.Errors.FrameException;
+import edu.vt.datasheet_text_processor.Errors.TokenizerException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;

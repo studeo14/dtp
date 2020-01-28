@@ -1,5 +1,6 @@
 package edu.vt.datasheet_text_processor.semantic_expressions.frames;
 
+import edu.vt.datasheet_text_processor.Errors.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.SearchTree.FrameSearchTree;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.SearchTree.FrameSearchTreeLeafNode;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.SearchTree.FrameSearchTreeNode;

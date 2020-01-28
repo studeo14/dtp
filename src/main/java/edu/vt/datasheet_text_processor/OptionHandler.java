@@ -1,20 +1,22 @@
 package edu.vt.datasheet_text_processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.Errors.Context.TokenizerContext;
+import edu.vt.datasheet_text_processor.Errors.Warning;
 import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
 import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.input.AllMappingsRaw;
-import edu.vt.datasheet_text_processor.intermediate_representation.IRException;
+import edu.vt.datasheet_text_processor.Errors.IRException;
 import edu.vt.datasheet_text_processor.intermediate_representation.IRFinder;
-import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
+import edu.vt.datasheet_text_processor.Errors.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
 import edu.vt.datasheet_text_processor.signals.Acronym;
 import edu.vt.datasheet_text_processor.signals.AcronymFinder;
 import edu.vt.datasheet_text_processor.signals.Signal;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
-import edu.vt.datasheet_text_processor.tokens.Tokenizer.TokenizerException;
+import edu.vt.datasheet_text_processor.Errors.TokenizerException;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.AcronymNormalizer;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.BitAccessNormalizer;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
@@ -151,7 +153,11 @@ public class OptionHandler {
                                     s.setTokens(tokens);
                                     repo.update(s);
                                 } catch (TokenizerException te) {
-                                    logger.error("Unable to tokenize \"{}\" at **{}({})**", s.getText(), allMappings.getSerializer().unconvert(te.getCurrentWord()), te.getWordIndex());
+                                    var context = (TokenizerContext)te.getContext();
+                                    logger.error("Unable to tokenize \"{}\" at **{}({})**", s.getText(), allMappings.getSerializer().unconvert(context.getCurrentWord()), context.getWordIndex());
+                                    var warning = new Warning(te);
+                                    s.getWarnings().add(warning);
+                                    repo.update(s);
                                 }
                             }
                         }

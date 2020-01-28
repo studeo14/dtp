@@ -1,6 +1,6 @@
 package edu.vt.datasheet_text_processor.semantic_expressions.processor;
 
-import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameException;
+import edu.vt.datasheet_text_processor.Errors.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import org.slf4j.Logger;

@@ -1,6 +1,7 @@
 package edu.vt.datasheet_text_processor;
 
 
+import edu.vt.datasheet_text_processor.Errors.Warning;
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import org.dizitart.no2.IndexType;
@@ -34,6 +35,7 @@ public class Sentence implements Serializable {
     private List<TokenInstance> tokens;
     private SemanticExpression semanticExpression;
     private String ir;
+    private List<Warning> warnings;
 
     public Sentence() {
 
@@ -47,6 +49,7 @@ public class Sentence implements Serializable {
         this.type = Type.NA;
         this.wordIds = new ArrayList<>();
         this.tokens = new ArrayList<>();
+        this.warnings = new ArrayList<>();
     }
 
     public Sentence(Integer sentenceId, Integer priority, String text, Type type) {
@@ -57,6 +60,7 @@ public class Sentence implements Serializable {
         this.type = type;
         this.wordIds = new ArrayList<>();
         this.tokens = new ArrayList<>();
+        this.warnings = new ArrayList<>();
     }
 
     public NitriteId getEmpId() {
@@ -137,5 +141,13 @@ public class Sentence implements Serializable {
 
     public void setIr(String ir) {
         this.ir = ir;
+    }
+
+    public List<Warning> getWarnings() {
+        return warnings;
+    }
+
+    public void setWarnings(List<Warning> warnings) {
+        this.warnings = warnings;
     }
 }

@@ -2,6 +2,7 @@ package edu.vt.datasheet_text_processor.wordid;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.Errors.StopAddNewException;
 import edu.vt.datasheet_text_processor.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
