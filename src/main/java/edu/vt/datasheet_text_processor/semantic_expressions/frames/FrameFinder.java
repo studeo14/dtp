@@ -1,5 +1,6 @@
 package edu.vt.datasheet_text_processor.semantic_expressions.frames;
 
+import edu.vt.datasheet_text_processor.Errors.Context.FrameFinderContext;
 import edu.vt.datasheet_text_processor.Errors.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.SearchTree.FrameSearchTree;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.SearchTree.FrameSearchTreeLeafNode;
@@ -45,7 +46,8 @@ public class FrameFinder {
                     retVal.add(frame.get());
                     logger.debug("Frame Added: {}", frame.get().getId());
                 } else {
-                    throw new FrameException(String.format("Invalid number of literals. Id: %d, Expected: %d, Actual: %d", frame.get().getId(), expected, numLit));
+                    var message = String.format("Invalid number of literals. Id: %d, Expected: %d, Actual: %d", frame.get().getId(), expected, numLit);
+                    throw new FrameException(message, new FrameFinderContext(message, tokens, frame.get()));
                 }
             }
         }
@@ -143,8 +145,9 @@ public class FrameFinder {
                         }
                     } else { // this means that no frame can be found here.
                         iter.previous();
-                        logger.debug("No valid child found. Returning empty frame.");
-                        return Optional.empty();
+                        var validOptions = currentNode.getChildren().keySet();
+                        var message = String.format("No valid child found. There is supposed to be something here. Valid options: [%s].", validOptions);
+                        throw new FrameException(message, new FrameFinderContext(message, tokenList, current));
                     }
                     break;
                 }
@@ -193,8 +196,9 @@ public class FrameFinder {
             current.setTokensAndLiterals(tokenList);
             return Optional.of(current);
         } else {
-            logger.debug("No leaf.");
-            return Optional.empty();
+            var validOptions = currentNode.getChildren().keySet();
+            var message = String.format("No valid child found. There is supposed to be something here. Valid options: [%s].", validOptions);
+            throw new FrameException(message, new FrameFinderContext(message, tokenList, current));
         }
     }
 

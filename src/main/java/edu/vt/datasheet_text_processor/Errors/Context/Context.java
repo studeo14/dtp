@@ -22,6 +22,10 @@ public abstract class Context {
         this.message = message;
     }
 
+    public Context(Context ctx) {
+        this.message = ctx.message;
+    }
+
     public String getMessage() {
         return message;
     }

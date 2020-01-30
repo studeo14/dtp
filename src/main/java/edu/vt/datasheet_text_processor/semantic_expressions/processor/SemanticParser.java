@@ -1,5 +1,6 @@
 package edu.vt.datasheet_text_processor.semantic_expressions.processor;
 
+import edu.vt.datasheet_text_processor.Errors.Context.SemanticExpressionContext;
 import edu.vt.datasheet_text_processor.Errors.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
@@ -33,9 +34,11 @@ public class SemanticParser {
                 }
             }
             if (semexpr.getConsequents().isEmpty() && semexpr.getAntecedents().isEmpty()) {
-                throw new FrameException("No Antecedents Or Consequents Found.");
+                var message = "No Antecedents or Consequents Found.";
+                throw new FrameException(message, new SemanticExpressionContext(message, tokens, frames, semexpr));
             } else if (semexpr.getConsequents().isEmpty() && !semexpr.getAntecedents().isEmpty()) {
-                throw new FrameException(String.format("Uneven frames. Has %d antecedents and 0 consequents.", semexpr.getAntecedents().size()));
+                var message = String.format("Uneven frames. Has %d antecedents and 0 consequents.", semexpr.getAntecedents().size());
+                throw new FrameException(message, new SemanticExpressionContext(message, tokens, frames, semexpr));
             } else {
                 return Optional.of(semexpr);
             }

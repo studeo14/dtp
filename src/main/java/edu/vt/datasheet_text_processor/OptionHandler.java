@@ -1,22 +1,19 @@
 package edu.vt.datasheet_text_processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.Errors.*;
 import edu.vt.datasheet_text_processor.Errors.Context.TokenizerContext;
-import edu.vt.datasheet_text_processor.Errors.Warning;
 import edu.vt.datasheet_text_processor.classification.DatasheetBOW;
 import edu.vt.datasheet_text_processor.cli.Application;
 import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.input.AllMappingsRaw;
-import edu.vt.datasheet_text_processor.Errors.IRException;
 import edu.vt.datasheet_text_processor.intermediate_representation.IRFinder;
-import edu.vt.datasheet_text_processor.Errors.FrameException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
 import edu.vt.datasheet_text_processor.signals.Acronym;
 import edu.vt.datasheet_text_processor.signals.AcronymFinder;
 import edu.vt.datasheet_text_processor.signals.Signal;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
-import edu.vt.datasheet_text_processor.Errors.TokenizerException;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.AcronymNormalizer;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.BitAccessNormalizer;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
@@ -124,13 +121,18 @@ public class OptionHandler {
                         var db = project.getDB();
                         var repo = db.getRepository(Sentence.class);
                         var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
-                        var t = new AddNewWrapper(options.wordIDOptions.addNew);
                         for (Sentence s : documents) {
                             // do serialize
                             if (s.getType() == Sentence.Type.NONCOMMENT) {
-                                var wordIds = allMappings.getSerializer().serialize(s.getText(), t);
-                                s.setWordIds(wordIds);
-                                repo.update(s);
+                                List<Integer> wordIds = null;
+                                try {
+                                    wordIds = allMappings.getSerializer().serialize(s.getText(), options.wordIDOptions.addNew);
+                                    s.setWordIds(wordIds);
+                                    repo.update(s);
+                                } catch (SerializerException e) {
+                                    s.getWarnings().add(new Warning(e));
+                                    repo.update(s);
+                                }
                             }
                         }
                         if (options.wordIDOptions.addNew) {
@@ -208,8 +210,8 @@ public class OptionHandler {
                                     repo.update(s);
                                 }
                             } catch (FrameException e) {
-                                logger.warn("For The Sentence: {}", s.getText());
-                                logger.warn(e.getMessage());
+                                s.getWarnings().add(new Warning(e));
+                                repo.update(s);
                             }
                         }
                     }
@@ -228,8 +230,8 @@ public class OptionHandler {
                                     s.setIr(ir);
                                     repo.update(s);
                                 } catch (IRException e) {
-                                    logger.warn("For sentence: {}", s.getText());
-                                    logger.warn(e.getMessage());
+                                    s.getWarnings().add(new Warning(e));
+                                    repo.update(s);
                                 }
                             } else {
                                 logger.info("No SE for sentence {}", s.getSentenceId());

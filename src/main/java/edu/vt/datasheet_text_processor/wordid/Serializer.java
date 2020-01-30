@@ -2,6 +2,8 @@ package edu.vt.datasheet_text_processor.wordid;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.Errors.Context.SerializerContext;
+import edu.vt.datasheet_text_processor.Errors.SerializerException;
 import edu.vt.datasheet_text_processor.Errors.StopAddNewException;
 import edu.vt.datasheet_text_processor.util.Constants;
 import org.slf4j.Logger;
@@ -9,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,21 +77,24 @@ public class Serializer {
         this.inverseMapping = new InverseMapping(t);
     }
 
-    public List< Integer > serialize (String sentence, AddNewWrapper addNew ) {
-
+    public List< Integer > serialize (String sentence, boolean addNew ) throws SerializerException {
+        var retList = new ArrayList<Integer>();
         // convert to list of base words (stemming)
-        return WordTokenizer.tokenize( sentence ).stream()
-                .map( this::stem )
-                .map( s -> {
-                    try {
-                        return convert( s, sentence, addNew.isValue() );
-                    } catch (StopAddNewException e) {
-                        addNew.setValue(false);
-                        return 0;
-                    }
-                })
-                .collect( Collectors.toList() );
-
+        boolean addNewLocal = addNew;
+        for (var word: WordTokenizer.tokenize(sentence)) {
+            var stem = stem(word);
+            try {
+                var wordId = convert(stem, sentence, addNewLocal);
+                retList.add(wordId);
+            } catch (StopAddNewException e) {
+                addNewLocal = false;
+                retList.add(0);
+            } catch (SerializerException e) {
+                retList.add(Constants.DEFAULT_WORD_ID);
+                throw new SerializerException(e);
+            }
+        }
+        return retList;
     }
 
     public List<String> deserialize( List<Integer> sentence) {
@@ -167,14 +173,16 @@ public class Serializer {
         return addWordToMapping(stem, catClass);
     }
 
-    public Integer convert ( String input, String sentenceRef, boolean addNew ) throws StopAddNewException {
+    public Integer convert ( String input, String sentenceRef, boolean addNew ) throws StopAddNewException, SerializerException {
         // get base conversion
         var base = mapping.getBaseMapping().getOrDefault( input, Constants.DEFAULT_WORD_ID );
         if (base.equals(Constants.DEFAULT_WORD_ID)) {
             if (addNew) {
                 base = addNewMapping( input, sentenceRef );
             } else {
-                logger.info("No existing mapping found for '{}' in \"{}\"", input, sentenceRef);
+                var message = String.format("No existing mapping found for '%s in \"%s\"", input, sentenceRef);
+                logger.info(message);
+                throw new SerializerException(message, new SerializerContext(message, input, sentenceRef));
             }
         }
         var baseClass = getWordIdClass( base );

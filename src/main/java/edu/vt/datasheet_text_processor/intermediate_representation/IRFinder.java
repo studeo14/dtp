@@ -1,5 +1,7 @@
 package edu.vt.datasheet_text_processor.intermediate_representation;
 
+import edu.vt.datasheet_text_processor.Errors.Context.IRContext;
+import edu.vt.datasheet_text_processor.Errors.Context.IRPropertyContext;
 import edu.vt.datasheet_text_processor.Errors.IRException;
 import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
@@ -30,9 +32,11 @@ public class IRFinder {
             logger.debug("Implicative Sentence");
             return processImplicative(se, allMappings);
         } else if (se.getAllFrames().isEmpty()) {
-            throw new IRException("Invalid SE. 0 frames.");
+            var message = "Invalid SE, 0 frames.";
+            throw new IRException(message, new IRContext(message, se, null));
         } else {
-            throw new IRException("Invalid SE. 0 consequents.");
+            var message = "Invalid SE. 0 consequents.";
+            throw new IRException(message, new IRContext(message, se, null));
         }
     }
 
@@ -49,7 +53,8 @@ public class IRFinder {
     private static String processAntecedent(SemanticExpression se, AllMappings allMappings) throws IRException {
         var sb = new StringBuilder();
         if (se.getAntecedents().size() > 1) {
-            throw new IRException("Cannot handle compound antecedents (1+).");
+            var message = "Cannot handle compound antecedents (1+).";
+            throw new IRException(message, new IRContext(message, se, null));
         } else {
             var flag = false;
             for (var frame: se.getAntecedents()) {
@@ -103,7 +108,8 @@ public class IRFinder {
             case 13:
                 return Optional.empty();
             default:
-                throw new IRException(String.format("Unknown Antecedent frame %d.", frame.getId()));
+                var message = String.format("Unknown Antecedent frame %d.", frame.getId());
+                throw new IRException(message, new IRContext(message, null, frame));
         }
     }
 
@@ -162,7 +168,8 @@ public class IRFinder {
             case 13:
                 return Optional.empty();
             default:
-                throw new IRException(String.format("Unknown Consequent frame %d.", frame.getId()));
+                var message = String.format("Unknown Consequent frame %d.", frame.getId());
+                throw new IRException(message, new IRContext(message, null, frame));
         }
     }
 
@@ -179,10 +186,12 @@ public class IRFinder {
                 try {
                     return "PROP(" + nameS + ", " + split[0] + ", " + split[1] + ")";
                 } catch (IndexOutOfBoundsException e) {
-                    throw new IRException("Malformed 'of' expression.");
+                    var message = "Malformed 'of' expression.";
+                    throw new IRException(message, new IRPropertyContext(message, nameS, propS));
                 }
             } else {
-                throw new IRException("Unknown 'has' expression.");
+                var message = "Unknown 'has' expression.";
+                throw new IRException(message, new IRPropertyContext(message, nameS, propS));
             }
         }
     }

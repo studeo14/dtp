@@ -11,6 +11,11 @@ public class ProcessorException extends Exception{
         this.context = context;
     }
 
+    public ProcessorException(SerializerException e) {
+        super(e.getMessage());
+        this.context = e.getContext();
+    }
+
     public Context getContext() {
         return context;
     }
