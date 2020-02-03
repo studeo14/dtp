@@ -3,6 +3,7 @@ package edu.vt.datasheet_text_processor.input;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.Errors.SerializerException;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameFinder;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameModel;
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticModel;
@@ -35,7 +36,7 @@ public class AllMappingsRaw {
 
     public AllMappingsRaw() {}
 
-    public void init() {
+    public void init() throws SerializerException {
         this.serializer = new Serializer(wordIdMapping);
         this.tokenizer = new Tokenizer(tokenMapping, serializer);
         this.frameFinder = new FrameFinder(frameMapping);

@@ -2,6 +2,7 @@ package edu.vt.datasheet_text_processor.tokens.Tokenizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.vt.datasheet_text_processor.Errors.Context.TokenizerContext;
+import edu.vt.datasheet_text_processor.Errors.SerializerException;
 import edu.vt.datasheet_text_processor.Errors.TokenizerException;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.tokens.TokenModel.RawTokenModel;
@@ -27,7 +28,7 @@ public class Tokenizer {
     private TokenModel tokenModel;
     private TokenSearchTree tokenSearchTree;
 
-    public Tokenizer(File mappingFile, boolean useRaw, Serializer serializer) throws IOException {
+    public Tokenizer(File mappingFile, boolean useRaw, Serializer serializer) throws IOException, SerializerException {
         if (useRaw) {
             logger.info("Using string token inputs. Will serialize to wordids before tokeniztion.");
             var rawTokenModel = new ObjectMapper().readValue(mappingFile, RawTokenModel.class);
@@ -43,7 +44,7 @@ public class Tokenizer {
         this.tokenSearchTree = new TokenSearchTree(this.tokenModel);
     }
 
-    public Tokenizer(RawTokenModel rawTokenModel, Serializer serializer) {
+    public Tokenizer(RawTokenModel rawTokenModel, Serializer serializer) throws SerializerException {
         logger.info("Using string token inputs. Will serialize to wordids before tokeniztion.");
         this.tokenModel = rawTokenModel.toTokenModel(serializer);
         this.tokenSearchTree = new TokenSearchTree(this.tokenModel);

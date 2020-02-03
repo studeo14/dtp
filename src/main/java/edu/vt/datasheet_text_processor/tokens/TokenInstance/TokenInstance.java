@@ -1,5 +1,6 @@
 package edu.vt.datasheet_text_processor.tokens.TokenInstance;
 
+import edu.vt.datasheet_text_processor.Errors.SerializerException;
 import edu.vt.datasheet_text_processor.util.Constants;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
@@ -135,9 +136,8 @@ public class TokenInstance {
         this.bitAccessToken = bitAccessToken;
     }
 
-    public void setBitAccessToken(BitAccessToken bitAccessToken, Serializer serializer) {
-        var t = new AddNewWrapper(false);
-        this.stream = serializer.serialize(bitAccessToken.toString(), t);
+    public void setBitAccessToken(BitAccessToken bitAccessToken, Serializer serializer) throws SerializerException {
+        this.stream = serializer.serialize(bitAccessToken.toString(), false);
         this.bitAccessToken = bitAccessToken;
     }
 

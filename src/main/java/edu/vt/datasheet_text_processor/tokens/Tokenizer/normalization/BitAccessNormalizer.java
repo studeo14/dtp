@@ -3,6 +3,7 @@ package edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization;
 import edu.vt.datasheet_text_processor.Errors.Context.BitAccessNormalizerContext;
 import edu.vt.datasheet_text_processor.Errors.Context.BitAccessNormalizerFinderContext;
 import edu.vt.datasheet_text_processor.Errors.Context.GenericContext;
+import edu.vt.datasheet_text_processor.Errors.SerializerException;
 import edu.vt.datasheet_text_processor.Errors.Warning;
 import edu.vt.datasheet_text_processor.Project;
 import edu.vt.datasheet_text_processor.Sentence;
@@ -74,7 +75,7 @@ public class BitAccessNormalizer {
                         window.add(newToken);
                         sentences.update(sentence);
                     }
-                } catch (TokenizerException e) {
+                } catch (TokenizerException | SerializerException e) {
                     var warning = new Warning(e);
                     sentence.getWarnings().add(warning);
                     sentences.update(sentence);

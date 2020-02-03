@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 public class OptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(OptionHandler.class);
 
-    public static void handle(Application options) throws IOException, TokenizerException, FrameException {
+    public static void handle(Application options) throws IOException, ProcessorException {
         if (options.inPointOptions.compileTokens) {
             var rawMappings = new ObjectMapper().readValue(options.mappingFile, AllMappingsRaw.class);
             rawMappings.init();

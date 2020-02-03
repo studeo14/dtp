@@ -1,5 +1,6 @@
 package edu.vt.datasheet_text_processor.signals;
 
+import edu.vt.datasheet_text_processor.Errors.SerializerException;
 import edu.vt.datasheet_text_processor.Project;
 import edu.vt.datasheet_text_processor.Sentence;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
@@ -110,6 +111,8 @@ public class AcronymFinder {
                     logger.debug("{} -> {}", acronym.getAcronym(), serializer.convert(acronym.getAcronym(), "", false));
                 } catch (StopAddNewException e) {
                     // ignore
+                } catch (SerializerException e) {
+                    logger.debug(e.getMessage());
                 }
             }
         }

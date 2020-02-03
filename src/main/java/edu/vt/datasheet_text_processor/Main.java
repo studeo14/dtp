@@ -1,5 +1,7 @@
 package edu.vt.datasheet_text_processor;
 
+import edu.vt.datasheet_text_processor.Errors.ProcessorException;
+import edu.vt.datasheet_text_processor.Errors.SerializerException;
 import edu.vt.datasheet_text_processor.cli.Application;
 import edu.vt.datasheet_text_processor.Errors.FrameException;
 import edu.vt.datasheet_text_processor.Errors.TokenizerException;
@@ -20,7 +22,7 @@ class Main {
         try {
             cli.parseArgs(args);
             handleCli(cli, options);
-        } catch (IOException | TokenizerException | FrameException e) {
+        } catch (IOException | ProcessorException e) {
             logger.error(e.getMessage(), e);
         } catch (CommandLine.ParameterException e) {
             logger.error(e.getMessage());
@@ -30,7 +32,7 @@ class Main {
         }
     }
 
-    private static void handleCli(CommandLine cli, Application options) throws IOException, TokenizerException, FrameException {
+    private static void handleCli(CommandLine cli, Application options) throws IOException, ProcessorException {
         if (cli.isUsageHelpRequested()) {
             cli.usage(System.out);
         } else {
