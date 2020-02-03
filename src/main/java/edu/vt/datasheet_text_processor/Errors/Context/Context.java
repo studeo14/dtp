@@ -13,10 +13,20 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = TokenizerContext.class, name = "TokenizerContext")
+        @JsonSubTypes.Type(value = TokenizerContext.class, name = "TokenizerContext"),
+        @JsonSubTypes.Type(value = BitAccessNormalizerContext.class, name = "BitAccessNormalizerContext"),
+        @JsonSubTypes.Type(value = BitAccessNormalizerFinderContext.class, name = "BitAccessNormalizerFinderContext"),
+        @JsonSubTypes.Type(value = FrameFinderContext.class, name = "FrameFinderContext"),
+        @JsonSubTypes.Type(value = GenericContext.class, name = "GenericContext"),
+        @JsonSubTypes.Type(value = IRContext.class, name = "IRContext"),
+        @JsonSubTypes.Type(value = IRPropertyContext.class, name = "IRPropertyContext"),
+        @JsonSubTypes.Type(value = SemanticExpressionContext.class, name = "SemanticExpressionContext"),
+        @JsonSubTypes.Type(value = SerializerContext.class, name = "SerializerContext")
 })
 public abstract class Context {
     private String message;
+
+    public Context() {}
 
     public Context(String message) {
         this.message = message;

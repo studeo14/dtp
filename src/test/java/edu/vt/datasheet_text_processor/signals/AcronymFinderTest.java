@@ -1,6 +1,7 @@
 package edu.vt.datasheet_text_processor.signals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.Errors.SerializerException;
 import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
@@ -35,9 +36,9 @@ public class AcronymFinderTest {
     }
 
     @Test
-    public void getAcronymFailNoAcronym() {
+    public void getAcronymFailNoAcronym() throws SerializerException {
         String test = "logic pll register (lcr).";
-        var wordIds = allMappings.getSerializer().serialize(test, new AddNewWrapper(false));
+        var wordIds = allMappings.getSerializer().serialize(test, false);
         TokenInstance token = new TokenInstance(TokenInstance.Type.LITERAL, wordIds);
         var acronymPair = AcronymFinder.getAcronym(token, allMappings.getSerializer());
         logger.debug("{}", acronymPair.isEmpty());
@@ -46,10 +47,10 @@ public class AcronymFinderTest {
     }
 
     @Test
-    public void getAcronym() {
+    public void getAcronym() throws SerializerException {
         // test sentence
         String test = "logic core register (lcr).";
-        var wordIds = allMappings.getSerializer().serialize(test, new AddNewWrapper(false));
+        var wordIds = allMappings.getSerializer().serialize(test, false);
         TokenInstance token = new TokenInstance(TokenInstance.Type.LITERAL, wordIds);
         var acronymPair = AcronymFinder.getAcronym(token, allMappings.getSerializer());
         logger.debug("{}", acronymPair.isEmpty());

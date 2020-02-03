@@ -2044,7 +2044,9 @@
       "stream": "of"
     },
     "12": {
-      "aliases": [],
+      "aliases": [
+        "are set"
+      ],
       "id": 12,
       "stream": "is set"
     },
@@ -2220,37 +2222,45 @@
       "stream": ":"
     },
     "45": {
-      "aliases": [],
+      "aliases": [
+        "are assert"
+      ],
       "id": 45,
       "stream": "is assert"
     },
     "46": {
-      "aliases": [],
+      "aliases": [
+        "are deassert"
+      ],
       "id": 46,
       "stream": "is deassert"
     },
     "47": {
-      "aliases": [],
+      "aliases": [
+        "are reassert"
+      ],
       "id": 47,
       "stream": "is reassert"
     },
     "48": {
-      "aliases": [],
+      "aliases": ["are high"],
       "id": 48,
       "stream": "is high"
     },
     "49": {
-      "aliases": [],
+      "aliases": ["are low"],
       "id": 49,
       "stream": "is low"
     },
     "50": {
-      "aliases": [],
+      "aliases": ["are unset"],
       "id": 50,
       "stream": "is unset"
     },
     "51": {
       "aliases": [
+        "are equal to",
+        "are set equal to",
         "is equal to",
         "is set equal to"
       ],
@@ -2282,7 +2292,7 @@
       "stream": "has"
     },
     "56": {
-      "aliases": [],
+      "aliases": ["are"],
       "id": 56,
       "stream": "is"
     },
@@ -2372,6 +2382,11 @@
       "aliases": [],
       "id": 73,
       "stream": "."
+    },
+    "74": {
+      "aliases": [],
+      "id": 74,
+      "stream": "can"
     }
   },
   "frameMapping": {

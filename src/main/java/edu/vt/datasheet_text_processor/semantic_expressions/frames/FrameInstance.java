@@ -105,7 +105,7 @@ public class FrameInstance {
     public void setTokensAndLiterals(List<TokenInstance> tokens) {
         this.tokens = tokens;
         this.literals = tokens.stream()
-                .filter(t -> t.getType() == TokenInstance.Type.LITERAL || t.getType() == TokenInstance.Type.COMPOUND)
+                .filter(t -> t.getId().equals(Constants.LITERAL_TOKEN_ID))
                 .map(TokenInstance::getStream)
                 .collect(Collectors.toList());
     }

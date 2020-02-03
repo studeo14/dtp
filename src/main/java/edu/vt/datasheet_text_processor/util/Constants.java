@@ -5,6 +5,7 @@ public class Constants {
     public static final Integer DEFAULT_WORD_ID = -10;
     public static final Integer DEFAULT_TOKEN_ID = -20;
     public static final Integer LITERAL_TOKEN_ID = -21;
+    public static final Integer UNINITIALIZED_TOKEN_ID = -22;
 
     public static final Integer BIT_ACCESS_1_FRAME_ID = 0;
     public static final Integer BIT_ACCESS_2_FRAME_ID = 1;

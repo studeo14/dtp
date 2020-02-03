@@ -130,6 +130,7 @@ public class OptionHandler {
                                     s.setWordIds(wordIds);
                                     repo.update(s);
                                 } catch (SerializerException e) {
+                                    logger.warn(e.getMessage());
                                     s.getWarnings().add(new Warning(e));
                                     repo.update(s);
                                 }
@@ -155,8 +156,9 @@ public class OptionHandler {
                                     s.setTokens(tokens);
                                     repo.update(s);
                                 } catch (TokenizerException te) {
+                                    logger.warn(te.getMessage());
                                     var context = (TokenizerContext)te.getContext();
-                                    logger.error("Unable to tokenize \"{}\" at **{}({})**", s.getText(), allMappings.getSerializer().unconvert(context.getCurrentWord()), context.getWordIndex());
+                                    logger.warn("Unable to tokenize \"{}\" at **{}({})**", s.getText(), allMappings.getSerializer().unconvert(context.getCurrentWord()), context.getWordIndex());
                                     var warning = new Warning(te);
                                     s.getWarnings().add(warning);
                                     repo.update(s);
@@ -210,6 +212,8 @@ public class OptionHandler {
                                     repo.update(s);
                                 }
                             } catch (FrameException e) {
+                                logger.warn(s.getText());
+                                logger.warn(e.getMessage());
                                 s.getWarnings().add(new Warning(e));
                                 repo.update(s);
                             }
@@ -230,6 +234,7 @@ public class OptionHandler {
                                     s.setIr(ir);
                                     repo.update(s);
                                 } catch (IRException e) {
+                                    logger.warn(e.getMessage());
                                     s.getWarnings().add(new Warning(e));
                                     repo.update(s);
                                 }

@@ -10,6 +10,9 @@ public class BitAccessNormalizerContext extends Context {
     private BitAccessToken bat;
     private List<TokenInstance> tokens;
 
+    public BitAccessNormalizerContext() {
+    }
+
     public BitAccessNormalizerContext(Context ctx, List<TokenInstance> tokens, BitAccessToken bat) {
         super(ctx);
         this.tokens = tokens;

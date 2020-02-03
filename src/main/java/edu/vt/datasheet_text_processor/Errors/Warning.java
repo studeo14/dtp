@@ -1,18 +1,26 @@
 package edu.vt.datasheet_text_processor.Errors;
 
+import edu.vt.datasheet_text_processor.Errors.Context.Context;
+
 public class Warning {
 
-    private ProcessorException exception;
+    private Context context;
 
-    public Warning(ProcessorException exception) {
-        this.exception = exception;
+    public Warning() {}
+
+    public Warning(Context context) {
+        this.context = context;
     }
 
-    public ProcessorException getException() {
-        return exception;
+    public Warning(ProcessorException e) {
+        this.context = e.getContext();
     }
 
-    public void setException(ProcessorException exception) {
-        this.exception = exception;
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
     }
 }

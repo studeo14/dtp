@@ -76,6 +76,7 @@ public class BitAccessNormalizer {
                         sentences.update(sentence);
                     }
                 } catch (TokenizerException | SerializerException e) {
+                    logger.warn(e.getMessage());
                     var warning = new Warning(e);
                     sentence.getWarnings().add(warning);
                     sentences.update(sentence);

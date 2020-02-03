@@ -8,6 +8,10 @@ import java.util.List;
 public class BitAccessNormalizerFinderContext extends Context {
     private List<TokenInstance> tokens;
     private FrameInstance frameInstance;
+
+    public BitAccessNormalizerFinderContext() {
+    }
+
     public BitAccessNormalizerFinderContext(String message, List<TokenInstance> tokens, FrameInstance frame) {
         super(message);
         this.tokens = tokens;

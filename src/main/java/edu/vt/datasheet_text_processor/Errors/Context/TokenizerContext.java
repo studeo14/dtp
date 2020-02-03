@@ -4,6 +4,8 @@ public class TokenizerContext extends Context {
     private Integer currentWord;
     private Integer wordIndex;
 
+    public TokenizerContext() {}
+
     public TokenizerContext(String message, Integer currentWord, Integer wordIndex) {
         super(message);
         this.currentWord = currentWord;

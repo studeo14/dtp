@@ -7,6 +7,9 @@ public class IRContext extends Context {
     private SemanticExpression semanticExpression;
     private FrameInstance problemFrame;
 
+    public IRContext() {
+    }
+
     public IRContext(String message, SemanticExpression semanticExpression, FrameInstance problemFrame) {
         super(message);
         this.semanticExpression = semanticExpression;

@@ -34,8 +34,8 @@ public class TokenInstanceTest {
 
         String test = "logic pll register (lcr).";
         String test2 = "logic pll register (lcr) but is not pll.";
-        var wordIds = allMappings.getSerializer().serialize(test, new AddNewWrapper(false));
-        var wordIds2 = allMappings.getSerializer().serialize(test2, new AddNewWrapper(false));
+        var wordIds = allMappings.getSerializer().serialize(test, false);
+        var wordIds2 = allMappings.getSerializer().serialize(test2, false);
         literalTokenA = new TokenInstance(TokenInstance.Type.LITERAL, wordIds);
         literalTokenA_ = new TokenInstance(TokenInstance.Type.LITERAL, wordIds);
         literalTokenB = new TokenInstance(TokenInstance.Type.LITERAL, wordIds2);

@@ -11,10 +11,7 @@ import edu.vt.datasheet_text_processor.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FrameFinder {
@@ -43,11 +40,23 @@ public class FrameFinder {
                 var numLit = frame.get().getLiterals().size();
                 var expected = frameModel.getGeneric().numLiterals(frame.get().getId());
                 if (numLit == expected) {
+                    // check if any of the literals are empty
+                    for (var lit: frame.get().getLiterals()) {
+                        if (lit.isEmpty()) {
+                            var message = "Given literal is empty.";
+                            throw new FrameException(message, new FrameFinderContext(message, tokens, frame.get(), null));
+                        }
+                    }
                     retVal.add(frame.get());
                     logger.debug("Frame Added: {}", frame.get().getId());
                 } else {
-                    var message = String.format("Invalid number of literals. Id: %d, Expected: %d, Actual: %d", frame.get().getId(), expected, numLit);
-                    throw new FrameException(message, new FrameFinderContext(message, tokens, frame.get()));
+                    var stream = frame.get().getTokens()
+                            .stream()
+                            .map(TokenInstance::getStream)
+//                            .flatMap(Collection::stream)
+                            .collect(Collectors.toList());
+                    var message = String.format("Invalid number of literals. Id: %d, Expected: %d, Actual: %d. Frames: %s", frame.get().getId(), expected, numLit, stream);
+                    throw new FrameException(message, new FrameFinderContext(message, tokens, frame.get(), null));
                 }
             }
         }
@@ -63,6 +72,7 @@ public class FrameFinder {
         var currentNode = new FrameSearchTreeNode();
         var state = FindState.BEGIN;
         while(iter.hasNext()) {
+            logger.debug("STATE: {}", state);
             switch (state) {
                 case BEGIN: {
                     var currentToken = iter.next();
@@ -119,7 +129,11 @@ public class FrameFinder {
                     var currentToken = iter.next();
                     logger.debug("Inside Frame: CN: {}, CT:{}", currentNode.getTokenId(), currentToken.getId());
                     if (currentNode.getChildren().containsKey(currentToken.getId())) { // if has direct child
-                        logger.debug("Direct Child");
+                        if (currentToken.getId().equals(Constants.LITERAL_TOKEN_ID)) {
+                            logger.debug("Direct Placeholder Child");
+                        } else {
+                            logger.debug("Direct Child");
+                        }
                         tokenList.add(currentToken);
                         currentNode = currentNode.getChildren().get(currentToken.getId());
                     } else if (currentNode.getChildren().containsKey(Constants.LITERAL_TOKEN_ID)) { // if has a "placeholder" child
@@ -131,9 +145,10 @@ public class FrameFinder {
                         tokenList.add(cToken);
                         currentNode = currentNode.getChildren().get(Constants.LITERAL_TOKEN_ID);
                     } else if (currentNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)) { // if has no more children
-                        logger.debug("Leaf Child");
                         iter.previous();
-                        current.setId(((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId());
+                        var id = ((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId();
+                        logger.debug("Leaf Child with ID: {}", id);
+                        current.setId(id);
                         // check if ending on a "placeholder" token
                         if (currentNode.getTokenId().equals(Constants.LITERAL_TOKEN_ID)) {
                             // remove earlier literal
@@ -146,8 +161,8 @@ public class FrameFinder {
                     } else { // this means that no frame can be found here.
                         iter.previous();
                         var validOptions = currentNode.getChildren().keySet();
-                        var message = String.format("No valid child found. There is supposed to be something here. Valid options: [%s].", validOptions);
-                        throw new FrameException(message, new FrameFinderContext(message, tokenList, current));
+                        var message = String.format("No valid child found. There is supposed to be something at token #%d. Valid options: %d:%s.", iter.nextIndex(), currentNode.getTokenId(), validOptions);
+                        throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
                     }
                     break;
                 }
@@ -161,16 +176,16 @@ public class FrameFinder {
                     literalList = new ArrayList<>();
                     while(iter.hasNext()) {
                         var currentToken = iter.next();
-                        if (!currentToken.getId().equals(Constants.LITERAL_TOKEN_ID) && frameSearchTree.getRootNode().getChildren().containsKey(currentToken.getId())) {
-                            logger.debug("End Literal on New Frame Found");
-                            iter.previous();
+                        if (punctuationToken(currentToken)) {
+                            logger.debug("End Literal on Punctuation Found");
                             var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
                             cToken.setCompoundToken(new CompoundToken(literalList));
                             tokenList.add(cToken);
                             current.setTokensAndLiterals(tokenList);
                             return Optional.of(current);
-                        } else if (punctuationToken(currentToken)) {
-                            logger.debug("End Literal on Punctuation Found");
+                        } else if (!currentToken.getId().equals(Constants.LITERAL_TOKEN_ID) && frameSearchTree.getRootNode().getChildren().containsKey(currentToken.getId())) {
+                            logger.debug("End Literal on New Frame Found");
+                            iter.previous();
                             var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
                             cToken.setCompoundToken(new CompoundToken(literalList));
                             tokenList.add(cToken);
@@ -196,9 +211,16 @@ public class FrameFinder {
             current.setTokensAndLiterals(tokenList);
             return Optional.of(current);
         } else {
-            var validOptions = currentNode.getChildren().keySet();
-            var message = String.format("No valid child found. There is supposed to be something here. Valid options: [%s].", validOptions);
-            throw new FrameException(message, new FrameFinderContext(message, tokenList, current));
+            var endingToken = iter.previous();
+            if (punctuationToken(endingToken)) {
+                logger.debug("Has punctuation.");
+                // prevent loop
+                iter.next();
+                return Optional.empty();
+            } else {
+                var message = String.format("Ending semantic expression on unexpected token. Non-literal, non-punctuation: %d", endingToken.getId());
+                throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
+            }
         }
     }
 

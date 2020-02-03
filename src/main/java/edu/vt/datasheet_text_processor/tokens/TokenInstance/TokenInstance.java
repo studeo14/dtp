@@ -21,18 +21,18 @@ public class TokenInstance {
 
     public TokenInstance () {
         this.stream = new ArrayList<>();
-        this.id = Constants.DEFAULT_TOKEN_ID;
+        this.id = Constants.UNINITIALIZED_TOKEN_ID;
     }
 
     public TokenInstance(Type type) {
         this.type = type;
-        this.id = Constants.DEFAULT_TOKEN_ID;
+        this.id = Constants.UNINITIALIZED_TOKEN_ID;
         this.stream = new ArrayList<>();
     }
 
     public TokenInstance(Type type, List<Integer> stream) {
         this.type = type;
-        this.id = Constants.DEFAULT_TOKEN_ID;
+        this.id = Constants.UNINITIALIZED_TOKEN_ID;
         this.stream = stream;
     }
 

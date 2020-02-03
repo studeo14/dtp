@@ -84,6 +84,7 @@ public class Tokenizer {
         ProcessState state = ProcessState.BEGIN;
         var originalIter = iter;
         while(iter.hasNext()) {
+            logger.debug("STATE: {}", state.toString());
             switch (state) {
                 case BEGIN:
                 {
@@ -123,7 +124,7 @@ public class Tokenizer {
                         state = ProcessState.END;
                         iter.previous();
                     } else {
-                        var message = String.format("Unknown token found at word %s", currentWord);
+                        var message = String.format("Unknown token found at word %d", currentWord);
                         throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex()));
                     }
                     break;
@@ -133,6 +134,9 @@ public class Tokenizer {
                     // add until new token begin found
                     // peek ahead
                     var peek = iter.next();
+                    if (WordIdUtils.getWordIdClass(peek) == Serializer.WordIDClass.JUNK) {
+                        break;
+                    }
                     if (tokenSearchTree.getRootNode().getChildren().contains(peek)) {
                         state = ProcessState.END;
                         iter.previous();
@@ -149,6 +153,18 @@ public class Tokenizer {
                 }
             }
         }
-        return current;
+        if (currentSearchTreeNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)) {
+            current.setId(((SearchTreeLeafNode) currentSearchTreeNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getTokenId());
+            logger.debug("Token end on valid token.");
+            return current;
+        } else if (state == ProcessState.LITERAL) {
+            current.setId(Constants.LITERAL_TOKEN_ID);
+            logger.debug("Token end on valid literal token.");
+            return current;
+        } else {
+            var currentWord = iter.previous();
+            var message = String.format("Unknown token found at end of sentence: %d", currentWord);
+            throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex()));
+        }
     }
 }
