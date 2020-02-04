@@ -356,7 +356,12 @@ public class OptionHandler {
                     } else if (options.debugOptions.doShowIR) {
                         var db = project.getDB();
                         var repo = db.getRepository(Sentence.class);
-                        var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
+                        var documents = repo.find(
+                                ObjectFilters.and(
+                                        ObjectFilters.eq("type", Sentence.Type.NONCOMMENT),
+                                        ObjectFilters.not(ObjectFilters.eq("ir", null))
+                                ),
+                                FindOptions.sort("sentenceId", SortOrder.Ascending));
                         for (var s : documents) {
                             logger.info("{} -> {}", s.getText(), s.getIr());
                         }

@@ -21,7 +21,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = IRContext.class, name = "IRContext"),
         @JsonSubTypes.Type(value = IRPropertyContext.class, name = "IRPropertyContext"),
         @JsonSubTypes.Type(value = SemanticExpressionContext.class, name = "SemanticExpressionContext"),
-        @JsonSubTypes.Type(value = SerializerContext.class, name = "SerializerContext")
+        @JsonSubTypes.Type(value = SerializerContext.class, name = "SerializerContext"),
+        @JsonSubTypes.Type(value = IRConsequentContext.class, name = "IRConsequentContext")
 })
 public abstract class Context {
     private String message;

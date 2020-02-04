@@ -1,5 +1,6 @@
 package edu.vt.datasheet_text_processor.intermediate_representation;
 
+import edu.vt.datasheet_text_processor.Errors.Context.IRConsequentContext;
 import edu.vt.datasheet_text_processor.Errors.Context.IRContext;
 import edu.vt.datasheet_text_processor.Errors.Context.IRPropertyContext;
 import edu.vt.datasheet_text_processor.Errors.IRException;
@@ -11,6 +12,8 @@ import edu.vt.datasheet_text_processor.wordid.WordIdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -117,7 +120,7 @@ public class IRFinder {
         var nameS = Serializer.mergeWords(allMappings.getSerializer().deserialize(name));
         var valueS = Serializer.mergeWords(allMappings.getSerializer().deserialize(value));
         if (value.size() == 1 && WordIdUtils.getWordIdClass(value.get(0)) == Serializer.WordIDClass.VERB) { // possible action
-            return valueS.toUpperCase() + "(" + nameS + ")";
+            return "STATE(" + nameS + ", " + valueS + ")";
         } else {
             return "(" + nameS + " == " + valueS + ")";
         }
@@ -149,14 +152,52 @@ public class IRFinder {
                 // descriptive type
                 // get first
                 var name = frame.get(0);
+                var names = normalizeSignalName(Serializer.mergeWords(allMappings.getSerializer().deserialize(name)));
                 var desc = frame.get(1);
+                var descs = Serializer.mergeWords(allMappings.getSerializer().deserialize(desc));
                 var sb = new StringBuilder();
-                sb.append("DESC(");
-                sb.append(normalizeSignalName(Serializer.mergeWords(allMappings.getSerializer().deserialize(name))));
-                sb.append(", ");
-                sb.append(Serializer.mergeWords(allMappings.getSerializer().deserialize(desc)));
-                sb.append(')');
-                return Optional.of(sb.toString());
+                switch (isStateAction(frame.get(1), allMappings)) {
+                    case STATE:
+                    {
+                        sb.append("STATE(");
+                        sb.append(names);
+                        sb.append(", ");
+                        sb.append(descs);
+                        sb.append(')');
+                        return Optional.of(sb.toString());
+                    }
+                    case MOD_STATE:
+                    {
+                        List<String> descsL = new LinkedList<>(Arrays.asList(descs.split(" ")));
+                        String descMod = descsL.remove(0);
+                        var descsRest = String.join(" ", descsL);
+                        sb.append("STATE(");
+                        sb.append(names);
+                        sb.append(", ");
+                        sb.append(descMod);
+                        sb.append(", ");
+                        sb.append(descsRest);
+                        sb.append(')');
+                        return Optional.of(sb.toString());
+                    }
+                    case DESC:
+                        sb.append("DESC(");
+                        sb.append(names);
+                        sb.append(", ");
+                        sb.append(descs);
+                        sb.append(')');
+                        return Optional.of(sb.toString());
+                    case NONE:
+                    {
+                        var message = "No consequent phrase found";
+                        throw new IRException(message, new IRConsequentContext(message, frame, names, descs));
+                    }
+                    case UNKNOWN:
+                    {
+                        var message = String.format("Unknown consequent phrase: %s", descs);
+                        throw new IRException(message, new IRConsequentContext(message, frame, names, descs));
+                    }
+                }
             }
             case 14: {
                 // property type
@@ -170,6 +211,38 @@ public class IRFinder {
             default:
                 var message = String.format("Unknown Consequent frame %d.", frame.getId());
                 throw new IRException(message, new IRContext(message, null, frame));
+        }
+    }
+
+    public enum ConsequentActionPhrase {STATE, MOD_STATE, DESC, NONE, UNKNOWN};
+
+    private static ConsequentActionPhrase isStateAction(List<Integer> phrase, AllMappings allMappings) {
+        if (phrase.size() > 1) {
+            var classA = WordIdUtils.getWordIdClass(phrase.get(0));
+            var classB = WordIdUtils.getWordIdClass(phrase.get(1));
+            if (classA.equals(Serializer.WordIDClass.MODIFIER) && classB.equals(Serializer.WordIDClass.VERB)) {
+                return ConsequentActionPhrase.MOD_STATE;
+            } else {
+                return ConsequentActionPhrase.DESC;
+            }
+        } else if (phrase.size() == 1){
+            var target = phrase.get(0);
+            switch (WordIdUtils.getWordIdClass(target)) {
+                case PRONOUN:
+                case NUMBER:
+                case OBJECT:
+                    return ConsequentActionPhrase.DESC;
+                case VERB:
+                case ADJECTIVE:
+                    return ConsequentActionPhrase.STATE;
+                case JUNK:
+                case CONDITION:
+                case MODIFIER:
+                default:
+                    return ConsequentActionPhrase.UNKNOWN;
+            }
+        } else {
+            return ConsequentActionPhrase.NONE;
         }
     }
 
