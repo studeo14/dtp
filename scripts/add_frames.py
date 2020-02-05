@@ -29,6 +29,14 @@ def main():
                         for alias in template["aliases"]:
                             aliasString = template_to_string(tokenMappings, alias)
                             print("\t{}".format(aliasString))
+                for mapping in frameMappings["bitAccess"]:
+                    template = frameMappings["bitAccess"][mapping]
+                    templateString = template_to_string(tokenMappings, template["template"])
+                    print("ID: {}, Template: {}".format(mapping, templateString))
+                    if len(template["aliases"]) > 0:
+                        for alias in template["aliases"]:
+                            aliasString = template_to_string(tokenMappings, alias)
+                            print("\t{}".format(aliasString))
             elif sys.argv[1] == "i":
                 pass
             else:

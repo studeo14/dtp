@@ -14,6 +14,7 @@ import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.Errors.TokenizerException;
 import edu.vt.datasheet_text_processor.util.Constants;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
+import org.dizitart.no2.objects.ObjectRepository;
 import org.dizitart.no2.objects.filters.ObjectFilters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,16 @@ public class BitAccessNormalizer {
             Pattern.compile("eleventh"),
             Pattern.compile("twelfth")
     };
+    private static final Pattern[] LOGIC_HIGH_PATTERNS = {
+            Pattern.compile("high"),
+            Pattern.compile("logic high"),
+            Pattern.compile("asserted"),
+    };
+    private static final Pattern[] LOGIC_LOW_PATTERNS = {
+            Pattern.compile("low"),
+            Pattern.compile("logic low"),
+            Pattern.compile("desserted"),
+    };
 
     public static void normalizeBitAccesses(Project project, FrameFinder frameFinder, Serializer serializer) {
         var db = project.getDB();
@@ -55,27 +66,13 @@ public class BitAccessNormalizer {
                 List<TokenInstance> tokens = sentence.getTokens();
                 try {
                     var res = getNormalizedBitAccess(tokens, frameFinder, serializer);
-                    if (res.isPresent()) {
-                        // replace tokens with new tokenInstance
-                        var bat = res.get();
-                        var sublistIndex = Collections.indexOfSubList(tokens, bat.getOriginalTokens());
-                        if (sublistIndex == -1) {
-                            var message = "Unable to replace sublist of tokens, not found";
-                            throw new TokenizerException(message, new BitAccessNormalizerContext(message, tokens, bat));
-                        }
-                        // else
-                        // clear original tokens from token list
-                        var window = tokens.subList(sublistIndex, sublistIndex + bat.getOriginalTokens().size());
-                        window.clear();
-                        // create new token replacement
-                        var newToken = new TokenInstance(TokenInstance.Type.ACCESS, null, Constants.LITERAL_TOKEN_ID);
-                        // add bat and make sure that the stream is created
-                        newToken.setBitAccessToken(bat, serializer);
-                        // add in place of old tokens
-                        window.add(newToken);
-                        sentences.update(sentence);
+                    while(res.isPresent()) {
+                        addAndReplace(res.get(), tokens, serializer, sentences, sentence);
+                        res = getNormalizedBitAccess(tokens, frameFinder, serializer);
                     }
                 } catch (TokenizerException | SerializerException e) {
+                    logger.warn("For sentence: {}", sentence.getText());
+                    logger.warn("{}", sentence.getTokens());
                     logger.warn(e.getMessage());
                     var warning = new Warning(e);
                     sentence.getWarnings().add(warning);
@@ -83,6 +80,26 @@ public class BitAccessNormalizer {
                 }
             }
         }
+    }
+
+    private static void addAndReplace(BitAccessToken bat, List<TokenInstance> tokens, Serializer serializer, ObjectRepository<Sentence> sentences, Sentence sentence) throws TokenizerException, SerializerException {
+        // replace tokens with new tokenInstance
+        var sublistIndex = Collections.indexOfSubList(tokens, bat.getOriginalTokens());
+        if (sublistIndex == -1) {
+            var message = "Unable to replace sublist of tokens, not found";
+            throw new TokenizerException(message, new BitAccessNormalizerContext(message, tokens, bat));
+        }
+        // else
+        // clear original tokens from token list
+        var window = tokens.subList(sublistIndex, sublistIndex + bat.getOriginalTokens().size());
+        window.clear();
+        // create new token replacement
+        var newToken = new TokenInstance(TokenInstance.Type.ACCESS, null, Constants.LITERAL_TOKEN_ID);
+        // add bat and make sure that the stream is created
+        newToken.setBitAccessToken(bat, serializer);
+        // add in place of old tokens
+        window.add(newToken);
+        sentences.update(sentence);
     }
 
     /**
@@ -97,6 +114,7 @@ public class BitAccessNormalizer {
         var frameRes = findBitAccess(tokens, frameFinder);
         if (frameRes.isPresent()) {
             var frame = frameRes.get();
+            logger.debug("Found Bit Access Frame: {}", frame.getId());
             try {
                 switch (frame.getId()) {
                     // two literals
@@ -110,22 +128,11 @@ public class BitAccessNormalizer {
                         var bat = new BitAccessToken(reg, bitx, frame.getTokens());
                         return Optional.of(bat);
                     }
-                    // two literals
-                    // first is reg
-                    // second is bit
-                    case 1:
-                    {
-                        var reg = Serializer.mergeWords(serializer.deserialize(frame.get(0)));
-                        var bitx_str = Serializer.mergeWords(serializer.deserialize(frame.get(1)));
-                        var bitx = normalizeBit(bitx_str);
-                        var bat = new BitAccessToken(reg, bitx, frame.getTokens());
-                        return Optional.of(bat);
-                    }
                     // three literals
                     // first is reg
                     // second is bitx
                     // third is bity
-                    case 2:
+                    case 1:
                     {
                         var reg = Serializer.mergeWords(serializer.deserialize(frame.get(0)));
                         var bitx_str = Serializer.mergeWords(serializer.deserialize(frame.get(1)));
@@ -133,6 +140,17 @@ public class BitAccessNormalizer {
                         var bity_str = Serializer.mergeWords(serializer.deserialize(frame.get(2)));
                         var bity = normalizeBit(bity_str);
                         var bat = new BitAccessToken(reg, bitx, bity, frame.getTokens());
+                        return Optional.of(bat);
+                    }
+                    // two literals
+                    // first is reg
+                    // second is bit
+                    case 2:
+                    {
+                        var reg = Serializer.mergeWords(serializer.deserialize(frame.get(0)));
+                        var bitx_str = Serializer.mergeWords(serializer.deserialize(frame.get(1)));
+                        var bitx = normalizeBit(bitx_str);
+                        var bat = new BitAccessToken(reg, bitx, frame.getTokens());
                         return Optional.of(bat);
                     }
                     // three literals
@@ -151,7 +169,7 @@ public class BitAccessNormalizer {
                     }
                 }
             } catch (TokenizerException e) {
-                var message = String.format("Found frame, but could not parse number. Tokens [%s], Frame ID [%s]", tokens.stream().map(TokenInstance::getId).collect(Collectors.toList()), frame.getId());
+                var message = e.getMessage();
                 var newContext = new BitAccessNormalizerFinderContext(message, tokens, frame);
                 throw new TokenizerException(message, newContext);
             }
@@ -181,13 +199,7 @@ public class BitAccessNormalizer {
      * Helper method to see if a BAT is present in the sentence
      */
     static Optional<FrameInstance> findBitAccess(List<TokenInstance> tokens, FrameFinder frameFinder) {
-        for (int i = 0; i < 4; i++) {
-            var temp = frameFinder.findFrame(tokens, i);
-            if (temp.isPresent()) {
-                return temp;
-            }
-        }
-        return Optional.empty();
+        return frameFinder.findBitAccessFrame(tokens);
     }
 
 }

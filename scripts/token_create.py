@@ -22,13 +22,19 @@ def main():
                     # split line into main + aliases
                     lr = line.split("::")
                     mainText = lr[0]
+                    if mainText == "is":
+                        print(mainText)
+                        print(line)
                     if len(lr) == 2:
                         aliases = lr[1].split("||")
                     elif len(lr) == 1:
                         aliases = []
                     if mainText in tokenStrings:
+                        print("Main text in tokenStrings")
                         pass
                     elif any(alias in tokenStrings for alias in aliases):
+                        print("any(alias in tokenStrings for alias in aliases)")
+                        pass
                         pass
                     else:
                         tokenStrings.add(mainText)

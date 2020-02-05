@@ -750,9 +750,7 @@
       "16": 3000120,
       "7": 3000130,
       "th": 80,
-      "(": 90,
       "dlab": 1000300,
-      ")": 100,
       "control": 2001850,
       "\u2018": 110,
       "\u2019": 120,
@@ -767,7 +765,7 @@
       "purposes": 1000320,
       "00": 3000160,
       "h": 4000400,
-      "iir": 1009830,
+      "iir": 1011230,
       "enable": 2000270,
       "programmer": 1000340,
       "retrieve": 2000280,
@@ -789,7 +787,7 @@
       "b": 3000180,
       "00000011": 3000190,
       "these": 6000060,
-      "lcr": 1009850,
+      "lcr": 1011250,
       "you": 1000420,
       "restore": 2000300,
       "after": 7000110,
@@ -1113,8 +1111,6 @@
       "fff": 3000460,
       "discontinue": 2000880,
       "simultaneously": 5000620,
-      "[": 220,
-      "]": 230,
       "cfg": 1001900,
       "gnt": 1001910,
       "req": 1001920,
@@ -1548,13 +1544,13 @@
       "draft": 1004180,
       "date": 1004190,
       "27": 3000790,
-      "01": 3000800,
+      "01": 1011370,
       "add": 2001640,
       "wide": 5001150,
       "17": 3000810,
       "names": 1004200,
       "03": 3000820,
-      "lsr": 1009870,
+      "lsr": 1011270,
       "thre": 260,
       "were": 4001180,
       "wishbone": 1004220,
@@ -1578,14 +1574,14 @@
       "pad": 2001820,
       "srx": 1004350,
       "rts": 1004360,
-      "dtr": 1009930,
+      "dtr": 1011330,
       "terminal": 1004380,
       "cts": 1004390,
       "dsr": 1006030,
       "ri": 1007140,
       "ring": 1004420,
       "indicator": 1004430,
-      "dcd": 1008640,
+      "dcd": 1011360,
       "carrier": 1004450,
       "name": 1004460,
       "rates": 1004470,
@@ -1596,7 +1592,7 @@
       "6864": 3000860,
       "115200": 3000870,
       "r": 1004500,
-      "thr": 1009920,
+      "thr": 1011320,
       "\u2013": 270,
       "modem": 1004520,
       "st": 1004530,
@@ -1615,7 +1611,7 @@
       "connections": 1004600,
       "made": 2001700,
       "dr": 1004610,
-      "oe": 1009940,
+      "oe": 1011340,
       "full": 5001180,
       "pe": 1004630,
       "currently": 4001240,
@@ -1672,7 +1668,7 @@
       "format": 1004840,
       "settings": 1004850,
       "words": 1004860,
-      "ddcd": 1009950,
+      "ddcd": 1011350,
       "complement": 1004880,
       "tf": 1005970,
       "working": 5001210,
@@ -1719,14 +1715,14 @@
       "tf_count": 1005160,
       "rf_count": 1005170,
       "unset": 2001760,
-      "rb": 1009800,
-      "ier": 1009820,
-      "fcr": 1009840,
-      "mcr": 1009860,
-      "msr": 1009880,
-      "dlr": 1009890,
-      "d1r": 1009900,
-      "d2r": 1009910,
+      "rb": 1011200,
+      "ier": 1011220,
+      "fcr": 1011240,
+      "mcr": 1011260,
+      "msr": 1011280,
+      "dlr": 1011290,
+      "d1r": 1011300,
+      "d2r": 1011310,
       "c1h": 3001150,
       "1258mhz": 3001160,
       "identification": 1006530,
@@ -1976,7 +1972,20 @@
       "product": 1011020,
       "flush": 2002120,
       "pick": 2002130,
-      "free": 2002140
+      "free": 2002140,
+      "rdata": 1011380,
+      "rvalid": 1011390,
+      "awvalid": 1011400,
+      "awready": 1011410,
+      "awid": 1011420,
+      "awcache": 1011430,
+      "ra": 1011440,
+      "awuser_width": 1011450,
+      "shall": 4001520,
+      "[": 3001670,
+      "]": 3001680,
+      "(": 3001690,
+      ")": 3001700
     }
   },
   "tokenMapping": {
@@ -2114,279 +2123,282 @@
     "23": {
       "aliases": [],
       "id": 23,
-      "stream": "are"
+      "stream": "available"
     },
     "24": {
       "aliases": [],
       "id": 24,
-      "stream": "available"
+      "stream": "for"
     },
     "25": {
       "aliases": [],
       "id": 25,
-      "stream": "for"
+      "stream": "reset value"
     },
     "26": {
       "aliases": [],
       "id": 26,
-      "stream": "reset value"
+      "stream": "to retrieve"
     },
     "27": {
       "aliases": [],
       "id": 27,
-      "stream": "to retrieve"
+      "stream": "what is"
     },
     "28": {
       "aliases": [],
       "id": 28,
-      "stream": "what is"
+      "stream": "current"
     },
     "29": {
       "aliases": [],
       "id": 29,
-      "stream": "current"
+      "stream": "following"
     },
     "30": {
       "aliases": [],
       "id": 30,
-      "stream": "following"
+      "stream": "displays"
     },
     "31": {
       "aliases": [],
       "id": 31,
-      "stream": "displays"
+      "stream": "list of"
     },
     "32": {
       "aliases": [],
       "id": 32,
-      "stream": "list of"
+      "stream": "along with"
     },
     "33": {
       "aliases": [],
       "id": 33,
-      "stream": "along with"
+      "stream": "they"
     },
     "34": {
       "aliases": [],
       "id": 34,
-      "stream": "they"
+      "stream": "enable"
     },
     "35": {
       "aliases": [],
       "id": 35,
-      "stream": "enable"
+      "stream": "priority"
     },
     "36": {
       "aliases": [],
       "id": 36,
-      "stream": "priority"
+      "stream": "their"
     },
     "37": {
       "aliases": [],
       "id": 37,
-      "stream": "their"
+      "stream": "set"
     },
     "38": {
       "aliases": [],
       "id": 38,
-      "stream": "set"
+      "stream": "disable"
     },
     "39": {
       "aliases": [],
       "id": 39,
-      "stream": "disable"
+      "stream": "from"
     },
     "40": {
       "aliases": [],
       "id": 40,
-      "stream": "from"
+      "stream": "through"
     },
     "41": {
       "aliases": [],
       "id": 41,
-      "stream": "through"
+      "stream": "["
     },
     "42": {
       "aliases": [],
       "id": 42,
-      "stream": "["
+      "stream": "]"
     },
     "43": {
       "aliases": [],
       "id": 43,
-      "stream": "]"
-    },
-    "44": {
-      "aliases": [],
-      "id": 44,
       "stream": ":"
     },
-    "45": {
-      "aliases": [
-        "are assert"
-      ],
-      "id": 45,
-      "stream": "is assert"
-    },
-    "46": {
-      "aliases": [
-        "are deassert"
-      ],
-      "id": 46,
-      "stream": "is deassert"
-    },
-    "47": {
-      "aliases": [
-        "are reassert"
-      ],
-      "id": 47,
-      "stream": "is reassert"
-    },
-    "48": {
-      "aliases": ["are high"],
-      "id": 48,
-      "stream": "is high"
-    },
-    "49": {
-      "aliases": ["are low"],
-      "id": 49,
-      "stream": "is low"
-    },
-    "50": {
-      "aliases": ["are unset"],
-      "id": 50,
-      "stream": "is unset"
-    },
-    "51": {
+    "44": {
       "aliases": [
         "are equal to",
         "are set equal to",
         "is equal to",
-        "is set equal to"
+        "is set equal to",
+        "goes to"
       ],
-      "id": 51,
+      "id": 44,
       "stream": "is set to"
+    },
+    "45": {
+      "aliases": [],
+      "id": 45,
+      "stream": "port"
+    },
+    "46": {
+      "aliases": [
+        "is an"
+      ],
+      "id": 46,
+      "stream": "is a"
+    },
+    "47": {
+      "aliases": [
+        "has an"
+      ],
+      "id": 47,
+      "stream": "has a"
+    },
+    "48": {
+      "aliases": [],
+      "id": 48,
+      "stream": "has"
+    },
+    "49": {
+      "aliases": [
+        "are",
+        "goes"
+      ],
+      "id": 49,
+      "stream": "is"
+    },
+    "50": {
+      "aliases": [],
+      "id": 50,
+      "stream": "if"
+    },
+    "51": {
+      "aliases": [],
+      "id": 51,
+      "stream": "in progress"
     },
     "52": {
       "aliases": [],
       "id": 52,
-      "stream": "port"
+      "stream": "in"
     },
     "53": {
-      "aliases": [
-        "is an"
-      ],
+      "aliases": [],
       "id": 53,
-      "stream": "is a"
+      "stream": "then"
     },
     "54": {
-      "aliases": [
-        "has an"
-      ],
+      "aliases": [],
       "id": 54,
-      "stream": "has a"
+      "stream": ","
     },
     "55": {
       "aliases": [],
       "id": 55,
-      "stream": "has"
+      "stream": "both"
     },
     "56": {
-      "aliases": ["are"],
+      "aliases": [],
       "id": 56,
-      "stream": "is"
+      "stream": "read"
     },
     "57": {
       "aliases": [],
       "id": 57,
-      "stream": "if"
+      "stream": "cleared"
     },
     "58": {
       "aliases": [],
       "id": 58,
-      "stream": "in progress"
+      "stream": "ignored"
     },
     "59": {
       "aliases": [],
       "id": 59,
-      "stream": "in"
+      "stream": "writing"
     },
     "60": {
-      "aliases": [],
+      "aliases": [
+        "an"
+      ],
       "id": 60,
-      "stream": "then"
+      "stream": "a"
     },
     "61": {
       "aliases": [],
       "id": 61,
-      "stream": ","
+      "stream": "reset"
     },
     "62": {
       "aliases": [],
       "id": 62,
-      "stream": "both"
+      "stream": "but"
     },
     "63": {
       "aliases": [],
       "id": 63,
-      "stream": "read"
+      "stream": "bit #"
     },
     "64": {
       "aliases": [],
       "id": 64,
-      "stream": "cleared"
+      "stream": "and"
     },
     "65": {
       "aliases": [],
       "id": 65,
-      "stream": "ignored"
+      "stream": "or"
     },
     "66": {
       "aliases": [],
       "id": 66,
-      "stream": "writing"
+      "stream": "."
     },
     "67": {
-      "aliases": [
-        "an"
-      ],
+      "aliases": [],
       "id": 67,
-      "stream": "a"
+      "stream": "can"
     },
     "68": {
       "aliases": [],
       "id": 68,
-      "stream": "reset"
+      "stream": "until"
     },
     "69": {
-      "aliases": [],
+      "aliases": [
+        "is required to be",
+        "should be",
+        "shall be",
+        "must"
+      ],
       "id": 69,
-      "stream": "but"
+      "stream": "must be"
     },
     "70": {
       "aliases": [],
       "id": 70,
-      "stream": "bit #"
+      "stream": "on"
     },
     "71": {
       "aliases": [],
       "id": 71,
-      "stream": "and"
+      "stream": "value"
     },
     "72": {
       "aliases": [],
       "id": 72,
-      "stream": "or"
+      "stream": "after"
     },
     "73": {
       "aliases": [],
       "id": 73,
-      "stream": "."
+      "stream": "before"
     },
     "74": {
       "aliases": [],
       "id": 74,
-      "stream": "can"
+      "stream": "during"
     }
   },
   "frameMapping": {
@@ -2412,9 +2424,11 @@
         "id": 1,
         "template": [
           -21,
-          42,
+          41,
           -21,
-          43
+          43,
+          -21,
+          42
         ],
         "aliases": []
       },
@@ -2422,18 +2436,16 @@
         "id": 2,
         "template": [
           -21,
-          42,
+          41,
           -21,
-          44,
-          -21,
-          43
+          42
         ],
         "aliases": []
       },
       "3": {
         "id": 3,
         "template": [
-          40,
+          39,
           10,
           -21,
           13,
@@ -2443,7 +2455,7 @@
         ],
         "aliases": [
           [
-            40,
+            39,
             -21,
             10,
             13,
@@ -2454,7 +2466,7 @@
           [
             10,
             -21,
-            41,
+            40,
             -21,
             11,
             -21
@@ -2475,53 +2487,8 @@
             -21
           ],
           [
-            57,
+            50,
             -21
-          ]
-        ]
-      },
-      "7": {
-        "id": 7,
-        "template": [
-          8,
-          -21,
-          12
-        ],
-        "aliases": [
-          [
-            8,
-            -21,
-            45
-          ],
-          [
-            8,
-            -21,
-            47
-          ],
-          [
-            8,
-            -21,
-            48
-          ]
-        ]
-      },
-      "8": {
-        "id": 8,
-        "template": [
-          8,
-          -21,
-          50
-        ],
-        "aliases": [
-          [
-            8,
-            -21,
-            49
-          ],
-          [
-            8,
-            -21,
-            46
           ]
         ]
       },
@@ -2530,77 +2497,51 @@
         "template": [
           8,
           -21,
-          51,
+          49,
           -21
         ],
         "aliases": [
           [
             8,
             -21,
-            56,
+            46,
             -21
           ],
           [
             8,
             -21,
-            53,
+            44,
             -21
           ],
           [
-            57,
+            8,
             -21,
-            56,
+            69,
             -21
           ],
           [
-            57,
+            50,
             -21,
-            53,
+            49,
             -21
           ],
           [
-            57,
+            50,
             -21,
-            51,
+            46,
             -21
-          ]
-        ]
-      },
-      "10": {
-        "id": 10,
-        "template": [
-          -21,
-          12
-        ],
-        "aliases": [
-          [
-            -21,
-            45
           ],
           [
+            50,
             -21,
-            47
+            44,
+            -21
           ],
           [
+            50,
             -21,
-            48
-          ]
-        ]
-      },
-      "11": {
-        "id": 11,
-        "template": [
-          -21,
-          50
-        ],
-        "aliases": [
-          [
-            -21,
-            49
-          ],
-          [
-            -21,
-            46
+            69,
+            -21
           ]
         ]
       },
@@ -2608,18 +2549,23 @@
         "id": 12,
         "template": [
           -21,
-          51,
+          49,
           -21
         ],
         "aliases": [
           [
             -21,
-            56,
+            46,
             -21
           ],
           [
             -21,
-            53,
+            44,
+            -21
+          ],
+          [
+            -21,
+            69,
             -21
           ]
         ]
@@ -2627,7 +2573,7 @@
       "13": {
         "id": 13,
         "template": [
-          60
+          53
         ],
         "aliases": [
           []
@@ -2637,13 +2583,13 @@
         "id": 14,
         "template": [
           -21,
-          54,
+          47,
           -21
         ],
         "aliases": [
           [
             -21,
-            55,
+            48,
             -21
           ]
         ]
