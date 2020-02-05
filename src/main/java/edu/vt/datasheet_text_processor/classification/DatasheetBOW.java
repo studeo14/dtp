@@ -71,13 +71,13 @@ public class DatasheetBOW {
             Pattern.compile("(^| )(bit|signal|register|bus|value) .+? (asserts|deasserts|enables|disables|activates|sends|starts|stops)"),
             Pattern.compile("padding .+? (bits|bus|register|value)"),
             Pattern.compile("(^| |-)(asserts|reassert|reasserts|assert|deassert|deasserts)"),
-            Pattern.compile("(^| )(is|is not|are|are not) (cleared|set|asserted|deasserted|enabled|disabled)"),
+            Pattern.compile("(^| )(is|is not|are|are not) (cleared|set|asserted|deasserted|enabled|disabled|sent|transmitted|checked)"),
             Pattern.compile(String.format("(^| )%s set to", conditions)),
             Pattern.compile(String.format("(^| )set .*? %s", conditions)),
             Pattern.compile("(hardwired|tied-off|tie-off|constant) to"),
             Pattern.compile("active (low|high)"),
             Pattern.compile("active-(low|high)"),
-            Pattern.compile(String.format("(^| )%s .+? is ", signals)),
+            Pattern.compile(String.format("(^| )%s .+? (is|must be|shall be) ", signals)),
     };
 
     public enum Action {
