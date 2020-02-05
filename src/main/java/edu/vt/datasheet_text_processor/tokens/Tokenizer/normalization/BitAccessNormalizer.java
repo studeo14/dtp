@@ -46,16 +46,6 @@ public class BitAccessNormalizer {
             Pattern.compile("eleventh"),
             Pattern.compile("twelfth")
     };
-    private static final Pattern[] LOGIC_HIGH_PATTERNS = {
-            Pattern.compile("high"),
-            Pattern.compile("logic high"),
-            Pattern.compile("asserted"),
-    };
-    private static final Pattern[] LOGIC_LOW_PATTERNS = {
-            Pattern.compile("low"),
-            Pattern.compile("logic low"),
-            Pattern.compile("desserted"),
-    };
 
     public static void normalizeBitAccesses(Project project, FrameFinder frameFinder, Serializer serializer) {
         var db = project.getDB();

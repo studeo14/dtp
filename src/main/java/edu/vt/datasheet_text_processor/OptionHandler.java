@@ -234,6 +234,7 @@ public class OptionHandler {
                                     s.setIr(ir);
                                     repo.update(s);
                                 } catch (IRException e) {
+                                    logger.warn("For Sentence: {}", s.getText());
                                     logger.warn(e.getMessage());
                                     s.getWarnings().add(new Warning(e));
                                     repo.update(s);

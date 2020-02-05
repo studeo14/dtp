@@ -65,7 +65,7 @@ public class FrameFinder {
 
     private enum FindState {BEGIN, INSIDE, END, END_ON_LITERAL}
 
-    private Optional<FrameInstance> getNextFrame(ListIterator<TokenInstance> iter) throws FrameException {
+    public Optional<FrameInstance> getNextFrame(ListIterator<TokenInstance> iter) throws FrameException {
         var current = new FrameInstance();
         var tokenList = new ArrayList<TokenInstance>();
         var literalList = new ArrayList<TokenInstance>();
@@ -226,8 +226,8 @@ public class FrameFinder {
 
     private boolean punctuationToken(TokenInstance currentToken) {
         switch (currentToken.getId()) {
-            case 60: // comma
-            case 72: // period
+            case 54: // comma
+            case 66: // period
             case -20:// DEFAULT
                 return true;
             default:
