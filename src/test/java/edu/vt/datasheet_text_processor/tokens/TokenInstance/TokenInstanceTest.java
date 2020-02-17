@@ -1,10 +1,9 @@
 package edu.vt.datasheet_text_processor.tokens.TokenInstance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.vt.datasheet_text_processor.Errors.SerializerException;
 import edu.vt.datasheet_text_processor.input.AllMappings;
-import edu.vt.datasheet_text_processor.signals.AcronymFinderTest;
 import edu.vt.datasheet_text_processor.util.Constants;
-import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +27,7 @@ public class TokenInstanceTest {
             ;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception, SerializerException {
         allMappings = new ObjectMapper().readValue(new File("Mappings_compiled.json"), AllMappings.class);
         allMappings.init();
 

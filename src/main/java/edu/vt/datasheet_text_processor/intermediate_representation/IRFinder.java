@@ -38,7 +38,7 @@ public class IRFinder {
             return processDeclarative(se, allMappings);
         } else if (!se.getAntecedents().isEmpty() && !se.getConsequents().isEmpty()) {
             logger.debug("Implicative Sentence");
-            return processImplicative(se, allMappings);
+            return processFrames(se.getAllFrames(), allMappings);
         } else if (se.getAllFrames().isEmpty()) {
             var message = "Invalid SE, 0 frames.";
             throw new IRException(message, new IRContext(message, se, null));
@@ -48,38 +48,55 @@ public class IRFinder {
         }
     }
 
-    private static String processImplicative(SemanticExpression se, AllMappings allMappings) throws IRException, FrameException {
-        var sb = new StringBuilder();
-        // process antecedent
-        sb.append(processAntecedent(se, allMappings));
-        sb.append(" -> ");
-        // process consequent
-        sb.append(processDeclarative(se, allMappings));
-        return sb.toString();
-    }
-
-    private static String processAntecedent(SemanticExpression se, AllMappings allMappings) throws IRException, FrameException {
-        var sb = new StringBuilder();
-        if (se.getAntecedents().size() > 1) {
-            var antecedentIRRes = processCompoundAntecedent(se.getAntecedents(), allMappings);
-            return antecedentIRRes.orElse("()");
-        } else {
-            for (var frame: se.getAntecedents()) {
-                var frameRes = processAntecedentFrame(frame, allMappings);
-                if (frameRes.isPresent()) {
-                    sb.append('(');
-                    // process frame
-                    sb.append(frameRes.get());
-                    sb.append(')');
+    private enum PREVIOUS_FRAME {NONE, A, C};
+    private static String processFrames(List<FrameInstance> frames, AllMappings allMappings) throws IRException, FrameException {
+        logger.debug("Processing frames");
+        // separate frames into proper antecedents and consequents
+        List<FrameInstance> antecedents = new ArrayList<>();
+        List<FrameInstance> consequents = new ArrayList<>();
+        PREVIOUS_FRAME previous_frame = PREVIOUS_FRAME.NONE;
+        for (var frame : frames) {
+            var id = frame.getId();
+            if (allMappings.getSemanticModel().getAntecedents().contains(id)) {
+                antecedents.add(frame);
+                previous_frame = PREVIOUS_FRAME.A;
+            } else if (allMappings.getSemanticModel().getConsequents().contains(id)) {
+                consequents.add(frame);
+                previous_frame = PREVIOUS_FRAME.C;
+            } else if (allMappings.getSemanticModel().getModifiers().contains(id)) {
+                switch (previous_frame) {
+                    case NONE:
+//                    {
+//                        var message = "Invalid Semantic Expression. Starting with a temporal or compound frame.";
+//                        throw new IRException(message, new IRCompoundContext(message, frame, frames));
+//                    }
+                    case A:
+                        antecedents.add(frame);
+                        break;
+                    case C:
+                        consequents.add(frame);
+                        break;
                 }
             }
         }
+        logger.debug("Found antecedents: {}", antecedents);
+        var sb = new StringBuilder();
+        // process antecedent
+        sb.append(processFrameGroup(antecedents, allMappings));
+        sb.append(" -> ");
+        // process consequent
+        sb.append(processFrameGroup(consequents, allMappings));
         return sb.toString();
     }
 
-    public enum COMPOUND_PROCESS_STATE {IDENTIFY, ADD_NORMAL, ADD_COMPOUND, END}
+    private static String processFrameGroup(List<FrameInstance> frameGroup, AllMappings allMappings) throws IRException, FrameException {
+        var res = process(frameGroup, allMappings);
+        return res.map(s -> "(" + s + ")").orElse("()");
+    }
 
-    private static Optional<String> processCompoundAntecedent(List<FrameInstance> antecedents, AllMappings allMappings) throws IRException, FrameException {
+    public enum COMPOUND_PROCESS_STATE {IDENTIFY, ADD_NORMAL, ADD_COMPOUND, ADD_TEMPORAL, END}
+
+    private static Optional<String> process(List<FrameInstance> antecedents, AllMappings allMappings) throws IRException, FrameException {
         var antecedentIter = antecedents.listIterator();
         COMPOUND_PROCESS_STATE state = COMPOUND_PROCESS_STATE.IDENTIFY;
         List<String> irTokens = new ArrayList<>();
@@ -98,8 +115,11 @@ public class IRFinder {
                     currentFrame = antecedentIter.next();
                     if (isCompound(currentFrame)) {
                         state = COMPOUND_PROCESS_STATE.ADD_COMPOUND;
+                    } else if (isTemporal(currentFrame)){
+                        state = COMPOUND_PROCESS_STATE.ADD_TEMPORAL;
                     } else {
                         state = COMPOUND_PROCESS_STATE.ADD_NORMAL;
+
                     }
                     break;
                 }
@@ -114,6 +134,7 @@ public class IRFinder {
                         // try to see if the next is a valid frame
                         var tempTokens = new ArrayList<>(currentFrame.getTokens());
                         // remove first (compound token) and identify
+                        logger.debug("Trying Frame: {}", tempTokens);
                         TokenInstance compoundToken = tempTokens.remove(0);
                         var originalNonCompoundTokens = tempTokens.get(0).getCompoundToken().getOriginalTokens();
                         logger.debug("Trying Frame: {}", originalNonCompoundTokens);
@@ -135,18 +156,19 @@ public class IRFinder {
                                         throw new IRException(message, new IRCompoundContext(message, currentFrame, antecedents));
                                     }
                                 }
-                                var tempRes = processConsequentFrame(tryFrame.get(), allMappings);
+                                var tempRes = processFrame(tryFrame.get(), allMappings);
                                 tempRes.ifPresent(irTokens::add);
                                 state = COMPOUND_PROCESS_STATE.IDENTIFY;
                             }
                         } catch (FrameException e){
-                                frameFailed = true;
+                            frameFailed = true;
                         }
                         if (frameFailed) {
                             // TODO: try to see if factoring is available
                             // else
                             // add back to previous if it ended in a literal
                             var previousFrame = antecedentIter.previous();
+                            logger.debug("Add to previous literal frame: {}", previousFrame.getId());
                             var previousFrameTokens = previousFrame.getTokens();
                             var lastToken = previousFrameTokens.get(previousFrameTokens.size() - 1);
                             switch (lastToken.getType()) {
@@ -175,10 +197,26 @@ public class IRFinder {
                     }
                     break;
                 }
+                case ADD_TEMPORAL:
+                {
+                    logger.debug("IN Temporal");
+                    if (irTokens.isEmpty()) {
+                        var message = "Found temporal frame at the beginning of antecedents.";
+                        throw new IRException(message, new IRCompoundContext(message, currentFrame, antecedents));
+                    } else {
+                        logger.debug("Not First");
+                        // get previous frame
+                        var previousFrameRes = irTokens.remove(irTokens.size() - 1);
+                        var temporalRes = processFrame(currentFrame, allMappings);
+                        irTokens.add(String.format("((%s) -> (%s))", temporalRes, previousFrameRes));
+                        state = COMPOUND_PROCESS_STATE.IDENTIFY;
+                    }
+                    break;
+                }
                 case ADD_NORMAL:
                 {
                     logger.debug("IN Normal");
-                    irTokens.add(processAntecedentFrame(currentFrame, allMappings).orElse("()"));
+                    irTokens.add(processFrame(currentFrame, allMappings).orElse("()"));
                     state = COMPOUND_PROCESS_STATE.IDENTIFY;
                     break;
                 }
@@ -203,6 +241,30 @@ public class IRFinder {
 
     private static boolean isCompound(FrameInstance frame) {
         return frame.getId().equals(15) || frame.getId().equals(16);
+    }
+
+    private static boolean isTemporal(FrameInstance frame) {
+        return frame.getId().equals(17);
+    }
+
+    private static Optional<String> processFrame(FrameInstance frame, AllMappings allMappings) throws IRException {
+        switch (frame.getId()) {
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 17:
+                return processAntecedentFrame(frame, allMappings);
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+                return processConsequentFrame(frame, allMappings);
+            default:
+                var message = String.format("Unknown frame %d.", frame.getId());
+                throw new IRException(message, new IRContext(message, null, frame));
+        }
     }
 
     private static Optional<String> processAntecedentFrame(FrameInstance frame, AllMappings allMappings) throws IRException {
@@ -238,6 +300,51 @@ public class IRFinder {
                 var name = frame.get(0);
                 var value = frame.get(1);
                 return Optional.of(getPossibleAction(name, value, allMappings));
+            }
+            case 17:
+            {
+                var sb = new StringBuilder();
+                // try to get frame from rest of frame
+                var tempTokens = new ArrayList<>(frame.getTokens());
+                // remove first (compound token) and identify
+                TokenInstance temporalToken = tempTokens.remove(0);
+                // add temporal modifier
+                switch (temporalToken.getId()) {
+                    case 72: // after
+                    case 74: // during
+                        break;
+                    case 73: // before
+                    case 68: // until
+                        sb.append("!");
+                        break;
+                    default: {
+                        var message = String.format("Found unknown temporal id: %s", temporalToken.getId());
+                        throw new IRException(message, new IRCompoundContext(message, frame, null));
+                    }
+                }
+                // extract other frame
+                var originalNonTemporalTokens = tempTokens.get(0).getCompoundToken().getOriginalTokens();
+                logger.debug("Trying Frame: {}", originalNonTemporalTokens);
+                var frameFailed = false;
+                try {
+                    var tryFrame = allMappings.getFrameFinder().getNextFrame(originalNonTemporalTokens.listIterator());
+                    frameFailed = tryFrame.isEmpty();
+                    if (!frameFailed) {
+                        sb.append("(");
+                        var tempRes = processFrame(tryFrame.get(), allMappings);
+                        tempRes.ifPresent(sb::append);
+                        sb.append(")");
+                    }
+                } catch (FrameException e){
+                    frameFailed = true;
+                }
+                // if failed just add literal
+                if (frameFailed) {
+                    sb.append("(STATE(");
+                    sb.append(Serializer.mergeWords(allMappings.getSerializer().deserialize(frame.get(0))));
+                    sb.append("))");
+                }
+                return Optional.of(sb.toString());
             }
             case 13:
                 return Optional.empty();

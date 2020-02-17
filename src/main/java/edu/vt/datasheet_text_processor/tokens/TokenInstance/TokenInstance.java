@@ -153,6 +153,8 @@ public class TokenInstance {
     public String toString() {
         if (getType() == Type.ACCESS) {
             return getBitAccessToken().toString();
+        } else if (getType() == Type.COMPOUND) {
+            return String.format("%s::%s", getType(), getCompoundToken().getOriginalTokens());
         } else {
             return String.format("%s::%d", getType(), getId());
         }

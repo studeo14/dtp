@@ -10,13 +10,15 @@ public class SemanticModel {
 
     private List<Integer> antecedents;
     private List<Integer> consequents;
+    private List<Integer> modifiers;
 
     public SemanticModel() {
     }
 
-    public SemanticModel(List<Integer> antecedents, List<Integer> consequents) {
+    public SemanticModel(List<Integer> antecedents, List<Integer> consequents, List<Integer> modifiers) {
         this.antecedents = antecedents;
         this.consequents = consequents;
+        this.modifiers = modifiers;
     }
 
     @JsonProperty("antecedents")
@@ -37,5 +39,15 @@ public class SemanticModel {
     @JsonProperty("consequents")
     public void setConsequents(List<Integer> consequents) {
         this.consequents = consequents;
+    }
+
+    @JsonProperty("modifiers")
+    public List<Integer> getModifiers() {
+        return modifiers;
+    }
+
+    @JsonProperty("modifiers")
+    public void setModifiers(List<Integer> modifiers) {
+        this.modifiers = modifiers;
     }
 }

@@ -73,6 +73,7 @@ public class FrameFinder {
         var state = FindState.BEGIN;
         while(iter.hasNext()) {
             logger.debug("STATE: {}", state);
+            logger.debug("TL: {}, LL: {}", tokenList, literalList);
             switch (state) {
                 case BEGIN: {
                     var currentToken = iter.next();
@@ -175,6 +176,7 @@ public class FrameFinder {
                     logger.debug("End On Literal");
                     literalList = new ArrayList<>();
                     while(iter.hasNext()) {
+                        logger.debug("TL: {}, LL: {}", tokenList, literalList);
                         var currentToken = iter.next();
                         if (punctuationToken(currentToken)) {
                             logger.debug("End Literal on Punctuation Found");

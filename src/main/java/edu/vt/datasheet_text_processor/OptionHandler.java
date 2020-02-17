@@ -207,6 +207,11 @@ public class OptionHandler {
                                             logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
                                         } else {
                                             logger.debug("{} -> {} ({})", s.getText(), s.getSemanticExpression(), seTT);
+                                            var test = s.getSemanticExpression().getAllFrames()
+                                                    .stream()
+                                                    .map(frame -> frame.getTokens().toString())
+                                                    .collect(Collectors.toList());
+                                            logger.info("{} -> {} ({})", s.getText(), s.getSemanticExpression(), test);
                                         }
                                     }
                                     repo.update(s);
@@ -350,7 +355,11 @@ public class OptionHandler {
                             if (se == null) {
                                 logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
                             } else {
-                                var seTT = s.getSemanticExpression().getTokenText();
+//                                var seTT = s.getSemanticExpression().getTokenText();
+                                var seTT = s.getSemanticExpression().getAllFrames()
+                                        .stream()
+                                        .map(frame -> frame.getTokens().toString())
+                                        .collect(Collectors.toList());
                                 logger.info("{} -> {} ({})", s.getText(), s.getSemanticExpression(), seTT);
                             }
                         }
