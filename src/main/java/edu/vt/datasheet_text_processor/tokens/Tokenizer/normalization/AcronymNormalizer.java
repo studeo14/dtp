@@ -53,6 +53,7 @@ public class AcronymNormalizer {
                         logger.debug("{}",tokensString);
                     }
                 } catch (SerializerException e) {
+                    logger.warn(e.getMessage());
                     var warning = new Warning(e);
                     sentence.getWarnings().add(warning);
                     sentences.update(sentence);

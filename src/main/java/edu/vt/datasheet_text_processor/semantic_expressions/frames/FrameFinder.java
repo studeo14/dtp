@@ -11,10 +11,7 @@ import edu.vt.datasheet_text_processor.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FrameFinder {
@@ -43,11 +40,23 @@ public class FrameFinder {
                 var numLit = frame.get().getLiterals().size();
                 var expected = frameModel.getGeneric().numLiterals(frame.get().getId());
                 if (numLit == expected) {
+                    // check if any of the literals are empty
+                    for (var lit: frame.get().getLiterals()) {
+                        if (lit.isEmpty()) {
+                            var message = "Given literal is empty.";
+                            throw new FrameException(message, new FrameFinderContext(message, tokens, frame.get(), null));
+                        }
+                    }
                     retVal.add(frame.get());
                     logger.debug("Frame Added: {}", frame.get().getId());
                 } else {
-                    var message = String.format("Invalid number of literals. Id: %d, Expected: %d, Actual: %d", frame.get().getId(), expected, numLit);
-                    throw new FrameException(message, new FrameFinderContext(message, tokens, frame.get()));
+                    var stream = frame.get().getTokens()
+                            .stream()
+                            .map(TokenInstance::getStream)
+//                            .flatMap(Collection::stream)
+                            .collect(Collectors.toList());
+                    var message = String.format("Invalid number of literals. Id: %d, Expected: %d, Actual: %d. Frames: %s", frame.get().getId(), expected, numLit, stream);
+                    throw new FrameException(message, new FrameFinderContext(message, tokens, frame.get(), null));
                 }
             }
         }
@@ -56,13 +65,14 @@ public class FrameFinder {
 
     private enum FindState {BEGIN, INSIDE, END, END_ON_LITERAL}
 
-    private Optional<FrameInstance> getNextFrame(ListIterator<TokenInstance> iter) throws FrameException {
+    public Optional<FrameInstance> getNextFrame(ListIterator<TokenInstance> iter) throws FrameException {
         var current = new FrameInstance();
         var tokenList = new ArrayList<TokenInstance>();
         var literalList = new ArrayList<TokenInstance>();
         var currentNode = new FrameSearchTreeNode();
         var state = FindState.BEGIN;
         while(iter.hasNext()) {
+            logger.debug("STATE: {}", state);
             switch (state) {
                 case BEGIN: {
                     var currentToken = iter.next();
@@ -109,7 +119,7 @@ public class FrameFinder {
                         logger.debug("Starting Frame at {} from literal token start", currentToken.getId());
                     // not a starting token. add to literal list
                     } else {
-                        logger.debug("No Frame. Adding literal to start.");
+                        logger.debug("No Frame. Adding literal {} to start.", currentToken.getId());
                         literalList.add(currentToken);
                     }
                     break;
@@ -119,7 +129,11 @@ public class FrameFinder {
                     var currentToken = iter.next();
                     logger.debug("Inside Frame: CN: {}, CT:{}", currentNode.getTokenId(), currentToken.getId());
                     if (currentNode.getChildren().containsKey(currentToken.getId())) { // if has direct child
-                        logger.debug("Direct Child");
+                        if (currentToken.getId().equals(Constants.LITERAL_TOKEN_ID)) {
+                            logger.debug("Direct Placeholder Child");
+                        } else {
+                            logger.debug("Direct Child");
+                        }
                         tokenList.add(currentToken);
                         currentNode = currentNode.getChildren().get(currentToken.getId());
                     } else if (currentNode.getChildren().containsKey(Constants.LITERAL_TOKEN_ID)) { // if has a "placeholder" child
@@ -131,9 +145,10 @@ public class FrameFinder {
                         tokenList.add(cToken);
                         currentNode = currentNode.getChildren().get(Constants.LITERAL_TOKEN_ID);
                     } else if (currentNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)) { // if has no more children
-                        logger.debug("Leaf Child");
                         iter.previous();
-                        current.setId(((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId());
+                        var id = ((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId();
+                        logger.debug("Leaf Child with ID: {}", id);
+                        current.setId(id);
                         // check if ending on a "placeholder" token
                         if (currentNode.getTokenId().equals(Constants.LITERAL_TOKEN_ID)) {
                             // remove earlier literal
@@ -146,8 +161,8 @@ public class FrameFinder {
                     } else { // this means that no frame can be found here.
                         iter.previous();
                         var validOptions = currentNode.getChildren().keySet();
-                        var message = String.format("No valid child found. There is supposed to be something here. Valid options: [%s].", validOptions);
-                        throw new FrameException(message, new FrameFinderContext(message, tokenList, current));
+                        var message = String.format("No valid child found. There is supposed to be something at token #%d. Valid options: %d:%s.", iter.nextIndex(), currentNode.getTokenId(), validOptions);
+                        throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
                     }
                     break;
                 }
@@ -161,16 +176,16 @@ public class FrameFinder {
                     literalList = new ArrayList<>();
                     while(iter.hasNext()) {
                         var currentToken = iter.next();
-                        if (!currentToken.getId().equals(Constants.LITERAL_TOKEN_ID) && frameSearchTree.getRootNode().getChildren().containsKey(currentToken.getId())) {
-                            logger.debug("End Literal on New Frame Found");
-                            iter.previous();
+                        if (punctuationToken(currentToken)) {
+                            logger.debug("End Literal on Punctuation Found");
                             var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
                             cToken.setCompoundToken(new CompoundToken(literalList));
                             tokenList.add(cToken);
                             current.setTokensAndLiterals(tokenList);
                             return Optional.of(current);
-                        } else if (punctuationToken(currentToken)) {
-                            logger.debug("End Literal on Punctuation Found");
+                        } else if (!currentToken.getId().equals(Constants.LITERAL_TOKEN_ID) && frameSearchTree.getRootNode().getChildren().containsKey(currentToken.getId())) {
+                            logger.debug("End Literal on New Frame Found");
+                            iter.previous();
                             var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
                             cToken.setCompoundToken(new CompoundToken(literalList));
                             tokenList.add(cToken);
@@ -196,133 +211,106 @@ public class FrameFinder {
             current.setTokensAndLiterals(tokenList);
             return Optional.of(current);
         } else {
-            var validOptions = currentNode.getChildren().keySet();
-            var message = String.format("No valid child found. There is supposed to be something here. Valid options: [%s].", validOptions);
-            throw new FrameException(message, new FrameFinderContext(message, tokenList, current));
+            var endingToken = iter.previous();
+            if (punctuationToken(endingToken)) {
+                logger.debug("Has punctuation.");
+                // prevent loop
+                iter.next();
+                return Optional.empty();
+            } else {
+                var message = String.format("Ending semantic expression on unexpected token. Non-literal, non-punctuation: %d", endingToken.getId());
+                throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
+            }
         }
     }
 
     private boolean punctuationToken(TokenInstance currentToken) {
         switch (currentToken.getId()) {
-            case 61: // comma
-            case 73: // period
-            case -20:// literal
+            case 54: // comma
+            case 66: // period
+            case -20:// DEFAULT
                 return true;
             default:
                 return false;
         }
     }
 
-    /**
-     * Helper method to use a frameid instead of a frametemplate
-     */
-    public Optional<FrameInstance> findFrame(List<TokenInstance> tokens, Integer frameId){
-        // get frameTemplate
-        if (frameModel.getGeneric().containsKey(frameId)) {
-            return findFrame(tokens, frameModel.getGeneric().get(frameId));
-        } else if (frameModel.getBitAccess().containsKey(frameId)) {
-            return findFrame(tokens, frameModel.getBitAccess().get(frameId));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Method to look for a single frame in a sentence rather than any frame
-     * @param tokens
-     * @param frameTemplate
-     * @return
-     */
-    public Optional<FrameInstance> findFrame(List<TokenInstance> tokens, FrameTemplate frameTemplate) {
-        // try base template
-        var tempRes = findFrame(tokens, frameTemplate.getTemplate(), frameTemplate.getId());
-        if (tempRes.isPresent()) {
-            return tempRes;
-        } else {
-            // try aliases
-            for (var alias: frameTemplate.getAliases()) {
-                tempRes = findFrame(tokens, alias, frameTemplate.getId());
-                if (tempRes.isPresent()) {
-                    return tempRes;
+    public Optional<FrameInstance> findBitAccessFrame(List<TokenInstance> tokens) {
+        for (var bat: frameModel.getBitAccess().entrySet()) {
+            var template = bat.getValue();
+            var id = bat.getKey();
+            var templateRes = findSingleFrameRestricted(tokens.listIterator(), template.getTemplate(), id);
+            if (templateRes.isPresent()) {
+                return templateRes;
+            } else {
+                for (var alias: template.getAliases()) {
+                    var aliasRes = findSingleFrameRestricted(tokens.listIterator(), alias, id);
+                    if (aliasRes.isPresent()) {
+                        return aliasRes;
+                    }
                 }
             }
         }
         return Optional.empty();
     }
 
-    /**
-     * Helper method to be able to use a raw template list + id
-     * This helps break out the processing of aliases and base templates into a single common algorithm
-     * @param tokens
-     * @param template
-     * @param frameId
-     * @return
-     */
-    public Optional<FrameInstance> findFrame(List<TokenInstance> tokens, List<Integer> template, Integer frameId) {
-        for (int i = 0, tokensSize = tokens.size(); i < tokensSize; i++) {
-            var tempRes = findFrameOnePass(tokens.listIterator(i), template.listIterator(), frameId);
-            if (tempRes.isPresent()) {
-                return tempRes;
-            }
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Helper method to look for a single frame from a specific starting place in a sentence
-     * @param tokenIter
-     * @param frameIter
-     * @param frameId
-     * @return
-     */
-    public Optional<FrameInstance> findFrameOnePass(ListIterator<TokenInstance> tokenIter, ListIterator<Integer> frameIter, Integer frameId) {
-        var state = State.BEGIN;
-        List<TokenInstance> frameTokens = new ArrayList<>();
-        while(tokenIter.hasNext()) {
+    public Optional<FrameInstance> findSingleFrameRestricted(ListIterator<TokenInstance> tokenIter, List<Integer> template, Integer frameId) {
+        FindState state = FindState.BEGIN;
+        var current = new FrameInstance();
+        ListIterator<Integer> templateIter = template.listIterator();
+        logger.debug("Single Frame Begin. Looking for: {}", frameId);
+        List<TokenInstance> tokens = new ArrayList<>();
+        while(tokenIter.hasNext() && templateIter.hasNext()) {
+            logger.debug("Single Frame::STATE: {}", state);
             switch (state) {
                 case BEGIN:
                 {
-                    var current = tokenIter.next();
-                    var currentId = frameIter.next();
-                    // if ids are equal then add and move on
-                    // if not then reset the frametemplate iterator, throw away token
-                    if (current.getId().equals(currentId)) {
-                        frameTokens.add(current);
-                        state = State.INSIDE;
-                    } else {
-                        state = State.FAIL;
+                    // reset
+                    templateIter = template.listIterator();
+                    tokens.clear();
+                    var currentToken = tokenIter.next();
+                    var startTemplate = templateIter.next();
+                    logger.debug("BEGIN: {} vs {}", currentToken.getId(), startTemplate);
+                    if (currentToken.getId().equals(startTemplate)) {
+                        logger.debug("Found start of single token at: {}", currentToken);
+                        state = FindState.INSIDE;
+                        tokens.add(currentToken);
                     }
                     break;
                 }
                 case INSIDE:
                 {
-                    var current = tokenIter.next();
-                    if (!frameIter.hasNext()) {
-                        state = State.END;
-                        break;
-                    }
-                    var currentId = frameIter.next();
-                    // if ids are equal then add and move on
-                    // if not then reset the frametemplate iterator, throw away token
-                    if (current.getId().equals(currentId)) {
-                        frameTokens.add(current);
+                    var currentToken = tokenIter.next();
+                    var templateId = templateIter.next();
+                    logger.debug("INSIDE: {} vs {}", currentToken.getId(), templateId);
+                    if (currentToken.getId().equals(templateId)) {
+                        if (templateId.equals(Constants.LITERAL_TOKEN_ID)) {
+                            logger.debug("Direct Placeholder Child");
+                        } else {
+                            logger.debug("Direct Child");
+                        }
+                        tokens.add(currentToken);
+                    } else if (templateId.equals(Constants.LITERAL_TOKEN_ID)) {
+                        logger.debug("Placeholder Child");
+                        tokens.add(currentToken);
                     } else {
-                        state = State.FAIL;
+                        state = FindState.BEGIN;
                     }
                     break;
                 }
-                case FAIL:
-                {
-                    return Optional.empty();
-                }
-                case END:
-                {
-                    var frame = new FrameInstance(frameId, frameTokens);
-                    return Optional.of(frame);
-                }
             }
         }
-        return Optional.empty();
+        logger.debug("Iter Ended");
+        // one of the iters has ended
+        if (!templateIter.hasNext()) {
+            logger.debug("Frame Iter Ended. Returning token of: {}", frameId);
+            current.setTokensAndLiterals(tokens);
+            current.setId(frameId);
+            return Optional.of(current);
+        } else {
+            logger.debug("Token Iter Ended");
+            return Optional.empty();
+        }
     }
 
     public FrameSearchTree getFrameSearchTree() {

@@ -2,7 +2,7 @@ package edu.vt.datasheet_text_processor.Errors;
 
 import edu.vt.datasheet_text_processor.Errors.Context.Context;
 
-public class ProcessorException extends Exception{
+public class ProcessorException extends Throwable {
 
     private Context context;
 

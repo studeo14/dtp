@@ -4,6 +4,9 @@ public class SerializerContext extends Context {
     private String word;
     private String sentence;
 
+    public SerializerContext() {
+    }
+
     public SerializerContext(String message, String word, String sentence) {
         super(message);
         this.word = word;

@@ -11,6 +11,9 @@ public class SemanticExpressionContext extends Context {
     private List<FrameInstance> frames;
     private SemanticExpression semanticExpression;
 
+    public SemanticExpressionContext() {
+    }
+
     public SemanticExpressionContext(String message, List<TokenInstance> tokens, List<FrameInstance> frames, SemanticExpression semanticExpression) {
         super(message);
         this.tokens = tokens;

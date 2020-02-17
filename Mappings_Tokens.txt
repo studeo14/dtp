@@ -1,45 +1,32 @@
 in addition
 there are
 there's::there‘s||there’s
-#2
-#clock divisor
-#registers
 that
 together
 form
-
-#register
 can be
 accessed
 when
 upon
 bit
 of
-is set
+is set::are set
 to
-
 at this time
 above
 at
 can't be::can‘t be||can’t be
-can be
 cannot::can't||can‘t||can’t
 does
 does not::doesn't||doesn’t||doesn‘t
-accessed
-
-when
 using
 additional
-are
 available
 for
 reset value
-
 to retrieve
 what is
 current
-
 following
 displays
 list of
@@ -48,58 +35,41 @@ they
 enable
 priority
 their
-
 set
 disable
-
 from
 through
-
 [
 ]
 :
-
-is assert
-is deassert
-is reassert
-is high
-
-is deassert
-is low
-is unset
-
-is set to::is equal to||is set equal to
-
-
+is set to::are equal to||are set equal to||is equal to||is set equal to||goes to
 port
 is a::is an
 has a::has an
 has
-is
+is::are||goes
 if
 in progress
 in
-
 then
-
 ,
 both
-
 read
-
-can be
 cleared
 ignored
 writing
 a::an
 reset
-
 but
 bit #
 and
 or
-if
-
 .
-
 can
+until
+must be::is required to be||should be||shall be||must
+on
+value
+after
+before
+during

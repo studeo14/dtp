@@ -130,6 +130,7 @@ public class OptionHandler {
                                     s.setWordIds(wordIds);
                                     repo.update(s);
                                 } catch (SerializerException e) {
+                                    logger.warn(e.getMessage());
                                     s.getWarnings().add(new Warning(e));
                                     repo.update(s);
                                 }
@@ -155,8 +156,9 @@ public class OptionHandler {
                                     s.setTokens(tokens);
                                     repo.update(s);
                                 } catch (TokenizerException te) {
+                                    logger.warn(te.getMessage());
                                     var context = (TokenizerContext)te.getContext();
-                                    logger.error("Unable to tokenize \"{}\" at **{}({})**", s.getText(), allMappings.getSerializer().unconvert(context.getCurrentWord()), context.getWordIndex());
+                                    logger.warn("Unable to tokenize \"{}\" at **{}({})**", s.getText(), allMappings.getSerializer().unconvert(context.getCurrentWord()), context.getWordIndex());
                                     var warning = new Warning(te);
                                     s.getWarnings().add(warning);
                                     repo.update(s);
@@ -210,6 +212,8 @@ public class OptionHandler {
                                     repo.update(s);
                                 }
                             } catch (FrameException e) {
+                                logger.warn(s.getText());
+                                logger.warn(e.getMessage());
                                 s.getWarnings().add(new Warning(e));
                                 repo.update(s);
                             }
@@ -230,6 +234,8 @@ public class OptionHandler {
                                     s.setIr(ir);
                                     repo.update(s);
                                 } catch (IRException e) {
+                                    logger.warn("For Sentence: {}", s.getText());
+                                    logger.warn(e.getMessage());
                                     s.getWarnings().add(new Warning(e));
                                     repo.update(s);
                                 }
@@ -351,7 +357,12 @@ public class OptionHandler {
                     } else if (options.debugOptions.doShowIR) {
                         var db = project.getDB();
                         var repo = db.getRepository(Sentence.class);
-                        var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
+                        var documents = repo.find(
+                                ObjectFilters.and(
+                                        ObjectFilters.eq("type", Sentence.Type.NONCOMMENT),
+                                        ObjectFilters.not(ObjectFilters.eq("ir", null))
+                                ),
+                                FindOptions.sort("sentenceId", SortOrder.Ascending));
                         for (var s : documents) {
                             logger.info("{} -> {}", s.getText(), s.getIr());
                         }

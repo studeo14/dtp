@@ -6,6 +6,9 @@ public class IRPropertyContext extends Context {
     private String name;
     private String prop;
 
+    public IRPropertyContext() {
+    }
+
     public IRPropertyContext(String message, String name, String prop) {
         super(message);
         this.name = name;
