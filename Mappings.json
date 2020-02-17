@@ -2263,7 +2263,8 @@
     "49": {
       "aliases": [
         "are",
-        "goes"
+          "goes",
+          "remains"
       ],
       "id": 49,
       "stream": "is"

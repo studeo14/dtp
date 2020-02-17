@@ -80,6 +80,7 @@ public class IRFinder {
             }
         }
         logger.debug("Found antecedents: {}", antecedents);
+        logger.debug("Found consequents: {}", consequents);
         var sb = new StringBuilder();
         // process antecedent
         sb.append(processFrameGroup(antecedents, allMappings));
@@ -91,7 +92,7 @@ public class IRFinder {
 
     private static String processFrameGroup(List<FrameInstance> frameGroup, AllMappings allMappings) throws IRException, FrameException {
         var res = process(frameGroup, allMappings);
-        return res.map(s -> "(" + s + ")").orElse("()");
+        return res.map(s -> "(" + s + ")").orElse("");
     }
 
     public enum COMPOUND_PROCESS_STATE {IDENTIFY, ADD_NORMAL, ADD_COMPOUND, ADD_TEMPORAL, END}
@@ -101,7 +102,7 @@ public class IRFinder {
         COMPOUND_PROCESS_STATE state = COMPOUND_PROCESS_STATE.IDENTIFY;
         List<String> irTokens = new ArrayList<>();
         FrameInstance currentFrame = null;
-        logger.debug("Begin compound antecedent. {}", antecedents.stream().map(FrameInstance::getId).collect(Collectors.toList()));
+        logger.debug("Begin compound. {}", antecedents.stream().map(FrameInstance::getId).collect(Collectors.toList()));
         var flag = true;
         while(flag) {
             logger.debug("STATE: {}", state);
@@ -113,6 +114,10 @@ public class IRFinder {
                         break;
                     }
                     currentFrame = antecedentIter.next();
+                    if (currentFrame == null) {
+                        state = COMPOUND_PROCESS_STATE.END;
+                        break;
+                    }
                     if (isCompound(currentFrame)) {
                         state = COMPOUND_PROCESS_STATE.ADD_COMPOUND;
                     } else if (isTemporal(currentFrame)){
@@ -167,6 +172,8 @@ public class IRFinder {
                             // TODO: try to see if factoring is available
                             // else
                             // add back to previous if it ended in a literal
+                            antecedentIter.previous();
+                            antecedentIter.remove();
                             var previousFrame = antecedentIter.previous();
                             logger.debug("Add to previous literal frame: {}", previousFrame.getId());
                             var previousFrameTokens = previousFrame.getTokens();
@@ -208,7 +215,7 @@ public class IRFinder {
                         // get previous frame
                         var previousFrameRes = irTokens.remove(irTokens.size() - 1);
                         var temporalRes = processFrame(currentFrame, allMappings);
-                        irTokens.add(String.format("((%s) -> (%s))", temporalRes, previousFrameRes));
+                        irTokens.add(String.format("((%s) -> (%s))", temporalRes.orElse("()"), previousFrameRes));
                         state = COMPOUND_PROCESS_STATE.IDENTIFY;
                     }
                     break;
@@ -216,7 +223,7 @@ public class IRFinder {
                 case ADD_NORMAL:
                 {
                     logger.debug("IN Normal");
-                    irTokens.add(processFrame(currentFrame, allMappings).orElse("()"));
+                    irTokens.add(processFrame(currentFrame, allMappings).orElse(""));
                     state = COMPOUND_PROCESS_STATE.IDENTIFY;
                     break;
                 }
@@ -377,7 +384,7 @@ public class IRFinder {
         var nameS = normalizeSignalName(Serializer.mergeWords(allMappings.getSerializer().deserialize(name)));
         var valueS = Serializer.mergeWords(allMappings.getSerializer().deserialize(value));
         ;
-        if (value.size() == 1 && WordIdUtils.getWordIdClass(value.get(0)) == Serializer.WordIDClass.VERB) { // possible action
+        if (WordIdUtils.getWordIdClass(value.get(0)) == Serializer.WordIDClass.VERB) { // possible action
             return "STATE(" + nameS + ", " + valueS + ")";
         } else if (Stream.of(LOGIC_PATTERNS).anyMatch(pattern -> pattern.matcher(valueS).find())) {
             return "(" + nameS + " == " + valueS + ")";
