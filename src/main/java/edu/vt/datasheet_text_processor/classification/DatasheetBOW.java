@@ -168,7 +168,6 @@ public class DatasheetBOW {
         return Optional.empty();
     }
 
-    // TODO: update for current flow
     public static Pair<Integer, Integer> count_questionable(final Project project) {
         var wrapper = new Object() {
             int total = 0;
@@ -183,7 +182,6 @@ public class DatasheetBOW {
         return Pair.of(wrapper.total, wrapper.quest);
     }
 
-    // TODO: update for current flow
     public static void debug_file_questionable(final Project project) {
         project.getSentences()
                 .toList().stream()
@@ -193,7 +191,13 @@ public class DatasheetBOW {
                 .forEach(p -> System.out.printf("%s :: %s\n", p.getLeft(), p.getRight().get()));
     }
 
-    // TODO: update for current flow
+    public static void debug_file_noncomments(final Project project) {
+        project.getSentences()
+                .toList().stream()
+                .filter(s -> s.getType() == Sentence.Type.NONCOMMENT)
+                .forEach(s -> System.out.println(s.getText()));
+    }
+
     public static void debug_file_comments(final Project project) {
         project.getSentences()
                 .toList().stream()

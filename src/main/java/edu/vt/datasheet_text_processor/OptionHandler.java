@@ -16,7 +16,6 @@ import edu.vt.datasheet_text_processor.signals.Signal;
 import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.AcronymNormalizer;
 import edu.vt.datasheet_text_processor.tokens.Tokenizer.normalization.BitAccessNormalizer;
-import edu.vt.datasheet_text_processor.wordid.AddNewWrapper;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import org.apache.commons.io.FilenameUtils;
 import org.dizitart.no2.FindOptions;
@@ -38,216 +37,301 @@ import java.util.stream.Collectors;
 public class OptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(OptionHandler.class);
 
+    /**
+     * Utility method for "compiling" the tokens mappings from "Raw" text format to a wordId format
+     * that is used in the generic Mappings data structure.
+     * @param mappingFile
+     * @throws IOException
+     * @throws SerializerException
+     */
+    public static void compileTokens(File mappingFile) throws IOException, SerializerException {
+        var rawMappings = new ObjectMapper().readValue(mappingFile, AllMappingsRaw.class);
+        rawMappings.init();
+        var exportFileBase = FilenameUtils.removeExtension(mappingFile.getName());
+        var exportFile = new File(exportFileBase + "_compiled.json");
+        rawMappings.export(exportFile);
+        logger.info("Exported compiled tokens to {}", exportFile.getName());
+        logger.info("exiting.");
+    }
+
+    /**
+     * Process the signal names from the signal names input file and attempt to add them to the project as signal names
+     * and acronyms.
+     * @param project
+     * @param signalNames File
+     * @throws IOException
+     */
+    public static void processSignalNames(Project project, File signalNames) throws IOException {
+        // add signal names to the project
+        // first check if the list is already present
+        var db = project.getDB();
+        var collection = db.getRepository(Signal.class); // creates if not already present
+        for (var signal : collection.find()) {
+            logger.debug("Existing Signal: {}", signal.getName());
+        }
+        // read in signal names
+        for (String line : Files.readAllLines(signalNames.toPath())) {
+            // split into name and acronyms
+            var split = line.split("::");
+            try {
+                if (split.length == 2) {
+                    var acronyms = Arrays.stream(split[1].split(","))
+                            .map(String::toLowerCase)
+                            .collect(Collectors.toList());
+                    var aliases = Arrays.stream(split[0].split("/"))
+                            .map(String::toLowerCase)
+                            .collect(Collectors.toList());
+                    for (var alias : aliases) {
+                        collection.insert(new Signal(alias, acronyms));
+                    }
+                } else {
+                    var aliases = Arrays.stream(split[0].split("/"))
+                            .map(String::toLowerCase)
+                            .collect(Collectors.toList());
+                    for (var alias : aliases) {
+                        collection.insert(new Signal(alias));
+                    }
+                }
+                logger.info("Signal added: {}", split[0]);
+            } catch (UniqueConstraintException | InvalidIdException r) {
+                logger.debug("Skipping {}. Already added.", split[0]);
+            }
+        }
+    }
+
+    /**
+     * Classify the sentences into comment and questionable. The method used aims to be greedy and possible overcapture
+     * the given sentences.
+     * @param project
+     */
+    public static void classifySentences(Project project) {
+        // create classify table
+        var db = project.getDB();
+        var repo = db.getRepository(Sentence.class);
+        var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
+        for (Sentence s : documents) {
+            if (s.getType() == Sentence.Type.META) {
+                continue;
+            }
+            // do classify
+            var isComment = DatasheetBOW.is_questionable(s.getText());
+            if (isComment) {
+                s.setType(Sentence.Type.NONCOMMENT);
+            } else {
+                s.setType(Sentence.Type.COMMENT);
+            }
+            repo.update(s);
+        }
+    }
+
+    /**
+     * Serialize the sentences into streams of wordIds (Integers). Possibly interact with the user when unknown words are
+     * encountered.
+     * @param project
+     * @param addNew
+     * @param mappingFile
+     * @param allMappings
+     * @throws IOException
+     */
+    public static void processWordIds(Project project, boolean addNew, File mappingFile, AllMappings allMappings) throws IOException {
+        logger.info("Doing wid");
+        if (addNew) {
+            logger.info("Looking for unmapped words.");
+            logger.info("Categories are:\n\t0. Junk\n\t1. Objects\n\t2. Verb\n\t3. Number\n\t4. " +
+                    "Modifier\n\t5. Adjective\n\t6. Pronoun\n\t7. Conditions");
+        }
+        var db = project.getDB();
+        var repo = db.getRepository(Sentence.class);
+        var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
+        for (Sentence s : documents) {
+            // do serialize
+            if (s.getType() == Sentence.Type.NONCOMMENT) {
+                List<Integer> wordIds = null;
+                try {
+                    wordIds = allMappings.getSerializer().serialize(s.getText(), addNew);
+                    s.setWordIds(wordIds);
+                    repo.update(s);
+                } catch (SerializerException e) {
+                    logger.warn(e.getMessage());
+                    s.getWarnings().add(new Warning(e));
+                    repo.update(s);
+                }
+            }
+        }
+        if (addNew) {
+            allMappings.export(mappingFile);
+        }
+    }
+
+    /**
+     * Chunk the wordIds into tokens of 1 or more wordIds. Many wordId combinations are aliased to a single token.
+     * @param project
+     * @param allMappings
+     * @param normalize
+     * @param mappingFile
+     * @throws IOException
+     */
+    public static void processTokens(Project project, AllMappings allMappings, boolean normalize, File mappingFile) throws IOException {
+        logger.info("Doing Tokenization");
+        // tokenize
+        var db = project.getDB();
+        var repo = db.getRepository(Sentence.class);
+        var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
+        for (Sentence s : documents) {
+            // do serialize
+            if (s.getType() == Sentence.Type.NONCOMMENT) {
+                try {
+                    List<TokenInstance> tokens = allMappings.getTokenizer().tokenize(s.getWordIds());
+                    s.setTokens(tokens);
+                    repo.update(s);
+                } catch (TokenizerException te) {
+                    logger.warn(te.getMessage());
+                    var context = (TokenizerContext)te.getContext();
+                    logger.warn("Unable to tokenize \"{}\" at **{}({})**", s.getText(), allMappings.getSerializer().unconvert(context.getCurrentWord()), context.getWordIndex());
+                    var warning = new Warning(te);
+                    s.getWarnings().add(warning);
+                    repo.update(s);
+                }
+            }
+        }
+        if (normalize) {
+            logger.info("Normalizing.");
+            // find and add acronyms
+            logger.info("Finding Acronyms.");
+            AcronymFinder.initializeAcronyms(project);
+            AcronymFinder.findAcronyms(project, allMappings.getSerializer());
+            var added = AcronymFinder.addAcronymsToMapping(project, allMappings.getSerializer());
+            if (added) {
+                allMappings.export(mappingFile);
+            }
+            // normalize acronyms
+            logger.info("Normalizing Acronyms.");
+            AcronymNormalizer.normalizeAcronyms(project, allMappings.getSerializer());
+            // normalize bit accesses
+            logger.info("Normalizing Bit Accesses.");
+            BitAccessNormalizer.normalizeBitAccesses(project, allMappings.getFrameFinder(), allMappings.getSerializer());
+        }
+    }
+
+    /**
+     * Process the tokens converting them to a bag of semantic frames.
+     * @param project
+     * @param allMappings
+     */
+    public static void processSemanticExpressions(Project project, AllMappings allMappings) {
+        logger.info("Finding Semantic Expressions");
+        var db = project.getDB();
+        var repo = db.getRepository(Sentence.class);
+        var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
+        for (Sentence s : documents) {
+            try {
+                var semexpr = allMappings.getSemanticParser().findSemanticExpression(s.getTokens(), allMappings.getFrameFinder());
+                if (semexpr.isPresent()) {
+                    var se = semexpr.get();
+                    var seTTo = getSemanticExpressionTokenText(se, allMappings);
+                    List<List<String>> seTT = null;
+                    if (seTTo.isPresent()) {
+                        seTT = seTTo.get();
+                        se.setTokenText(seTT);
+                    }
+                    s.setSemanticExpression(se);
+                    if (logger.isDebugEnabled()) {
+                        if (seTT == null) {
+                            logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
+                        } else {
+                            logger.debug("{} -> {} ({})", s.getText(), s.getSemanticExpression(), seTT);
+                            var test = s.getSemanticExpression().getAllFrames()
+                                    .stream()
+                                    .map(frame -> frame.getTokens().toString())
+                                    .collect(Collectors.toList());
+                            logger.info("{} -> {} ({})", s.getText(), s.getSemanticExpression(), test);
+                        }
+                    }
+                    repo.update(s);
+                }
+            } catch (FrameException e) {
+                logger.warn(s.getText());
+                logger.warn(e.getMessage());
+                s.getWarnings().add(new Warning(e));
+                repo.update(s);
+            }
+        }
+    }
+
+    /**
+     * Further process the semantic expression to reduce compound expressions, temporal opereators, and other complex
+     * cases into unified frames. Then convert the frames into IR.
+     * @param project
+     * @param allMappings
+     */
+    public static void processIR(Project project, AllMappings allMappings) {
+        logger.info("Finding Intermediate Representation");
+        var db = project.getDB();
+        var repo = db.getRepository(Sentence.class);
+        var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
+        for (Sentence s : documents) {
+            var se = s.getSemanticExpression();
+            if (se != null) {
+                try {
+                    var ir = IRFinder.findIR(se, allMappings);
+                    s.setIr(ir);
+                    repo.update(s);
+                } catch (ProcessorException e) {
+                    logger.warn("For Sentence: {}", s.getText());
+                    logger.warn(e.getMessage());
+                    s.getWarnings().add(new Warning(e));
+                    repo.update(s);
+                }
+            } else {
+                logger.info("No SE for sentence {}", s.getSentenceId());
+            }
+        }
+    }
+
+    /**
+     * Handle the CLI options by exporting to the other specialized processing functions. Debugging is not exported.
+     * @param options
+     * @throws IOException
+     * @throws ProcessorException
+     */
     public static void handle(Application options) throws IOException, ProcessorException {
+        // compile tokens or process project
         if (options.inPointOptions.compileTokens) {
-            var rawMappings = new ObjectMapper().readValue(options.mappingFile, AllMappingsRaw.class);
-            rawMappings.init();
-            var exportFileBase = FilenameUtils.removeExtension(options.mappingFile.getName());
-            var exportFile = new File(exportFileBase + "_compiled.json");
-            rawMappings.export(exportFile);
-            logger.info("Exported compiled tokens to {}", exportFile.getName());
-            logger.info("exiting.");
+            compileTokens(options.mappingFile);
         } else {
+            // open and process
             var project = ProjectUtils.openProject(options.inPointOptions.inputFile);
             if (project.getDB() == null) {
                 logger.error("Unable to open project");
             } else {
+                // init mappings
                 var allMappings = new ObjectMapper().readValue(options.mappingFile, AllMappings.class);
                 allMappings.init();
+                // handle processing options
                 if (options.signalNames != null) {
-                    // add signal names to the project
-                    // first check if the list is already present
-                    var db = project.getDB();
-                    var collection = db.getRepository(Signal.class); // creates if not already present
-                    for (var signal : collection.find()) {
-                        logger.debug("Existing Signal: {}", signal.getName());
-                    }
-                    // read in signal names
-                    for (String line : Files.readAllLines(options.signalNames.toPath())) {
-                        // split into name and acronyms
-                        var split = line.split("::");
-                        try {
-                            if (split.length == 2) {
-                                var acronyms = Arrays.stream(split[1].split(","))
-                                        .map(String::toLowerCase)
-                                        .collect(Collectors.toList());
-                                var aliases = Arrays.stream(split[0].split("/"))
-                                        .map(String::toLowerCase)
-                                        .collect(Collectors.toList());
-                                for (var alias : aliases) {
-                                    collection.insert(new Signal(alias, acronyms));
-                                }
-                            } else {
-                                var aliases = Arrays.stream(split[0].split("/"))
-                                        .map(String::toLowerCase)
-                                        .collect(Collectors.toList());
-                                for (var alias : aliases) {
-                                    collection.insert(new Signal(alias));
-                                }
-                            }
-                            logger.info("Signal added: {}", split[0]);
-                        } catch (UniqueConstraintException | InvalidIdException r) {
-                            logger.debug("Skipping {}. Already added.", split[0]);
-                        }
-                    }
+                    processSignalNames(project, options.signalNames);
                 }
                 if (options.doClassify) {
-                    // create classify table
-                    var db = project.getDB();
-                    var repo = db.getRepository(Sentence.class);
-                    var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
-                    for (Sentence s : documents) {
-                        if (s.getType() == Sentence.Type.META) {
-                            continue;
-                        }
-                        // do classify
-                        var isComment = DatasheetBOW.is_questionable(s.getText());
-                        if (isComment) {
-                            s.setType(Sentence.Type.NONCOMMENT);
-                        } else {
-                            s.setType(Sentence.Type.COMMENT);
-                        }
-                        repo.update(s);
-                    }
+                    classifySentences(project);
                 }
                 if (options.wordIDOptions != null) {
                     if (options.wordIDOptions.doWordId) {
-                        logger.info("Doing wid");
-                        if (options.wordIDOptions.addNew) {
-                            logger.info("Looking for unmapped words.");
-                            logger.info("Categories are:\n\t0. Junk\n\t1. Objects\n\t2. Verb\n\t3. Number\n\t4. " +
-                                    "Modifier\n\t5. Adjective\n\t6. Pronoun\n\t7. Conditions");
-                        }
-                        var db = project.getDB();
-                        var repo = db.getRepository(Sentence.class);
-                        var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
-                        for (Sentence s : documents) {
-                            // do serialize
-                            if (s.getType() == Sentence.Type.NONCOMMENT) {
-                                List<Integer> wordIds = null;
-                                try {
-                                    wordIds = allMappings.getSerializer().serialize(s.getText(), options.wordIDOptions.addNew);
-                                    s.setWordIds(wordIds);
-                                    repo.update(s);
-                                } catch (SerializerException e) {
-                                    logger.warn(e.getMessage());
-                                    s.getWarnings().add(new Warning(e));
-                                    repo.update(s);
-                                }
-                            }
-                        }
-                        if (options.wordIDOptions.addNew) {
-                            allMappings.export(options.mappingFile);
-                        }
+                        processWordIds(project, options.wordIDOptions.addNew, options.mappingFile, allMappings);
                     }
                 }
                 if (options.tokenOptions != null) {
                     if (options.tokenOptions.doToken) {
-                        logger.info("Doing Tokenization");
-                        // tokenize
-                        var db = project.getDB();
-                        var repo = db.getRepository(Sentence.class);
-                        var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
-                        for (Sentence s : documents) {
-                            // do serialize
-                            if (s.getType() == Sentence.Type.NONCOMMENT) {
-                                try {
-                                    List<TokenInstance> tokens = allMappings.getTokenizer().tokenize(s.getWordIds());
-                                    s.setTokens(tokens);
-                                    repo.update(s);
-                                } catch (TokenizerException te) {
-                                    logger.warn(te.getMessage());
-                                    var context = (TokenizerContext)te.getContext();
-                                    logger.warn("Unable to tokenize \"{}\" at **{}({})**", s.getText(), allMappings.getSerializer().unconvert(context.getCurrentWord()), context.getWordIndex());
-                                    var warning = new Warning(te);
-                                    s.getWarnings().add(warning);
-                                    repo.update(s);
-                                }
-                            }
-                        }
-                        if (options.tokenOptions.normalize) {
-                            logger.info("Normalizing.");
-                            // find and add acronyms
-                            logger.info("Finding Acronyms.");
-                            AcronymFinder.initializeAcronyms(project);
-                            AcronymFinder.findAcronyms(project, allMappings.getSerializer());
-                            var added = AcronymFinder.addAcronymsToMapping(project, allMappings.getSerializer());
-                            if (added) {
-                                allMappings.export(options.mappingFile);
-                            }
-                            // normalize acronyms
-                            logger.info("Normalizing Acronyms.");
-                            AcronymNormalizer.normalizeAcronyms(project, allMappings.getSerializer());
-                            // normalize bit accesses
-                            logger.info("Normalizing Bit Accesses.");
-                            BitAccessNormalizer.normalizeBitAccesses(project, allMappings.getFrameFinder(), allMappings.getSerializer());
-                        }
+                        processTokens(project, allMappings, options.tokenOptions.normalize, options.mappingFile);
                     }
                 }
                 if (options.semanticExpressionOptions != null) {
                     if (options.semanticExpressionOptions.doSemanticExpression) {
-                        logger.info("Finding Semantic Expressions");
-                        var db = project.getDB();
-                        var repo = db.getRepository(Sentence.class);
-                        var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
-                        for (Sentence s : documents) {
-                            try {
-                                var semexpr = allMappings.getSemanticParser().findSemanticExpression(s.getTokens(), allMappings.getFrameFinder());
-                                if (semexpr.isPresent()) {
-                                    var se = semexpr.get();
-                                    var seTTo = getSemanticExpressionTokenText(se, allMappings);
-                                    List<List<String>> seTT = null;
-                                    if (seTTo.isPresent()) {
-                                        seTT = seTTo.get();
-                                        se.setTokenText(seTT);
-                                    }
-                                    s.setSemanticExpression(se);
-                                    if (logger.isDebugEnabled()) {
-                                        if (seTT == null) {
-                                            logger.warn("Sentence {} has no semantic expression!", s.getSentenceId());
-                                        } else {
-                                            logger.debug("{} -> {} ({})", s.getText(), s.getSemanticExpression(), seTT);
-                                            var test = s.getSemanticExpression().getAllFrames()
-                                                    .stream()
-                                                    .map(frame -> frame.getTokens().toString())
-                                                    .collect(Collectors.toList());
-                                            logger.info("{} -> {} ({})", s.getText(), s.getSemanticExpression(), test);
-                                        }
-                                    }
-                                    repo.update(s);
-                                }
-                            } catch (FrameException e) {
-                                logger.warn(s.getText());
-                                logger.warn(e.getMessage());
-                                s.getWarnings().add(new Warning(e));
-                                repo.update(s);
-                            }
-                        }
+                        processSemanticExpressions(project, allMappings);
                     }
                 }
                 if (options.irOptions != null) {
                     if (options.irOptions.doGetIr) {
-                        logger.info("Finding Intermediate Representation");
-                        var db = project.getDB();
-                        var repo = db.getRepository(Sentence.class);
-                        var documents = repo.find(ObjectFilters.eq("type", Sentence.Type.NONCOMMENT), FindOptions.sort("sentenceId", SortOrder.Ascending));
-                        for (Sentence s : documents) {
-                            var se = s.getSemanticExpression();
-                            if (se != null) {
-                                try {
-                                    var ir = IRFinder.findIR(se, allMappings);
-                                    s.setIr(ir);
-                                    repo.update(s);
-                                } catch (IRException e) {
-                                    logger.warn("For Sentence: {}", s.getText());
-                                    logger.warn(e.getMessage());
-                                    s.getWarnings().add(new Warning(e));
-                                    repo.update(s);
-                                }
-                            } else {
-                                logger.info("No SE for sentence {}", s.getSentenceId());
-                            }
-                        }
+                        processIR(project, allMappings);
                     }
                 }
                 if (options.debugOptions != null) {
@@ -267,15 +351,7 @@ public class OptionHandler {
                     } else if (options.debugOptions.doShowComments) {
                         DatasheetBOW.debug_file_comments(project);
                     } else if (options.debugOptions.doShowNonComments) {
-                        var db = project.getDB();
-                        var repo = db.getRepository(Sentence.class);
-                        var documents = repo.find(FindOptions.sort("sentenceId", SortOrder.Ascending));
-                        for (Sentence s : documents) {
-                            // do serializee
-                            if (s.getType() == Sentence.Type.NONCOMMENT) {
-                                logger.info("{}", s.getText());
-                            }
-                        }
+                        DatasheetBOW.debug_file_noncomments(project);
                     } else if (options.debugOptions.doShowNonCommentsMatches) {
                         DatasheetBOW.debug_file_questionable(project);
                     } else if (options.debugOptions.doShowMatches) {
@@ -385,7 +461,13 @@ public class OptionHandler {
         }
     }
 
-    public static Optional<List<List<String>>> getSemanticExpressionTokenText(SemanticExpression se, AllMappings allMappings) {
+    /**
+     * Helper method to convert a semantic expression into a printable format for debugging.
+     * @param se
+     * @param allMappings
+     * @return
+     */
+    private static Optional<List<List<String>>> getSemanticExpressionTokenText(SemanticExpression se, AllMappings allMappings) {
         if (se != null) {
             var tokens = se.getAllFrames().stream()
                     .map(FrameInstance::getTokens)
