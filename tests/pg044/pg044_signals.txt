@@ -4,7 +4,7 @@ Vsync
 Hsync
 Vbank
 Hblank
-Data Enable::DE
+Data Enable/Data Enable Register::DER
 Video Timing Controller::VTC
 tready
 frame buffer/frame buffer register/frame buffer fifo::fbr

@@ -7,6 +7,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +37,7 @@ public class DatasheetBOW {
             Pattern.compile("(^| )it (does|doesn.t|does not) (clear|set)"),
             Pattern.compile("(overwrite|overwrites)"),
             Pattern.compile("waits for "),
-            Pattern.compile("should be equal to"),
+            Pattern.compile("should be equal to "),
             Pattern.compile("(^| )(upon|on|during) reset"),
             Pattern.compile("(^| )(can|cannot|can.t) be (cleared|set|asserted|deasserted)"),
             Pattern.compile("sampled (at|when|if|during)"),
@@ -41,7 +45,7 @@ public class DatasheetBOW {
             Pattern.compile("(read|write)-only"),
             Pattern.compile("(read|write) only"),
             Pattern.compile("is ignored"),
-            Pattern.compile("written to"),
+            Pattern.compile("written to "),
             Pattern.compile("not written"),
             Pattern.compile("will reset .+?"),
             Pattern.compile("(^| )(set|asserted|driven) (low|high)"),
@@ -56,14 +60,14 @@ public class DatasheetBOW {
             Pattern.compile("(maximum|max|minimum|min) (number|value)"),
             Pattern.compile("by (setting|clearing|asserting|deasserting)"),
             Pattern.compile("when .+? (true|false)"),
-            Pattern.compile("setting .+? to"),
+            Pattern.compile("setting .+? to "),
             Pattern.compile("per clock cycle"),
-            Pattern.compile("wired to"),
+            Pattern.compile("wired to "),
             Pattern.compile("values range (from|between)"),
-            Pattern.compile("value (on|of) .+? is"),
+            Pattern.compile("value (on|of) .+? is "),
             Pattern.compile("will clear "),
-            Pattern.compile("is unaffected by"),
-            Pattern.compile("restrictions .+? be able to"),
+            Pattern.compile("is unaffected by "),
+            Pattern.compile("restrictions .+? be able to "),
             Pattern.compile("can go active"),
             Pattern.compile(".+? is active"),
             Pattern.compile("possible values"),
@@ -74,13 +78,15 @@ public class DatasheetBOW {
             Pattern.compile("padding .+? (bits|bus|register|value)"),
             Pattern.compile("(^| |-)(asserts|reassert|reasserts|assert|deassert|deasserts)"),
             Pattern.compile("(^| )(is|is not|are|are not) (cleared|set|asserted|deasserted|enabled|disabled|sent|transmitted|checked)"),
-            Pattern.compile(String.format("(^| )%s set to", conditions)),
+            Pattern.compile(String.format("(^| )%s set to ", conditions)),
             Pattern.compile(String.format("(^| )set .*? %s", conditions)),
             Pattern.compile("(hardwired|tied-off|tie-off|constant) to"),
             Pattern.compile("active (low|high)"),
             Pattern.compile("active-(low|high)"),
             Pattern.compile(String.format("(^| )%s .+? (is|must be|shall be) ", signals)),
     };
+
+    private static Pattern signalNamesRegex;
 
     public enum Action {
         PERCENTAGE, CLASSIFY, CLASSIFY_CAS, CLASSIFY_CAS2TXT, MOST_USED, DEBUG_COMMENTS, DEBUG_QUESTIONABLE, NONE
@@ -120,7 +126,9 @@ public class DatasheetBOW {
                 .collect(Collectors.joining("|"));
         var acronyms = signals.stream()
                 .map(Signal::getAcronyms)
+                .filter(Objects::nonNull)
                 .map(a -> String.join("|", a))
+                .distinct()
                 .collect(Collectors.joining("|"));
         if (!signalNames.isEmpty() && !signalNames.isBlank())  {
             var regexString = "(" + signalNames;
@@ -128,7 +136,10 @@ public class DatasheetBOW {
                 regexString += "|" + acronyms;
             }
             regexString += ")";
-            return Optional.of(Pattern.compile(regexString));
+            regexString = "(^| )" + regexString;
+            var pattern = Pattern.compile(regexString);
+            logger.info(pattern.toString());
+            return Optional.of(pattern);
         } else {
             return Optional.empty();
         }
@@ -144,10 +155,12 @@ public class DatasheetBOW {
      * @return
      */
     public static boolean is_questionable__with_signal_names__(Project project, String sentence) {
-        var signalRegex = getSignalRegex(project);
-        if (signalRegex.isPresent()) {
-            var signalRegexActual = signalRegex.get();
-            var match = signalRegexActual.matcher(sentence);
+        if (signalNamesRegex == null) {
+            var regex = getSignalRegex( project );
+            regex.ifPresent( pattern -> signalNamesRegex = pattern );
+        }
+        if (signalNamesRegex != null) {
+            var match = signalNamesRegex.matcher(sentence);
             if (match.find()) {
                 return true;
             } else {
@@ -168,10 +181,12 @@ public class DatasheetBOW {
      * @return
      */
     public static boolean is_questionable__only_signal_names__(Project project, String sentence) {
-        var signalRegex = getSignalRegex(project);
-        if (signalRegex.isPresent()) {
-            var signalRegexActual = signalRegex.get();
-            var match = signalRegexActual.matcher(sentence);
+        if (signalNamesRegex == null) {
+            var regex = getSignalRegex( project );
+            regex.ifPresent( pattern -> signalNamesRegex = pattern );
+        }
+        if (signalNamesRegex != null) {
+            var match = signalNamesRegex.matcher(sentence);
             return match.find();
         }
         return false;
@@ -272,11 +287,29 @@ public class DatasheetBOW {
                 .forEach(s -> System.out.println(s.getText()));
     }
 
+    public static void debug_file_noncomments(final Project project, File output) throws IOException {
+        PrintWriter pw = new PrintWriter(new FileWriter(output));
+        project.getSentences()
+                .toList().stream()
+                .filter(s -> s.getType() == Sentence.Type.NONCOMMENT)
+                .forEach(s -> pw.println(s.getText()));
+        pw.flush();
+    }
+
     public static void debug_file_comments(final Project project) {
         project.getSentences()
                 .toList().stream()
                 .filter(s -> s.getType() == Sentence.Type.COMMENT)
                 .forEach(s -> System.out.println(s.getText()));
+    }
+
+    public static void debug_file_comments(final Project project, File output) throws IOException {
+        PrintWriter pw = new PrintWriter(new FileWriter(output));
+        project.getSentences()
+                .toList().stream()
+                .filter(s -> s.getType() == Sentence.Type.COMMENT)
+                .forEach(s -> pw.println(s.getText()));
+        pw.flush();
     }
 
     public static void debug_file_matches(final Project project) {

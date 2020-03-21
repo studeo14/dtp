@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 
 class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -40,8 +43,16 @@ class Main {
             if (options.verbose) {
                 Configurator.setAllLevels("edu.vt", Level.DEBUG);
             }
-            OptionHandler.handle(options);
-            // open and continue
+            // handle
+            if (options.debugOptions != null && options.debugOptions.doShowTime) {
+                Instant start = Instant.now();
+                OptionHandler.handle(options);
+                Instant end = Instant.now();
+                var duration = Duration.between( start, end );
+                logger.info("Execution Duration: {} [{} (ms)]", duration, duration.toMillis());
+            } else {
+                OptionHandler.handle(options);
+            }
         }
     }
 }

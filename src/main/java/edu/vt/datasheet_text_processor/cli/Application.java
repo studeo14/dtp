@@ -76,12 +76,12 @@ public class Application {
     public ExperimentalOptions experimentalOptions;
     public static class ExperimentalOptions {
         public enum ClassificationScheme {nosig, withsig, sigonly};
-        @Option(names={"--classfication-scheme"}, defaultValue = "nosig", description = "define the classification scheme to use. Valid Options: ${COMPLETION-CANDIDATES}. Default: ${DEFAULT-VALUE}")
-        public ClassificationScheme classificationScheme;
+        @Option(names={"--classification-scheme"}, defaultValue = "nosig", description = "define the classification scheme to use. Valid Options: ${COMPLETION-CANDIDATES}. Default: ${DEFAULT-VALUE}")
+        public ClassificationScheme classificationScheme = ClassificationScheme.nosig;
     }
 
     // debugging options
-    @ArgGroup(exclusive = true, heading = "Debugging options for classification%n")
+    @ArgGroup(exclusive = false, heading = "Debugging options for classification%n")
     public DebugOptions debugOptions;
 
     public static class DebugOptions {
@@ -97,6 +97,8 @@ public class Application {
         public boolean doShowComments;
         @Option(names = {"--show-non-comments"}, description = "print out only the non-comments")
         public boolean doShowNonComments;
+        @Option(names = {"--print-non-comments"}, description = "print out only the non-comments to the given file")
+        public File doPrintNonComments;
         @Option(names = {"--show-non-comments-matches"}, description = "print out only the non-comments with their pattern matches")
         public boolean doShowNonCommentsMatches;
         @Option(names = {"--show-wordids"}, description = "print out the word id streams")
@@ -115,6 +117,8 @@ public class Application {
         public boolean doShowSemanticExpressions;
         @Option(names = {"--show-ir"}, description = "print out the ir")
         public boolean doShowIR;
+        @Option(names={"--time"}, description = "show execution time")
+        public boolean doShowTime;
     }
 
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
