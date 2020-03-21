@@ -103,8 +103,9 @@ public class OptionHandler {
      * Classify the sentences into comment and questionable. The method used aims to be greedy and possible overcapture
      * the given sentences.
      * @param project
+     * @param classificationScheme
      */
-    public static void classifySentences(Project project) {
+    public static void classifySentences(Project project, Application.ExperimentalOptions.ClassificationScheme classificationScheme) {
         // create classify table
         var db = project.getDB();
         var repo = db.getRepository(Sentence.class);
@@ -114,7 +115,18 @@ public class OptionHandler {
                 continue;
             }
             // do classify
-            var isComment = DatasheetBOW.is_questionable(s.getText());
+            var isComment = true;
+            switch (classificationScheme) {
+                case nosig:
+                    isComment = DatasheetBOW.is_questionable(s.getText());
+                    break;
+                case withsig:
+                    isComment = DatasheetBOW.is_questionable__with_signal_names__(project, s.getText());
+                    break;
+                case sigonly:
+                    isComment = DatasheetBOW.is_questionable__only_signal_names__(project, s.getText());
+                    break;
+            }
             if (isComment) {
                 s.setType(Sentence.Type.NONCOMMENT);
             } else {
@@ -312,7 +324,7 @@ public class OptionHandler {
                     processSignalNames(project, options.signalNames);
                 }
                 if (options.doClassify) {
-                    classifySentences(project);
+                    classifySentences(project, options.experimentalOptions.classificationScheme);
                 }
                 if (options.wordIDOptions != null) {
                     if (options.wordIDOptions.doWordId) {

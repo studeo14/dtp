@@ -2,6 +2,7 @@ package edu.vt.datasheet_text_processor.classification;
 
 import edu.vt.datasheet_text_processor.Project;
 import edu.vt.datasheet_text_processor.Sentence;
+import edu.vt.datasheet_text_processor.signals.Signal;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class DatasheetBOW {
     private static final Logger logger = LoggerFactory.getLogger(DatasheetBOW.class);
@@ -101,6 +103,78 @@ public class DatasheetBOW {
         // sort and print
         matchCount.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .forEach(entry -> System.out.println(String.format("%d :: %s", entry.getValue(), entry.getKey().pattern())));
+    }
+
+    /**
+     * Utility method to construct a regex from the current signals in the project.
+     * @param project
+     * @return
+     */
+    public static Optional<Pattern> getSignalRegex(Project project) {
+        // create search regex for signal names
+        var db = project.getDB();
+        var signalRepo = db.getRepository(Signal.class);
+        var signals = signalRepo.find().toList();
+        var signalNames = signals.stream()
+                .map(Signal::getName)
+                .collect(Collectors.joining("|"));
+        var acronyms = signals.stream()
+                .map(Signal::getAcronyms)
+                .map(a -> String.join("|", a))
+                .collect(Collectors.joining("|"));
+        if (!signalNames.isEmpty() && !signalNames.isBlank())  {
+            var regexString = "(" + signalNames;
+            if (!acronyms.isEmpty() && !acronyms.isBlank())  {
+                regexString += "|" + acronyms;
+            }
+            regexString += ")";
+            return Optional.of(Pattern.compile(regexString));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Experimental function.
+     *
+     * First checks if a signal name is present in the sentence. If so then automatically acccepts the sentence as
+     * questionable. Otherwise uses normal classification methods.
+     * @param project
+     * @param sentence
+     * @return
+     */
+    public static boolean is_questionable__with_signal_names__(Project project, String sentence) {
+        var signalRegex = getSignalRegex(project);
+        if (signalRegex.isPresent()) {
+            var signalRegexActual = signalRegex.get();
+            var match = signalRegexActual.matcher(sentence);
+            if (match.find()) {
+                return true;
+            } else {
+                return is_questionable(sentence);
+            }
+        } else {
+            return is_questionable(sentence);
+        }
+    }
+
+    /**
+     * Experimental function.
+     *
+     * Only checks if a signal name is present in the sentence. If so then automatically acccepts the sentence as
+     * questionable.
+     * @param project
+     * @param sentence
+     * @return
+     */
+    public static boolean is_questionable__only_signal_names__(Project project, String sentence) {
+        var signalRegex = getSignalRegex(project);
+        if (signalRegex.isPresent()) {
+            var signalRegexActual = signalRegex.get();
+            var match = signalRegexActual.matcher(sentence);
+            return match.find();
+        }
+        return false;
     }
 
     /**

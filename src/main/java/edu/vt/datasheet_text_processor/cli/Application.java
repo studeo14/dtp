@@ -71,6 +71,15 @@ public class Application {
         public boolean doGetIr;
     }
 
+    // experimental optimizations ect (all off by default)
+    @ArgGroup(exclusive = false, heading = "Experimental Options%n")
+    public ExperimentalOptions experimentalOptions;
+    public static class ExperimentalOptions {
+        public enum ClassificationScheme {nosig, withsig, sigonly};
+        @Option(names={"--classfication-scheme"}, defaultValue = "nosig", description = "define the classification scheme to use. Valid Options: ${COMPLETION-CANDIDATES}. Default: ${DEFAULT-VALUE}")
+        public ClassificationScheme classificationScheme;
+    }
+
     // debugging options
     @ArgGroup(exclusive = true, heading = "Debugging options for classification%n")
     public DebugOptions debugOptions;
