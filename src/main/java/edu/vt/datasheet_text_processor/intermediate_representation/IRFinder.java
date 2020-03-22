@@ -145,7 +145,7 @@ public class IRFinder {
                         logger.debug("Trying Frame: {}", originalNonCompoundTokens);
                         var frameFailed = false;
                         try {
-                            var tryFrame = allMappings.getFrameFinder().getNextFrame(originalNonCompoundTokens.listIterator());
+                            var tryFrame = allMappings.getFrameFinder().getNextFrame(originalNonCompoundTokens.listIterator(), false );
                             frameFailed = tryFrame.isEmpty();
                             if (!frameFailed) {
                                 switch (compoundToken.getId()) {
@@ -334,7 +334,7 @@ public class IRFinder {
                 logger.debug("Trying Frame: {}", originalNonTemporalTokens);
                 var frameFailed = false;
                 try {
-                    var tryFrame = allMappings.getFrameFinder().getNextFrame(originalNonTemporalTokens.listIterator());
+                    var tryFrame = allMappings.getFrameFinder().getNextFrame(originalNonTemporalTokens.listIterator(), false );
                     frameFailed = tryFrame.isEmpty();
                     if (!frameFailed) {
                         sb.append("(");

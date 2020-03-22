@@ -7,6 +7,7 @@ import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,21 +20,24 @@ public class SemanticParser {
         this.semanticModel = semanticModel;
     }
 
-    public Optional<SemanticExpression> findSemanticExpression(List<TokenInstance> tokens, FrameFinder frameFinder) throws FrameException {
-        var frames = frameFinder.findAllFrames(tokens);
+    public Optional<SemanticExpression> findSemanticExpression ( List< TokenInstance > tokens, FrameFinder frameFinder, boolean preferShorterFrames ) throws FrameException {
+        var frames = frameFinder.findAllFrames(tokens, preferShorterFrames );
         if (frames.isEmpty()) {
             return Optional.empty();
         } else {
             var semexpr = new SemanticExpression();
             semexpr.setAllFrames(frames);
+            var modifiers = new ArrayList<Integer>();
             for (var frame: frames) {
                 if (semanticModel.getAntecedents().contains(frame.getId())) {
                     semexpr.getAntecedents().add(frame);
                 } else if (semanticModel.getConsequents().contains(frame.getId())) {
                     semexpr.getConsequents().add(frame);
+                } else  if (semanticModel.getModifiers().contains( frame.getId() ) ) {
+                    modifiers.add(frame.getId());
                 }
             }
-            if (semexpr.getConsequents().isEmpty() && semexpr.getAntecedents().isEmpty()) {
+            if (semexpr.getConsequents().isEmpty() && semexpr.getAntecedents().isEmpty() && modifiers.isEmpty() ) {
                 var message = "No Antecedents or Consequents Found.";
                 throw new FrameException(message, new SemanticExpressionContext(message, tokens, frames, semexpr));
             } else if (semexpr.getConsequents().isEmpty() && !semexpr.getAntecedents().isEmpty()) {

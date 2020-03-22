@@ -29,13 +29,13 @@ public class FrameFinder {
     }
 
 
-    public List<FrameInstance> findAllFrames(List<TokenInstance> tokens) throws FrameException {
+    public List<FrameInstance> findAllFrames ( List< TokenInstance > tokens, boolean preferShorterFrames ) throws FrameException {
         ArrayList<FrameInstance> retVal = new ArrayList<>();
         logger.debug("Start new sentence frame finding.");
         logger.debug("Tokens: {}", tokens.stream().map(TokenInstance::getId).collect(Collectors.toList()));
         var iter = tokens.listIterator();
         while(iter.hasNext()) {
-            var frame = getNextFrame(iter);
+            var frame = getNextFrame(iter, preferShorterFrames );
             if (frame.isPresent()) {
                 var numLit = frame.get().getLiterals().size();
                 var expected = frameModel.getGeneric().numLiterals(frame.get().getId());
@@ -65,7 +65,7 @@ public class FrameFinder {
 
     private enum FindState {BEGIN, INSIDE, END, END_ON_LITERAL}
 
-    public Optional<FrameInstance> getNextFrame(ListIterator<TokenInstance> iter) throws FrameException {
+    public Optional<FrameInstance> getNextFrame ( ListIterator< TokenInstance > iter, boolean preferShorterFrames ) throws FrameException {
         var current = new FrameInstance();
         var tokenList = new ArrayList<TokenInstance>();
         var literalList = new ArrayList<TokenInstance>();
@@ -129,41 +129,81 @@ public class FrameFinder {
                     // get current
                     var currentToken = iter.next();
                     logger.debug("Inside Frame: CN: {}, CT:{}", currentNode.getTokenId(), currentToken.getId());
-                    if (currentNode.getChildren().containsKey(currentToken.getId())) { // if has direct child
-                        if (currentToken.getId().equals(Constants.LITERAL_TOKEN_ID)) {
-                            logger.debug("Direct Placeholder Child");
-                        } else {
-                            logger.debug("Direct Child");
-                        }
-                        tokenList.add(currentToken);
-                        currentNode = currentNode.getChildren().get(currentToken.getId());
-                    } else if (currentNode.getChildren().containsKey(Constants.LITERAL_TOKEN_ID)) { // if has a "placeholder" child
-                        logger.debug("Placeholder Child");
-                        literalList = new ArrayList<>();
-                        literalList.add(currentToken);
-                        var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
-                        cToken.setCompoundToken(new CompoundToken(literalList));
-                        tokenList.add(cToken);
-                        currentNode = currentNode.getChildren().get(Constants.LITERAL_TOKEN_ID);
-                    } else if (currentNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)) { // if has no more children
-                        iter.previous();
-                        var id = ((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId();
-                        logger.debug("Leaf Child with ID: {}", id);
-                        current.setId(id);
-                        // check if ending on a "placeholder" token
-                        if (currentNode.getTokenId().equals(Constants.LITERAL_TOKEN_ID)) {
-                            // remove earlier literal
-                            tokenList.remove(tokenList.size() - 1);
+                    // if experimental option is on (default not)
+                    if (preferShorterFrames) {
+                        if (currentNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)) { // if has no more children
                             iter.previous();
-                            state = FindState.END_ON_LITERAL;
-                        } else { // if not
-                            state = FindState.END;
+                            var id = ((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId();
+                            logger.debug("Leaf Child with ID: {}", id);
+                            current.setId(id);
+                            // check if ending on a "placeholder" token
+                            if (currentNode.getTokenId().equals(Constants.LITERAL_TOKEN_ID)) {
+                                // remove earlier literal
+                                tokenList.remove(tokenList.size() - 1);
+                                iter.previous();
+                                state = FindState.END_ON_LITERAL;
+                            } else { // if not
+                                state = FindState.END;
+                            }
+                        } else if (currentNode.getChildren().containsKey(Constants.LITERAL_TOKEN_ID)) { // if has a "placeholder" child
+                            logger.debug("Placeholder Child");
+                            literalList = new ArrayList<>();
+                            literalList.add(currentToken);
+                            var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
+                            cToken.setCompoundToken(new CompoundToken(literalList));
+                            tokenList.add(cToken);
+                            currentNode = currentNode.getChildren().get(Constants.LITERAL_TOKEN_ID);
+                        } else if (currentNode.getChildren().containsKey(currentToken.getId())) { // if has direct child
+                            if (currentToken.getId().equals(Constants.LITERAL_TOKEN_ID)) {
+                                logger.debug("Direct Placeholder Child");
+                            } else {
+                                logger.debug("Direct Child");
+                            }
+                            tokenList.add(currentToken);
+                            currentNode = currentNode.getChildren().get(currentToken.getId());
+                        } else { // this means that no frame can be found here.
+                            iter.previous();
+                            var validOptions = currentNode.getChildren().keySet();
+                            var message = String.format("No valid child found. There is supposed to be something at token #%d. Valid options: %d:%s.", iter.nextIndex(), currentNode.getTokenId(), validOptions);
+                            throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
                         }
-                    } else { // this means that no frame can be found here.
-                        iter.previous();
-                        var validOptions = currentNode.getChildren().keySet();
-                        var message = String.format("No valid child found. There is supposed to be something at token #%d. Valid options: %d:%s.", iter.nextIndex(), currentNode.getTokenId(), validOptions);
-                        throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
+                    } else { //default option
+                        if (currentNode.getChildren().containsKey(currentToken.getId())) { // if has direct child
+                            if (currentToken.getId().equals(Constants.LITERAL_TOKEN_ID)) {
+                                logger.debug("Direct Placeholder Child");
+                            } else {
+                                logger.debug("Direct Child");
+                            }
+                            tokenList.add(currentToken);
+                            currentNode = currentNode.getChildren().get(currentToken.getId());
+                        } else if (currentNode.getChildren().containsKey(Constants.LITERAL_TOKEN_ID)) { // if has a "placeholder" child
+                            logger.debug("Placeholder Child");
+                            literalList = new ArrayList<>();
+                            literalList.add(currentToken);
+                            var cToken = new TokenInstance(TokenInstance.Type.COMPOUND, null, Constants.LITERAL_TOKEN_ID);
+                            cToken.setCompoundToken(new CompoundToken(literalList));
+                            tokenList.add(cToken);
+                            currentNode = currentNode.getChildren().get(Constants.LITERAL_TOKEN_ID);
+                        } else if (currentNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)) { // if has no more children
+                            iter.previous();
+                            var id = ((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId();
+                            logger.debug("Leaf Child with ID: {}", id);
+                            current.setId(id);
+                            // check if ending on a "placeholder" token
+                            if (currentNode.getTokenId().equals(Constants.LITERAL_TOKEN_ID)) {
+                                // remove earlier literal
+                                tokenList.remove(tokenList.size() - 1);
+                                iter.previous();
+                                state = FindState.END_ON_LITERAL;
+                            } else { // if not
+                                state = FindState.END;
+                            }
+                        } else { // this means that no frame can be found here.
+                            iter.previous();
+                            var validOptions = currentNode.getChildren().keySet();
+                            var message = String.format("No valid child found. There is supposed to be something at token #%d. Valid options: %d:%s.", iter.nextIndex(), currentNode.getTokenId(), validOptions);
+                            throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
+                        }
                     }
                     break;
                 }

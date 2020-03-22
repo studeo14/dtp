@@ -244,7 +244,7 @@ public class OptionHandler {
         var documents = repo.find( ObjectFilters.eq( "type", Sentence.Type.NONCOMMENT ), FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
         for ( Sentence s : documents ) {
             try {
-                var semexpr = allMappings.getSemanticParser().findSemanticExpression( s.getTokens(), allMappings.getFrameFinder() );
+                var semexpr = allMappings.getSemanticParser().findSemanticExpression( s.getTokens(), allMappings.getFrameFinder(), preferShorterFrames);
                 if ( semexpr.isPresent() ) {
                     var se = semexpr.get();
                     var seTTo = getSemanticExpressionTokenText( se, allMappings );
