@@ -78,6 +78,13 @@ public class Application {
         public enum ClassificationScheme {nosig, withsig, sigonly};
         @Option(names={"--classification-scheme"}, defaultValue = "nosig", description = "define the classification scheme to use. Valid Options: ${COMPLETION-CANDIDATES}. Default: ${DEFAULT-VALUE}")
         public ClassificationScheme classificationScheme = ClassificationScheme.nosig;
+
+        @Option(names="--prefer-shorter-tokens", description = "prefer shorter tokens when tokenizing")
+        public boolean preferShorterTokens;
+        @Option(names="--prefer-shorter-frames", description = "prefer shorter frames")
+        public boolean preferShorterFrames;
+        @Option(names={"--show-ir-counts"}, description = "show execution time")
+        public boolean doShowIRCounts;
     }
 
     // debugging options
@@ -119,6 +126,10 @@ public class Application {
         public boolean doShowIR;
         @Option(names={"--time"}, description = "show execution time")
         public boolean doShowTime;
+        @Option(names={"--show-average-tokens"}, description = "show execution time")
+        public boolean doShowAverageTokens;
+        @Option(names={"--show-average-frames"}, description = "show execution time")
+        public boolean doShowAverageFrames;
     }
 
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")

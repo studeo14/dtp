@@ -181,7 +181,7 @@ public class Serializer {
                 base = addNewMapping( input, sentenceRef );
             } else {
                 var message = String.format("No existing mapping found for '%s in \"%s\"", input, sentenceRef);
-                logger.info(message);
+                logger.debug(message);
                 throw new SerializerException(message, new SerializerContext(message, input, sentenceRef));
             }
         }

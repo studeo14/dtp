@@ -5,7 +5,9 @@
         "stream": "in addition"
     },
     "1": {
-        "aliases": [],
+        "aliases": [
+            "there is"
+        ],
         "id": 1,
         "stream": "there are"
     },
@@ -77,7 +79,7 @@
     "14": {
         "aliases": [],
         "id": 14,
-        "stream": "at this time"
+        "stream": "in"
     },
     "15": {
         "aliases": [],
@@ -291,7 +293,7 @@
     "52": {
         "aliases": [],
         "id": 52,
-        "stream": "in"
+        "stream": "ie"
     },
     "53": {
         "aliases": [],
@@ -380,7 +382,9 @@
             "is required to be",
             "should be",
             "shall be",
-            "must"
+            "must",
+            "is required",
+            "there must be"
         ],
         "id": 69,
         "stream": "must be"
@@ -409,5 +413,27 @@
         "aliases": [],
         "id": 74,
         "stream": "during"
+    },
+    "75": {
+        "aliases": [],
+        "id": 75,
+        "stream": "should"
+    },
+    "76": {
+        "aliases": [],
+        "id": 76,
+        "stream": "should not"
+    },
+    "77": {
+        "aliases": [
+            "to be able to"
+        ],
+        "id": 77,
+        "stream": "in order to"
+    },
+    "78": {
+        "aliases": [],
+        "id": 78,
+        "stream": "to be"
     }
 }

@@ -186,9 +186,10 @@ public class OptionHandler {
      * @param allMappings
      * @param normalize
      * @param mappingFile
+     * @param preferShorterTokens
      * @throws IOException
      */
-    public static void processTokens ( Project project, AllMappings allMappings, boolean normalize, File mappingFile ) throws IOException {
+    public static void processTokens ( Project project, AllMappings allMappings, boolean normalize, File mappingFile, boolean preferShorterTokens ) throws IOException {
         logger.info( "Doing Tokenization" );
         // tokenize
         var db = project.getDB();
@@ -198,7 +199,7 @@ public class OptionHandler {
             // do serialize
             if ( s.getType() == Sentence.Type.NONCOMMENT ) {
                 try {
-                    List< TokenInstance > tokens = allMappings.getTokenizer().tokenize( s.getWordIds() );
+                    List< TokenInstance > tokens = allMappings.getTokenizer().tokenize( s.getWordIds(), preferShorterTokens );
                     s.setTokens( tokens );
                     repo.update( s );
                 } catch ( TokenizerException te ) {
@@ -232,11 +233,11 @@ public class OptionHandler {
 
     /**
      * Process the tokens converting them to a bag of semantic frames.
-     *
-     * @param project
+     *  @param project
      * @param allMappings
+     * @param preferShorterFrames
      */
-    public static void processSemanticExpressions ( Project project, AllMappings allMappings ) {
+    public static void processSemanticExpressions ( Project project, AllMappings allMappings, boolean preferShorterFrames ) {
         logger.info( "Finding Semantic Expressions" );
         var db = project.getDB();
         var repo = db.getRepository( Sentence.class );
@@ -279,11 +280,11 @@ public class OptionHandler {
     /**
      * Further process the semantic expression to reduce compound expressions, temporal opereators, and other complex
      * cases into unified frames. Then convert the frames into IR.
-     *
-     * @param project
+     *  @param project
      * @param allMappings
+     * @param doShowIRCounts
      */
-    public static void processIR ( Project project, AllMappings allMappings ) {
+    public static void processIR ( Project project, AllMappings allMappings, boolean doShowIRCounts ) {
         logger.info( "Finding Intermediate Representation" );
         var db = project.getDB();
         var repo = db.getRepository( Sentence.class );
@@ -326,6 +327,7 @@ public class OptionHandler {
             } else {
                 // init mappings
                 var allMappings = new ObjectMapper().readValue( options.mappingFile, AllMappings.class );
+                // init experimental options to default values (disabled) if not specified
                 if ( options.experimentalOptions == null ) {
                     options.experimentalOptions = new Application.ExperimentalOptions();
                 }
@@ -344,17 +346,17 @@ public class OptionHandler {
                 }
                 if ( options.tokenOptions != null ) {
                     if ( options.tokenOptions.doToken ) {
-                        processTokens( project, allMappings, options.tokenOptions.normalize, options.mappingFile );
+                        processTokens( project, allMappings, options.tokenOptions.normalize, options.mappingFile, options.experimentalOptions.preferShorterTokens );
                     }
                 }
                 if ( options.semanticExpressionOptions != null ) {
                     if ( options.semanticExpressionOptions.doSemanticExpression ) {
-                        processSemanticExpressions( project, allMappings );
+                        processSemanticExpressions( project, allMappings, options.experimentalOptions.preferShorterFrames );
                     }
                 }
                 if ( options.irOptions != null ) {
                     if ( options.irOptions.doGetIr ) {
-                        processIR( project, allMappings );
+                        processIR( project, allMappings, options.experimentalOptions.doShowIRCounts );
                     }
                 }
                 if ( options.debugOptions != null ) {
@@ -491,6 +493,47 @@ public class OptionHandler {
                         for ( var s : documents ) {
                             logger.info( "{} -> {}", s.getText(), s.getIr() );
                         }
+                    }
+                    if (options.debugOptions.doShowAverageTokens) {
+                        var db = project.getDB();
+                        var repo = db.getRepository( Sentence.class );
+                        var documents = repo.find(
+                                ObjectFilters.and(
+                                        ObjectFilters.eq( "type", Sentence.Type.NONCOMMENT ),
+                                        ObjectFilters.not( ObjectFilters.eq( "tokens", null ) )
+                                ),
+                                FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
+                        var avg = documents.toList().stream()
+                                .map(Sentence::getTokens)
+                                .mapToInt(List::size)
+                                .average();
+                        logger.info("Average number of tokens: {}", avg);
+                    }
+                    if (options.debugOptions.doShowAverageFrames) {
+                        var db = project.getDB();
+                        var repo = db.getRepository( Sentence.class );
+                        var documents = repo.find(
+                                ObjectFilters.and(
+                                        ObjectFilters.eq( "type", Sentence.Type.NONCOMMENT ),
+                                        ObjectFilters.not( ObjectFilters.eq( "semanticExpression", null ) )
+                                ),
+                                FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
+                        var avgAll = documents.toList().stream()
+                                .map(Sentence::getSemanticExpression)
+                                .map(SemanticExpression::getAllFrames)
+                                .mapToInt(List::size)
+                                .average();
+                        var avgA = documents.toList().stream()
+                                .map(Sentence::getSemanticExpression)
+                                .map(SemanticExpression::getAntecedents)
+                                .mapToInt(List::size)
+                                .average();
+                        var avgC = documents.toList().stream()
+                                .map(Sentence::getSemanticExpression)
+                                .map(SemanticExpression::getConsequents)
+                                .mapToInt(List::size)
+                                .average();
+                        logger.info("Average number of frames: All: {}, Antecedents: {}, Consequents: {}", avgAll, avgA, avgC);
                     }
                 }
                 if ( project.getDB().hasUnsavedChanges() ) {

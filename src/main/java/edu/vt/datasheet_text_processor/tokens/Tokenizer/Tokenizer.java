@@ -62,23 +62,23 @@ public class Tokenizer {
         new ObjectMapper().writeValue(exportFile, tokenModel);
     }
 
-    public List<TokenInstance> tokenize(List<Integer> sentence) throws TokenizerException {
+    public List<TokenInstance> tokenize ( List< Integer > sentence, boolean preferShorterTokens ) throws TokenizerException {
         var iter = sentence.listIterator();
-        return processWordIdStream(iter);
+        return processWordIdStream(iter, preferShorterTokens);
     }
 
     private enum ProcessState {BEGIN, INSIDE, LITERAL, END}
 
-    private List<TokenInstance> processWordIdStream(ListIterator<Integer> iter) throws TokenizerException {
+    private List<TokenInstance> processWordIdStream(ListIterator<Integer> iter, boolean preferShorterTokens) throws TokenizerException {
         ArrayList<TokenInstance> retVal = new ArrayList<>();
         logger.debug("Start new sentence tokenization");
         while(iter.hasNext()) {
-            retVal.add(getNextToken(iter));
+            retVal.add(getNextToken(iter, preferShorterTokens));
         }
         return retVal;
     }
 
-    private TokenInstance getNextToken(ListIterator<Integer> iter) throws TokenizerException {
+    private TokenInstance getNextToken(ListIterator<Integer> iter, boolean preferShorterTokens) throws TokenizerException {
         var current = new TokenInstance(TokenInstance.Type.NA);
         SearchTreeNode currentSearchTreeNode = new SearchTreeNode();
         ProcessState state = ProcessState.BEGIN;
@@ -116,16 +116,34 @@ public class Tokenizer {
                     //      no  - ERROR
                     var currentWord = iter.next();
                     logger.debug("Current Node: {}, CW: {}", currentSearchTreeNode.getWordId(), currentWord);
-                    if (currentSearchTreeNode.getChildren().contains(currentWord)) {
-                        current.getStream().add(currentWord);
-                        currentSearchTreeNode = currentSearchTreeNode.getChildren().get(currentWord);
-                    } else if (currentSearchTreeNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)){
-                        current.setId(((SearchTreeLeafNode)currentSearchTreeNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getTokenId());
-                        state = ProcessState.END;
-                        iter.previous();
+                    // prefer shorter tokens
+                    // if so then end on first available option
+                    if (preferShorterTokens) {
+                        // if leaf
+                        if (currentSearchTreeNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)){
+                            current.setId(((SearchTreeLeafNode)currentSearchTreeNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getTokenId());
+                            state = ProcessState.END;
+                            iter.previous();
+                        } else if (currentSearchTreeNode.getChildren().contains(currentWord)) { // if has child
+                            current.getStream().add(currentWord);
+                            currentSearchTreeNode = currentSearchTreeNode.getChildren().get(currentWord);
+                        } else { // no option available
+                            var message = String.format("Unknown token found at word %d", currentWord);
+                            throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex()));
+                        }
                     } else {
-                        var message = String.format("Unknown token found at word %d", currentWord);
-                        throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex()));
+                        // if has child
+                        if (currentSearchTreeNode.getChildren().contains(currentWord)) {
+                            current.getStream().add(currentWord);
+                            currentSearchTreeNode = currentSearchTreeNode.getChildren().get(currentWord);
+                        } else if (currentSearchTreeNode.getChildren().containsKey(Constants.SEARCH_TREE_LEAF_NODE_ID)){ // if has leaf
+                            current.setId(((SearchTreeLeafNode)currentSearchTreeNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getTokenId());
+                            state = ProcessState.END;
+                            iter.previous();
+                        } else { // no options available
+                            var message = String.format("Unknown token found at word %d", currentWord);
+                            throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex()));
+                        }
                     }
                     break;
                 }
