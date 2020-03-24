@@ -18,6 +18,7 @@ public class FrameInstance {
     private Integer id;
     private List<TokenInstance> tokens;
     private List<List<Integer>> literals;
+    private List< TokenInstance > miscTokens;
 
     public FrameInstance(Integer id, List<TokenInstance> tokens, List<List<Integer>> literals) {
         this.id = id;
@@ -116,5 +117,13 @@ public class FrameInstance {
 
     public void setLiterals(List<List<Integer>> literals) {
         this.literals = literals;
+    }
+
+    public void setMiscTokens ( List< TokenInstance> literalList ) {
+        this.miscTokens = literalList;
+    }
+
+    public List< TokenInstance > getMiscTokens () {
+        return miscTokens;
     }
 }

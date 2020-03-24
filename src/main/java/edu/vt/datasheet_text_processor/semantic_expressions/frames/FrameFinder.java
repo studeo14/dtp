@@ -70,6 +70,8 @@ public class FrameFinder {
         var tokenList = new ArrayList<TokenInstance>();
         var literalList = new ArrayList<TokenInstance>();
         var currentNode = new FrameSearchTreeNode();
+        // make a shallow copy for safekeeping
+        List<TokenInstance> frontsideLiteralList = literalList;
         var state = FindState.BEGIN;
         while(iter.hasNext()) {
             logger.debug("STATE: {}", state);
@@ -136,6 +138,7 @@ public class FrameFinder {
                             var id = ((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId();
                             logger.debug("Leaf Child with ID: {}", id);
                             current.setId(id);
+                            current.setMiscTokens( frontsideLiteralList );
                             // check if ending on a "placeholder" token
                             if (currentNode.getTokenId().equals(Constants.LITERAL_TOKEN_ID)) {
                                 // remove earlier literal
@@ -189,6 +192,7 @@ public class FrameFinder {
                             var id = ((FrameSearchTreeLeafNode)currentNode.getChildren().get(Constants.SEARCH_TREE_LEAF_NODE_ID)).getFrameId();
                             logger.debug("Leaf Child with ID: {}", id);
                             current.setId(id);
+                            current.setMiscTokens( frontsideLiteralList );
                             // check if ending on a "placeholder" token
                             if (currentNode.getTokenId().equals(Constants.LITERAL_TOKEN_ID)) {
                                 // remove earlier literal
@@ -244,6 +248,8 @@ public class FrameFinder {
                     current.setTokensAndLiterals(tokenList);
                     return Optional.of(current);
                 }
+                default:
+                    throw new IllegalStateException( "Unexpected value: " + state );
             }
         }
         logger.debug("End On Empty.");

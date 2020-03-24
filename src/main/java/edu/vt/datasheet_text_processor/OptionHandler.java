@@ -272,6 +272,7 @@ public class OptionHandler {
                 logger.warn( s.getText() );
                 logger.warn( e.getMessage() );
                 s.getWarnings().add( new Warning( e ) );
+                s.setSemanticExpression( null );
                 repo.update( s );
             }
         }
@@ -305,6 +306,9 @@ public class OptionHandler {
             } else {
                 logger.info( "No SE for sentence {}", s.getSentenceId() );
             }
+        }
+        if (doShowIRCounts) {
+            IRFinder.showCounters();
         }
     }
 
@@ -478,6 +482,7 @@ public class OptionHandler {
                                         .map( frame -> frame.getTokens().toString() )
                                         .collect( Collectors.toList() );
                                 logger.info( "{} -> {} ({})", s.getText(), s.getSemanticExpression(), seTT );
+                                logger.info( "{} -> {} ({})", s.getText(), s.getSemanticExpression(), s.getSemanticExpression().getTokenText() );
                             }
                         }
                     }
