@@ -42,7 +42,7 @@ through
 [
 ]
 :
-is set to::are equal to||are set equal to||is equal to||is set equal to||goes to
+is set to::are set to||are equal to||are set equal to||is equal to||is set equal to||goes to
 port
 is a::is an
 has a::has an
