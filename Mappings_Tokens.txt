@@ -46,7 +46,7 @@ is set to::are set to||are equal to||are set equal to||is equal to||is set equal
 port
 is a::is an
 has a::has an
-has
+has::has been
 is::are||goes
 if
 in progress

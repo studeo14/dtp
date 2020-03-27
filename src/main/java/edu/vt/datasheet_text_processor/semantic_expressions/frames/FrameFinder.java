@@ -166,6 +166,7 @@ public class FrameFinder {
                             currentNode = currentNode.getChildren().get(currentToken.getId());
                         } else { // this means that no frame can be found here.
                             iter.previous();
+                            tokenList.add(currentToken);
                             var validOptions = currentNode.getChildren().keySet();
                             var message = String.format("No valid child found. There is supposed to be something at token #%d. Valid options: %d:%s.", iter.nextIndex(), currentNode.getTokenId(), validOptions);
                             throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
@@ -205,6 +206,7 @@ public class FrameFinder {
                         } else { // this means that no frame can be found here.
                             iter.previous();
                             var validOptions = currentNode.getChildren().keySet();
+                            tokenList.add(currentToken);
                             var message = String.format("No valid child found. There is supposed to be something at token #%d. Valid options: %d:%s.", iter.nextIndex(), currentNode.getTokenId(), validOptions);
                             throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
                         }
@@ -266,6 +268,7 @@ public class FrameFinder {
                 iter.next();
                 return Optional.empty();
             } else {
+                tokenList.add(endingToken);
                 var message = String.format("Ending semantic expression on unexpected token. Non-literal, non-punctuation: %d", endingToken.getId());
                 throw new FrameException(message, new FrameFinderContext(message, tokenList, current, currentNode));
             }

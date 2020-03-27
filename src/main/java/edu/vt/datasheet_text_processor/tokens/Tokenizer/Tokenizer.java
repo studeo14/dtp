@@ -129,7 +129,7 @@ public class Tokenizer {
                             currentSearchTreeNode = currentSearchTreeNode.getChildren().get(currentWord);
                         } else { // no option available
                             var message = String.format("Unknown token found at word %d", currentWord);
-                            throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex()));
+                            throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex(), currentSearchTreeNode));
                         }
                     } else {
                         // if has child
@@ -142,7 +142,7 @@ public class Tokenizer {
                             iter.previous();
                         } else { // no options available
                             var message = String.format("Unknown token found at word %d", currentWord);
-                            throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex()));
+                            throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex(), currentSearchTreeNode));
                         }
                     }
                     break;
@@ -182,7 +182,7 @@ public class Tokenizer {
         } else {
             var currentWord = iter.previous();
             var message = String.format("Unknown token found at end of sentence: %d", currentWord);
-            throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex()));
+            throw new TokenizerException(message, new TokenizerContext(message, currentWord, iter.previousIndex(), currentSearchTreeNode));
         }
     }
 }

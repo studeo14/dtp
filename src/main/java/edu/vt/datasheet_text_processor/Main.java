@@ -14,7 +14,6 @@ import picocli.CommandLine;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoField;
 
 class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);

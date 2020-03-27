@@ -269,7 +269,9 @@
         "stream": "has a"
     },
     "48": {
-        "aliases": [],
+        "aliases": [
+            "has been"
+        ],
         "id": 48,
         "stream": "has"
     },

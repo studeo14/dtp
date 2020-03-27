@@ -424,6 +424,8 @@ public class IRFinder {
             case 13:
             case 14:
                 return processConsequentFrame(frame, allMappings);
+            case 16:
+                return Optional.empty();
             default:
                 var message = String.format("Unknown frame %d.", frame.getId());
                 throw new IRException(message, new IRContext(message, null, frame));

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,16 @@ import java.util.stream.Collectors;
 
 public class OptionHandler {
     private static final Logger logger = LoggerFactory.getLogger( OptionHandler.class );
+
+    private static boolean warningsReset = false;
+
+    private static void resetWarnings(Sentence sentence) {
+        if (sentence.getWarnings() != null) {
+            sentence.getWarnings().clear();
+        } else {
+            sentence.setWarnings(new ArrayList<>());
+        }
+    }
 
     /**
      * Utility method for "compiling" the tokens mappings from "Raw" text format to a wordId format
@@ -162,6 +173,9 @@ public class OptionHandler {
         for ( Sentence s : documents ) {
             // do serialize
             if ( s.getType() == Sentence.Type.NONCOMMENT ) {
+                if (!warningsReset) {
+                    resetWarnings( s );
+                }
                 List< Integer > wordIds = null;
                 try {
                     wordIds = allMappings.getSerializer().serialize( s.getText(), addNew );
@@ -173,6 +187,9 @@ public class OptionHandler {
                     repo.update( s );
                 }
             }
+        }
+        if (!warningsReset) {
+            warningsReset = true;
         }
         if ( addNew ) {
             allMappings.export( mappingFile );
@@ -198,6 +215,9 @@ public class OptionHandler {
         for ( Sentence s : documents ) {
             // do serialize
             if ( s.getType() == Sentence.Type.NONCOMMENT ) {
+                if (!warningsReset) {
+                    resetWarnings( s );
+                }
                 try {
                     List< TokenInstance > tokens = allMappings.getTokenizer().tokenize( s.getWordIds(), preferShorterTokens );
                     s.setTokens( tokens );
@@ -229,6 +249,9 @@ public class OptionHandler {
             logger.info( "Normalizing Bit Accesses." );
             BitAccessNormalizer.normalizeBitAccesses( project, allMappings.getFrameFinder(), allMappings.getSerializer() );
         }
+        if (!warningsReset) {
+            warningsReset = true;
+        }
     }
 
     /**
@@ -243,6 +266,9 @@ public class OptionHandler {
         var repo = db.getRepository( Sentence.class );
         var documents = repo.find( ObjectFilters.eq( "type", Sentence.Type.NONCOMMENT ), FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
         for ( Sentence s : documents ) {
+            if (!warningsReset) {
+                resetWarnings( s );
+            }
             try {
                 var semexpr = allMappings.getSemanticParser().findSemanticExpression( s.getTokens(), allMappings.getFrameFinder(), preferShorterFrames);
                 if ( semexpr.isPresent() ) {
@@ -276,6 +302,9 @@ public class OptionHandler {
                 repo.update( s );
             }
         }
+        if (!warningsReset) {
+            warningsReset = true;
+        }
     }
 
     /**
@@ -291,6 +320,9 @@ public class OptionHandler {
         var repo = db.getRepository( Sentence.class );
         var documents = repo.find( ObjectFilters.eq( "type", Sentence.Type.NONCOMMENT ), FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
         for ( Sentence s : documents ) {
+            if (!warningsReset) {
+                resetWarnings( s );
+            }
             var se = s.getSemanticExpression();
             if ( se != null ) {
                 try {
@@ -309,6 +341,9 @@ public class OptionHandler {
         }
         if (doShowIRCounts) {
             IRFinder.showCounters();
+        }
+        if (!warningsReset) {
+            warningsReset = true;
         }
     }
 
