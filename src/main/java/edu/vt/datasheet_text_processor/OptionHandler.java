@@ -534,6 +534,24 @@ public class OptionHandler {
                             logger.info( "{} -> {}", s.getText(), s.getIr() );
                         }
                     }
+                    if ( options.debugOptions.doShowIRP ) {
+                        var db = project.getDB();
+                        var repo = db.getRepository( Sentence.class );
+                        var documents = repo.find(
+                                ObjectFilters.and(
+                                        ObjectFilters.eq( "type", Sentence.Type.NONCOMMENT )
+                                ),
+                                FindOptions.sort( "sentenceId", SortOrder.Ascending ) );
+                        var count = 0.0;
+                        var total = 0.0;
+                        for ( var s : documents ) {
+                            total += 1;
+                            if (s.getIr() != null && !s.getIr().isBlank() && !s.getIr().isEmpty()) {
+                                count += 1;
+                            }
+                        }
+                        logger.info("Total Q: {}, Q With IR: {}, %: {}%", total, count, (count/total) * 100);
+                    }
                     if (options.debugOptions.doShowAverageTokens) {
                         var db = project.getDB();
                         var repo = db.getRepository( Sentence.class );

@@ -124,6 +124,8 @@ public class Application {
         public boolean doShowSemanticExpressions;
         @Option(names = {"--show-ir"}, description = "print out the ir")
         public boolean doShowIR;
+        @Option(names = {"--show-irp"}, description = "print out the % ir")
+        public boolean doShowIRP;
         @Option(names={"--time"}, description = "show execution time")
         public boolean doShowTime;
         @Option(names={"--show-average-tokens"}, description = "show execution time")
