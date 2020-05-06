@@ -922,7 +922,6 @@
       "port": 1001050,
       "ram": 1001060,
       "3": 3000320,
-      "high": 5000240,
       "location": 1001070,
       "previously": 5000250,
       "resulting": 2000510,
@@ -2006,7 +2005,9 @@
       "without": 4001570,
       "overflowing": 4001580,
       "ie": 5001550,
-      "input": 2002160
+      "input": 2002160,
+      "axb": 1015380,
+      "high": 1015390
     }
   },
   "tokenMapping": {

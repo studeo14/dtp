@@ -105,11 +105,12 @@ public class IRFinder {
 
 
     public static String findIR(SemanticExpression se, AllMappings allMappings) throws ProcessorException {
+        logger.debug("Starting new findIR");
         // first need to determine which type of se we are dealing with
         if (se.getAntecedents().isEmpty() && !se.getConsequents().isEmpty()) {
             logger.debug("Declarative Sentence");
             declarative += 1;
-            return processDeclarative(se, allMappings);
+            return processFrames(se.getAllFrames(), allMappings);
         } else if (!se.getAntecedents().isEmpty() && !se.getConsequents().isEmpty()) {
             logger.debug( "Implicative Sentence" );
             implicative += 1;
@@ -550,7 +551,7 @@ public class IRFinder {
     private static String getPossibleDescription(List<Integer> name, List<Integer> value, AllMappings allMappings) {
         var nameS = normalizeSignalName(Serializer.mergeWords(allMappings.getSerializer().deserialize(name)));
         var valueS = Serializer.mergeWords(allMappings.getSerializer().deserialize(value));
-        ;
+        logger.debug("DESC: {}, {}", nameS, valueS);
         if (WordIdUtils.getWordIdClass(value.get(0)) == Serializer.WordIDClass.VERB) { // possible action
             descriptionAsState += 1;
             return "STATE(" + nameS + ", " + valueS + ")";
@@ -597,6 +598,7 @@ public class IRFinder {
                     case STATE:
                     {
                         stateConsequent += 1;
+                        logger.debug("State CF.");
                         sb.append("STATE(");
                         sb.append(names);
                         sb.append(", ");
@@ -607,6 +609,7 @@ public class IRFinder {
                     case MOD_STATE:
                     {
                         modConsequent += 1;
+                        logger.debug("Mod State CF.");
                         List<String> descsL = new LinkedList<>(Arrays.asList(descs.split(" ")));
                         String descMod = descsL.remove(0);
                         var descsRest = String.join(" ", descsL);
@@ -620,6 +623,7 @@ public class IRFinder {
                         return Optional.of(sb.toString());
                     }
                     case DESC:
+                        logger.debug("Desc CF.");
                         descriptionConsequent += 1;
                         return Optional.of(getPossibleDescription(name, desc, allMappings));
                     case NONE:
