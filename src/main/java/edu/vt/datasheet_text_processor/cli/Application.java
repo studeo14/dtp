@@ -124,7 +124,7 @@ public class Application {
         public boolean doShowSemanticExpressions;
         @Option(names = {"--show-ir"}, description = "print out the ir")
         public boolean doShowIR;
-        @Option(names = {"--show-irp"}, description = "print out the % ir")
+        @Option(names = {"--show-irp"}, description = "print out the %% ir")
         public boolean doShowIRP;
         @Option(names={"--time"}, description = "show execution time")
         public boolean doShowTime;
