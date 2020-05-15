@@ -69,6 +69,8 @@ public class Application {
     public static class IROptions {
         @Option(names={"-i", "--get-ir"}, description = "find the IR of the semantic expressiosn")
         public boolean doGetIr;
+        @Option(names={"--reset-metrics"}, description = "reset metric counter in db")
+        public boolean doResetMetrics;
     }
 
     // experimental optimizations ect (all off by default)
@@ -132,6 +134,8 @@ public class Application {
         public boolean doShowAverageTokens;
         @Option(names={"--show-average-frames"}, description = "show execution time")
         public boolean doShowAverageFrames;
+        @Option(names={"--show-metrics"}, description = "show stored metrics")
+        public boolean doShowMetrics;
     }
 
     @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")

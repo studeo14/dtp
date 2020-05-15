@@ -7,6 +7,7 @@ import edu.vt.datasheet_text_processor.Errors.Context.IRPropertyContext;
 import edu.vt.datasheet_text_processor.Errors.FrameException;
 import edu.vt.datasheet_text_processor.Errors.IRException;
 import edu.vt.datasheet_text_processor.Errors.ProcessorException;
+import edu.vt.datasheet_text_processor.Project;
 import edu.vt.datasheet_text_processor.input.AllMappings;
 import edu.vt.datasheet_text_processor.semantic_expressions.frames.FrameInstance;
 import edu.vt.datasheet_text_processor.semantic_expressions.processor.SemanticExpression;
@@ -15,7 +16,7 @@ import edu.vt.datasheet_text_processor.tokens.TokenInstance.TokenInstance;
 import edu.vt.datasheet_text_processor.util.Constants;
 import edu.vt.datasheet_text_processor.wordid.Serializer;
 import edu.vt.datasheet_text_processor.wordid.WordIdUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import org.dizitart.no2.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,40 +32,40 @@ import java.util.stream.Stream;
  */
 public class IRFinder {
     private final static Logger logger = LoggerFactory.getLogger(IRFinder.class);
-    private static int declarative = 0;
-    private static int implicative = 0;
-    private static int modifier = 0;
-    private static int invalidInput = 0;
-    private static int compoundAfterNone;
-    private static int compoundAfterA;
-    private static int compoundAfterC;
-    private static int compoundWithValidFrame;
-    private static int compoundWithoutValidFrame;
-    private static int invalidCompound;
-    private static int singluarCompound;
-    private static int genericCompound;
-    private static int compoundWithFactoring;
-    private static int invalidTemporal;
-    private static int genericTemporal;
-    private static int eventAntecedent;
-    private static int logicHighAntecedent;
-    private static int logicLowAntecedent;
-    private static int valueAntecedent;
-    private static int recursiveTemporal;
-    private static int literalTemporal;
-    private static int then;
-    private static int actionAsState;
-    private static int actionAsValue;
-    private static int descriptionAsState;
-    private static int descriptionAsValue;
-    private static int descriptionAsDescription;
-    private static int stateConsequent;
-    private static int modConsequent;
-    private static int descriptionConsequent;
-    private static int propertyConsequent;
-    private static int propertyAsState;
-    private static int propertyAsProperty;
-    private static int normalizedSignalName;
+    private static Double declarative = 0.0;
+    private static Double implicative = 0.0;
+    private static Double modifier = 0.0;
+    private static Double invalidInput = 0.0;
+    private static Double compoundAfterNone = 0.0;
+    private static Double compoundAfterA = 0.0;
+    private static Double compoundAfterC = 0.0;
+    private static Double compoundWithValidFrame = 0.0;
+    private static Double compoundWithoutValidFrame = 0.0;
+    private static Double invalidCompound = 0.0;
+    private static Double singluarCompound = 0.0;
+    private static Double genericCompound = 0.0;
+    private static Double compoundWithFactoring = 0.0;
+    private static Double invalidTemporal = 0.0;
+    private static Double genericTemporal = 0.0;
+    private static Double eventAntecedent = 0.0;
+    private static Double logicHighAntecedent = 0.0;
+    private static Double logicLowAntecedent = 0.0;
+    private static Double valueAntecedent = 0.0;
+    private static Double recursiveTemporal = 0.0;
+    private static Double literalTemporal = 0.0;
+    private static Double then = 0.0;
+    private static Double actionAsState = 0.0;
+    private static Double actionAsValue = 0.0;
+    private static Double descriptionAsState = 0.0;
+    private static Double descriptionAsValue = 0.0;
+    private static Double descriptionAsDescription = 0.0;
+    private static Double stateConsequent = 0.0;
+    private static Double modConsequent = 0.0;
+    private static Double descriptionConsequent = 0.0;
+    private static Double propertyConsequent = 0.0;
+    private static Double propertyAsState = 0.0;
+    private static Double propertyAsProperty = 0.0;
+    private static Double normalizedSignalName = 0.0;
 
     public static void showCounters() {
         logger.info("{} declarative", declarative);
@@ -103,6 +104,152 @@ public class IRFinder {
         logger.info("{} normalizedSignalName", normalizedSignalName);
     }
 
+    public static String[] metricNames = {
+            "declarative",
+            "implicative",
+            "modifier",
+            "invalidInput",
+            "compoundAfterNone",
+            "compoundAfterA",
+            "compoundAfterC",
+            "compoundWithValidFrame",
+            "compoundWithoutValidFrame",
+            "invalidCompound",
+            "singluarCompound",
+            "genericCompound",
+            "compoundWithFactoring",
+            "invalidTemporal",
+            "genericTemporal",
+            "eventAntecedent",
+            "logicHighAntecedent",
+            "logicLowAntecedent",
+            "valueAntecedent",
+            "recursiveTemporal",
+            "literalTemporal",
+            "then",
+            "actionAsState",
+            "actionAsValue",
+            "descriptionAsState",
+            "descriptionAsValue",
+            "descriptionAsDescription",
+            "stateConsequent",
+            "modConsequent",
+            "descriptionConsequent",
+            "propertyConsequent",
+            "propertyAsState",
+            "propertyAsProperty",
+            "normalizedSignalName"
+    };
+
+    private static Document metricsToDocument(Project project) {
+        var metric = project.getMetric("currentIrMetric");
+        if (metric.isPresent()) {
+            var doc = metric.get();
+            doc.put("declarative", declarative)
+                    .put("implicative", implicative)
+                    .put("modifier", modifier)
+                    .put("invalidInput", invalidInput)
+                    .put("compoundAfterNone", compoundAfterNone)
+                    .put("compoundAfterA", compoundAfterA)
+                    .put("compoundAfterC", compoundAfterC)
+                    .put("compoundWithValidFrame", compoundWithValidFrame)
+                    .put("compoundWithoutValidFrame", compoundWithoutValidFrame)
+                    .put("invalidCompound", invalidCompound)
+                    .put("singluarCompound", singluarCompound)
+                    .put("genericCompound", genericCompound)
+                    .put("compoundWithFactoring", compoundWithFactoring)
+                    .put("invalidTemporal", invalidTemporal)
+                    .put("genericTemporal", genericTemporal)
+                    .put("eventAntecedent", eventAntecedent)
+                    .put("logicHighAntecedent", logicHighAntecedent)
+                    .put("logicLowAntecedent", logicLowAntecedent)
+                    .put("valueAntecedent", valueAntecedent)
+                    .put("recursiveTemporal", recursiveTemporal)
+                    .put("literalTemporal", literalTemporal)
+                    .put("then", then)
+                    .put("actionAsState", actionAsState)
+                    .put("actionAsValue", actionAsValue)
+                    .put("descriptionAsState", descriptionAsState)
+                    .put("descriptionAsValue", descriptionAsValue)
+                    .put("descriptionAsDescription", descriptionAsDescription)
+                    .put("stateConsequent", stateConsequent)
+                    .put("modConsequent", modConsequent)
+                    .put("descriptionConsequent", descriptionConsequent)
+                    .put("propertyConsequent", propertyConsequent)
+                    .put("propertyAsState", propertyAsState)
+                    .put("propertyAsProperty", propertyAsProperty)
+                    .put("normalizedSignalName", normalizedSignalName);
+            return doc;
+        } else {
+            return Document.createDocument("name", "currentIrMetrics")
+                    .put("declarative", declarative)
+                    .put("implicative", implicative)
+                    .put("modifier", modifier)
+                    .put("invalidInput", invalidInput)
+                    .put("compoundAfterNone", compoundAfterNone)
+                    .put("compoundAfterA", compoundAfterA)
+                    .put("compoundAfterC", compoundAfterC)
+                    .put("compoundWithValidFrame", compoundWithValidFrame)
+                    .put("compoundWithoutValidFrame", compoundWithoutValidFrame)
+                    .put("invalidCompound", invalidCompound)
+                    .put("singluarCompound", singluarCompound)
+                    .put("genericCompound", genericCompound)
+                    .put("compoundWithFactoring", compoundWithFactoring)
+                    .put("invalidTemporal", invalidTemporal)
+                    .put("genericTemporal", genericTemporal)
+                    .put("eventAntecedent", eventAntecedent)
+                    .put("logicHighAntecedent", logicHighAntecedent)
+                    .put("logicLowAntecedent", logicLowAntecedent)
+                    .put("valueAntecedent", valueAntecedent)
+                    .put("recursiveTemporal", recursiveTemporal)
+                    .put("literalTemporal", literalTemporal)
+                    .put("then", then)
+                    .put("actionAsState", actionAsState)
+                    .put("actionAsValue", actionAsValue)
+                    .put("descriptionAsState", descriptionAsState)
+                    .put("descriptionAsValue", descriptionAsValue)
+                    .put("descriptionAsDescription", descriptionAsDescription)
+                    .put("stateConsequent", stateConsequent)
+                    .put("modConsequent", modConsequent)
+                    .put("descriptionConsequent", descriptionConsequent)
+                    .put("propertyConsequent", propertyConsequent)
+                    .put("propertyAsState", propertyAsState)
+                    .put("propertyAsProperty", propertyAsProperty)
+                    .put("normalizedSignalName", normalizedSignalName);
+        }
+    }
+
+    public static void addCountersToProject(Project project) {
+        // update current metrics
+        var currentMetrics = metricsToDocument(project);
+        project.updateMetric("currentIrMetrics", currentMetrics, true);
+        // need to update average
+        var avgMetrics = project.getMetric("avgIrMetrics");
+        if (avgMetrics.isPresent()) {
+            var avgMetricsDoc = avgMetrics.get();
+            var count = (Double) avgMetricsDoc.get("count");
+            for (var key: metricNames) {
+                // get old and new metrics value
+                logger.debug("{}, {}", count, key);
+                var orig = (Double) avgMetricsDoc.get(key);
+                var newValue = (Double) currentMetrics.get(key);
+                // get cumulative mean
+                logger.debug("{}, {}", orig, newValue);
+                newValue = (newValue + (count * orig)) / (count + 1);
+                // update
+                avgMetricsDoc.put(key, newValue);
+            }
+            // update count
+            avgMetricsDoc.put("count", count + 1);
+            // update db
+            project.updateMetric("avgIrMetrics", avgMetricsDoc);
+        } else { // need to create
+            var newAverage = metricsToDocument(project);
+            newAverage.put("name", "avgIrMetrics");
+            newAverage.put("count", 1.0);
+            project.addMetric(newAverage, false);
+        }
+    }
 
     public static String findIR(SemanticExpression se, AllMappings allMappings) throws ProcessorException {
         logger.debug("Starting new findIR");

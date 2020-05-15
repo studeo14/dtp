@@ -339,6 +339,7 @@ public class OptionHandler {
                 logger.info( "No SE for sentence {}", s.getSentenceId() );
             }
         }
+        IRFinder.addCountersToProject(project);
         if (doShowIRCounts) {
             IRFinder.showCounters();
         }
@@ -394,6 +395,10 @@ public class OptionHandler {
                     }
                 }
                 if ( options.irOptions != null ) {
+                    if (options.irOptions.doResetMetrics) {
+                        project.removeMetric("avgIrMetrics");
+                        project.removeMetric("currentIrMetrics");
+                    }
                     if ( options.irOptions.doGetIr ) {
                         processIR( project, allMappings, options.experimentalOptions.doShowIRCounts );
                     }
@@ -593,11 +598,16 @@ public class OptionHandler {
                                 .average();
                         logger.info("Average number of frames: All: {}, Antecedents: {}, Consequents: {}", avgAll, avgA, avgC);
                     }
+                    if (options.debugOptions.doShowMetrics) {
+                        var metrics = project.getMetrics();
+                        for (var metric: metrics) {
+                            for (var kvp: metric) {
+                                logger.info("Value: {} :: {}", kvp.getKey(), kvp.getValue());
+                            }
+                        }
+                    }
                 }
-                if ( project.getDB().hasUnsavedChanges() ) {
-                    project.getDB().commit();
-                }
-                project.getDB().close();
+                project.close();
             }
         }
     }
