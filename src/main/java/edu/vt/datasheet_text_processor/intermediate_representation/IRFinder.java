@@ -219,6 +219,10 @@ public class IRFinder {
         }
     }
 
+    /**
+     * Updates the metrics database with the current metrics counters. Updated average and current counts.
+     * @param project
+     */
     public static void addCountersToProject(Project project) {
         // update current metrics
         var currentMetrics = metricsToDocument(project);
@@ -247,10 +251,17 @@ public class IRFinder {
             var newAverage = metricsToDocument(project);
             newAverage.put("name", "avgIrMetrics");
             newAverage.put("count", 1.0);
-            project.addMetric(newAverage, false);
+            project.addMetric(newAverage);
         }
     }
 
+    /**
+     * Attempts to find the IR for a given SemanticExpression.
+     * @param se
+     * @param allMappings
+     * @return IR for the SE.
+     * @throws ProcessorException if an error is encountered or a malformed se is given.
+     */
     public static String findIR(SemanticExpression se, AllMappings allMappings) throws ProcessorException {
         logger.debug("Starting new findIR");
         // first need to determine which type of se we are dealing with
@@ -275,12 +286,22 @@ public class IRFinder {
     }
 
     private enum PREVIOUS_FRAME {NONE, A, C};
+
+    /**
+     * Processes a group of frames.
+     * @param frames from an SE.
+     * @param allMappings
+     * @return IR for the group
+     * @throws IRException
+     * @throws FrameException
+     */
     private static String processFrames(List<FrameInstance> frames, AllMappings allMappings) throws IRException, FrameException {
         logger.debug("Processing frames");
         // separate frames into proper antecedents and consequents
         List<FrameInstance> antecedents = new ArrayList<>();
         List<FrameInstance> consequents = new ArrayList<>();
         PREVIOUS_FRAME previous_frame = PREVIOUS_FRAME.NONE;
+        // group frames into categories
         for (var frame : frames) {
             var id = frame.getId();
             if (allMappings.getSemanticModel().getAntecedents().contains(id)) {
@@ -298,7 +319,7 @@ public class IRFinder {
                         // if can be factored then process
                         // if not then this is an error
                         if (frame.getMiscTokens() != null && !frame.getMiscTokens().isEmpty()) {
-                            var compoundRes = processCompound( frame, allMappings, frames );
+                            var compoundRes = processCompound( frame, allMappings);
                             if (compoundRes.isPresent()) {
                                 return compoundRes.get();
                             } else {
@@ -332,6 +353,14 @@ public class IRFinder {
         return sb.toString();
     }
 
+    /**
+     * Process a single frame group and wraps it in brackets.
+     * @param frameGroup
+     * @param allMappings
+     * @return
+     * @throws IRException
+     * @throws FrameException
+     */
     private static String processFrameGroup(List<FrameInstance> frameGroup, AllMappings allMappings) throws IRException, FrameException {
         var res = process(frameGroup, allMappings);
         return res.map(s -> "(" + s + ")").orElse("");
@@ -339,23 +368,32 @@ public class IRFinder {
 
     public enum COMPOUND_PROCESS_STATE {IDENTIFY, ADD_NORMAL, ADD_COMPOUND, ADD_TEMPORAL, END}
 
-    private static Optional<String> process(List<FrameInstance> antecedents, AllMappings allMappings) throws IRException, FrameException {
-        var antecedentIter = antecedents.listIterator();
+    /**
+     * State machine that consumes and processes each frame into IR. Then combines, refactors, and interprets the individual IR
+     * segments into a single IR statement for the frame group.
+     * @param frameGroupFrames
+     * @param allMappings
+     * @return
+     * @throws IRException
+     * @throws FrameException
+     */
+    private static Optional<String> process(List<FrameInstance> frameGroupFrames, AllMappings allMappings) throws IRException, FrameException {
+        var frameGroupFramesIter = frameGroupFrames.listIterator();
         COMPOUND_PROCESS_STATE state = COMPOUND_PROCESS_STATE.IDENTIFY;
         List<String> irTokens = new ArrayList<>();
         FrameInstance currentFrame = null;
-        logger.debug("Begin compound. {}", antecedents.stream().map(FrameInstance::getId).collect(Collectors.toList()));
+        logger.debug("Begin compound. {}", frameGroupFrames.stream().map(FrameInstance::getId).collect(Collectors.toList()));
         var flag = true;
         while(flag) {
             logger.debug("STATE: {}", state);
             switch (state) {
                 case IDENTIFY:
                 {
-                    if (!antecedentIter.hasNext()) {
+                    if (!frameGroupFramesIter.hasNext()) {
                         state = COMPOUND_PROCESS_STATE.END;
                         break;
                     }
-                    currentFrame = antecedentIter.next();
+                    currentFrame = frameGroupFramesIter.next();
                     if (currentFrame == null) {
                         state = COMPOUND_PROCESS_STATE.END;
                         break;
@@ -376,7 +414,7 @@ public class IRFinder {
                     if (irTokens.isEmpty()) {
                         var message = "Found compound frame at the beginning of antecedents.";
                         invalidCompound += 1;
-                        throw new IRException(message, new IRCompoundContext(message, currentFrame, antecedents));
+                        throw new IRException(message, new IRCompoundContext(message, currentFrame, frameGroupFrames));
                     } else {
                         logger.debug("Not First");
                         // check type of compound
@@ -385,7 +423,7 @@ public class IRFinder {
                             irTokens.add(compoundOperator( currentFrame.getTokens().get(0) ));
                         } else {
                             genericCompound += 1;
-                            var compundFrameRes = processCompound( currentFrame, allMappings, antecedents );
+                            var compundFrameRes = processCompound( currentFrame, allMappings);
                             // if failed to find a valid frame in the compound (action)
                             if (compundFrameRes.isEmpty()) { // if failed
                                 compoundWithoutValidFrame += 1;
@@ -393,10 +431,10 @@ public class IRFinder {
                                 // else
                                 // add back to previous if it ended in a literal
                                 // remove compound frame from iter
-                                antecedentIter.previous();
-                                antecedentIter.remove();
+                                frameGroupFramesIter.previous();
+                                frameGroupFramesIter.remove();
                                 // get previous frame
-                                var previousFrame = antecedentIter.previous();
+                                var previousFrame = frameGroupFramesIter.previous();
                                 logger.debug("Add to previous literal frame: {}", previousFrame.getId());
                                 // get tokens and ending token
                                 var previousFrameTokens = previousFrame.getTokens();
@@ -448,7 +486,7 @@ public class IRFinder {
                     if (irTokens.isEmpty()) {
                         invalidTemporal += 1;
                         var message = "Found temporal frame at the beginning of antecedents.";
-                        throw new IRException(message, new IRCompoundContext(message, currentFrame, antecedents));
+                        throw new IRException(message, new IRCompoundContext(message, currentFrame, frameGroupFrames));
                     } else {
                         logger.debug("Not First");
                         genericTemporal += 1;
@@ -486,7 +524,14 @@ public class IRFinder {
         }
     }
 
-    private static Optional< String > processCompound ( FrameInstance compoundFrame, AllMappings allMappings, List< FrameInstance > antecedents ) throws IRException {
+    /**
+     * Helper method to handle the recursive/factoring logic for compound frames.
+     * @param compoundFrame
+     * @param allMappings
+     * @return
+     * @throws IRException
+     */
+    private static Optional< String > processCompound(FrameInstance compoundFrame, AllMappings allMappings) throws IRException {
         var frameFailed = true;
         var sb = new StringBuilder();
         try {
